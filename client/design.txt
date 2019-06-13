@@ -1,0 +1,55 @@
+SavedText data structure:
+  { phrases, history }
+Data:
+  Export / import format
+  myphrases.txt is default file name for export
+  Each phrase gets its own line
+  Each line format: [tag, tag,... ] {weight} Phrase, where [] {}  are delimiters
+    Lines starting with # are comment line, will be stripped on import
+    Blank lines are ignored, will be stripped on import
+    White space before and after phrase will be stripped on import
+    At least one tag is recommended; otherwise, text will only appear in history
+    weight is optional, range from 0-9=highest, default=0
+  Software provides a default set of tagged phrases
+  Ui allows
+    download of all
+    upload and merge
+    upload and replace
+  Internal data format:
+    [{[tags], weight, phase, lastused, [usagetimestamps], created}]
+    Persisted both on server and localStorage, with a timestamp for last saved.
+    For performance, at initialization time, create a cache that is indexed by individual tags
+    For reliability, only allow changes through an API
+      https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures#Emulating_private_methods_with_closures
+      Exported API: phrases.{addTag(text,tag,weight),use(tx),removeTag(tx,tg),setWeight(tx)}
+UI:
+  Speech text control: editable text area (auto-grows), plus speak+clear, speak, clear buttons
+    https://github.com/JonKFerraiolo/BPLearn/blob/master/client/util/resizeableTextarea.js
+  Second row:
+    Search, filters tags and saved text, with x for clear
+    List of current tags, separated by "and" or "or"
+      Clicking on (x) next to a tag removes it from list
+    clear all tags button
+    toggle and-vs-or button
+  Phrases on left, Tags on right
+    Phrases
+      List of saved text strings (history or myphrases)
+      If no tags selected, shows history
+      Else, scrolling list of phrases matching tags, sorted by weight & #timesused
+      Each text is a horizontal control
+        Text (press means replace speech text, speak, clear speech text)
+        Badge showing number of times used
+        Weight (used for sorting)
+          Click this and popup appears with buttons for 1=highest to 9=default, close by click away
+        Speak it now
+        Add to speech text
+        Delete from history (are you sure prompt)
+        Add tag ( cursor changes )
+    History
+      Groupings
+        Moments ago
+        Today
+        This week
+        Distant past
+    Tags
+      2D list of buttons with tag as label for button, alphabetically
