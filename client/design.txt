@@ -1,5 +1,16 @@
 SavedText data structure:
   { phrases, history }
+Application state
+  phrases ( hidden by clkk)
+  text (get/set)
+  activeTags [strings]
+  andVsOr
+  activeView
+    showPhrasesAndTags
+    addTagToPhrase(phrase)
+    setWeightOnPhrase(phrase)
+    download, upload
+    settings
 Data:
   Export / import format
   myphrases.txt is default file name for export
@@ -16,7 +27,7 @@ Data:
     upload and merge
     upload and replace
   Internal data format:
-    [{[tags], weight, phase, lastused, [usagetimestamps], created}]
+    [{[tags], weight, phrase, lastused, [usagetimestamps], created}]
     Persisted both on server and localStorage, with a timestamp for last saved.
     For performance, at initialization time, create a cache that is indexed by individual tags
     For reliability, only allow changes through an API

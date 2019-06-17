@@ -1,11 +1,9 @@
 
 import { SavedTextControl } from './SavedTextControl.js'
-const { wire } = hyperHTML;
+import { html } from 'https://unpkg.com/lit-html?module';
 
 export function SavedTextContainer(text) {
   let obj = { text };
-  //return wire()`
-  //<div class=SavedTextContainer>${obj.text}</div>`;
-  return wire()`
+  return html`
   <div class=SavedTextContainer>${SavedTextControl(obj.text)}</div>`;
 }
