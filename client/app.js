@@ -35,7 +35,7 @@ window.onload = function() {
 		// Don't show settings for the time being.
 		// Will make into a popup
 		const props = Object.assign({}, state.settings);
-		render(Settings(props), document.getElementById('root'));
+		// render(Settings(props), document.getElementById('root'));
 	}
 
 	var button = document.getElementById('speak');
