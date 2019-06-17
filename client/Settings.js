@@ -2,22 +2,22 @@
 import { html } from 'https://unpkg.com/lit-html?module';
 
 export function Settings(props) {
-  let { voices, setVoice } = props;
-  let voice = props.voice || voices[0];
+  let { voiceNames, setVoiceName } = props;
+  let voiceName = props.voice || voiceNames[0];
   let onChangeVoice = e => {
     e.preventDefault();
-    setVoice(voices.find(v => v.name === e.target.value));
+    setVoiceName(voiceNames.find(voiceName => voiceName === e.target.value));
   }
   let voiceOptionElements = html`${
-    voices.map(
-      v =>
-      html`<option value=${v.name}>${v.name}</option>}`
+    voiceNames.map(
+      name =>
+      html`<option value=${name}>${name}</option>}`
     )
   }`
   return html`
   <div class="option">
     <label for="voice">Voice</label>
-    <select name="voice" id="voice" value=${voice.name} @change=${onChangeVoice}>
+    <select name="voice" id="voice" value=${voiceName} @change=${onChangeVoice}>
       ${voiceOptionElements}
     </select>
   </div>
