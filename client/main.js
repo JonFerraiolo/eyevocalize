@@ -34,20 +34,6 @@ input[type="text"] {
   box-shadow: 0 2px 3px rgba(0,0,0,0.1) inset;
 }
 
-input[type="range"] {
-  width: 300px;
-}
-
-label {
-  display: inline-block;
-  float: left;
-  width: 150px;
-}
-
-.option {
-  margin: 1em 0;
-}
-
 button {
   display: inline-block;
   border-radius: 3px;
@@ -96,7 +82,7 @@ export function main(props) {
 		// Don't show settings for the time being.
 		// Will make into a popup
 		const props = Object.assign({}, state.settings);
-		//render(Settings(props), document.getElementById('root'));
+		render(Settings(props), document.getElementById('root'));
 	}
 
 	// Create a new utterance for the specified text and add it to

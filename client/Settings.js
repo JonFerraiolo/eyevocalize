@@ -1,6 +1,22 @@
 
 import { html } from 'https://unpkg.com/lit-html?module';
 
+let css = `
+input[type="range"] {
+  width: 300px;
+}
+
+label {
+  display: inline-block;
+  float: left;
+  width: 150px;
+}
+
+.option {
+  margin: 1em 0;
+}
+`;
+
 export function Settings(props) {
   let { voiceNames, setVoiceName } = props;
   let voiceName = props.voice || voiceNames[0];
@@ -15,6 +31,7 @@ export function Settings(props) {
     )
   }`
   return html`
+  <style>${css}</style>
   <div class="option">
     <label for="voice">Voice</label>
     <select name="voice" id="voice" value=${voiceName} @change=${onChangeVoice}>
