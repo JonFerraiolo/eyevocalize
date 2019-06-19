@@ -1,4 +1,5 @@
-import { SavedTextControl } from './SavedTextControl.js';
+
+import { TextEntryRow, TextEntryRowSetFocus } from './TextEntryRow.js';
 import { Settings } from './Settings.js';
 import { html, render } from 'https://unpkg.com/lit-html?module';
 
@@ -23,41 +24,6 @@ html {
 
 .nospeechsupport {
   font-size: 2em;
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 0.5em;
-  font-size: 1.2em;
-  border-radius: 3px;
-  border: 1px solid #D9D9D9;
-  box-shadow: 0 2px 3px rgba(0,0,0,0.1) inset;
-}
-
-button {
-  display: inline-block;
-  border-radius: 3px;
-  border: none;
-  font-size: 0.9rem;
-  padding: 0.5rem 0.8em;
-  background: #69c773;
-  border-bottom: 1px solid #498b50;
-  color: white;
-  -webkit-font-smoothing: antialiased;
-  font-weight: bold;
-  margin: 0;
-  width: 100%;
-  text-align: center;
-}
-
-button:hover, button:focus {
-  opacity: 0.75;
-  cursor: pointer;
-}
-
-button:active {
-  opacity: 1;
-  box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1) inset;
 }
 `;
 
@@ -87,8 +53,7 @@ export function main(props) {
 
 	// Create a new utterance for the specified text and add it to
 	// the queue.
-	function speak() {
-		let text = document.getElementById('speech-msg').value;
+	function speak(text) {
 		if (text.length > 0) {
 			let voice = voices.find(v => {
 				return v.name === state.settings.voiceName;
@@ -110,16 +75,18 @@ export function main(props) {
 		}
 	}
 
+	let TextEntryRowProps = {
+		initialText: '',
+		speak
+	};
+
 	render(html`
 		<style>${css}</style>
 		<div class=main>
+			${TextEntryRow(TextEntryRowProps)}
 			<div id="root"></div>
-			<div>
-				<input type="text" name="speech-msg" id="speech-msg" x-webkit-speech />
-			</div>
-			<div id="SavedText"></div>
-			<button @click=${speak}>Speak</button>
 		</div>
 	`, document.body);
 
+	TextEntryRowSetFocus();
 }
