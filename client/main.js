@@ -3,6 +3,7 @@ import { TextEntryRow, TextEntryRowSetFocus } from './TextEntryRow.js';
 import { Settings } from './Settings.js';
 import { DefaultPhrases } from './DefaultPhrases.js';
 import { BuildPhrases } from './BuildPhrases.js';
+import { PhrasesAndTags } from './PhrasesAndTags.js';
 import { html, render } from 'https://unpkg.com/lit-html?module';
 
 let css = `
@@ -11,19 +12,24 @@ let css = `
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-
 html {
   font-family: Helvetica, Arial, sans-serif;
   background: #222;
 }
-
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
 .main {
-  width: 500px;
-  margin: 10px auto;
+  width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
   padding: 1em;
   background: #FFFFFF;
 }
-
 .nospeechsupport {
   font-size: 2em;
 }
@@ -84,12 +90,13 @@ export function main(props) {
 		initialText: '',
 		speak
 	};
+	let PhrasesAndTagsProps = { phrases, speak };
 
 	render(html`
 		<style>${css}</style>
 		<div class=main>
 			${TextEntryRow(TextEntryRowProps)}
-			<div id="root"></div>
+			${PhrasesAndTags(PhrasesAndTagsProps)}
 		</div>
 	`, document.body);
 

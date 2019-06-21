@@ -17,7 +17,7 @@ let css = `
   border-radius: 3px;
   border: 1px solid #D9D9D9;
 }
-button {
+.TextEntryRow button {
   height: 4em;
   display: inline-flex;
   align-items: center;
@@ -31,10 +31,10 @@ button {
   font-weight: bold;
   text-align: center;
 }
-button:hover, button:focus {
+.TextEntryRow button:hover, .TextEntryRow button:focus {
   cursor: pointer;
 }
-button:active {
+.TextEntryRow button:active {
   box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1) inset;
 }
 `;

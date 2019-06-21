@@ -1,4 +1,20 @@
 export const DefaultPhrases = `
+Please come here
+I need help
+Can I have air?
+Pepe, no bark
+Hello
+How are you?
+That's good
+A little more
+What time is it?
+Time for nebulizer and feeding
+Take me to the toilet, please
+Please hurry!
+No hurry
+`;
+
+const TestPhrases = `
 # A comment
 
 [help] Please come here
