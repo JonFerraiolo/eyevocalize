@@ -1,6 +1,8 @@
 
 import { TextEntryRow, TextEntryRowSetFocus } from './TextEntryRow.js';
 import { Settings } from './Settings.js';
+import { DefaultPhrases } from './DefaultPhrases.js';
+import { BuildPhrases } from './BuildPhrases.js';
 import { html, render } from 'https://unpkg.com/lit-html?module';
 
 let css = `
@@ -27,6 +29,8 @@ html {
 }
 `;
 
+let phrases = BuildPhrases(DefaultPhrases);
+
 export function main(props) {
 	let { voices } = props;
 	// render(SavedTextControl('hello'), document.getElementById('SavedText'));
@@ -41,7 +45,8 @@ export function main(props) {
 				state.settings.voiceName = voiceName;
 				showSettings();
 			}
-		}
+		},
+		phrases
 	};
 
 	let showSettings = () => {
