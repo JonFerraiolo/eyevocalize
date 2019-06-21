@@ -6,6 +6,7 @@ let css = `
   padding: 0.25em;
   display: flex;
   align-items: center;
+  flex: 0;
 }
 .TextEntryRow > * {
 }
