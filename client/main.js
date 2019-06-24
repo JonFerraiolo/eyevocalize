@@ -38,17 +38,17 @@ body {
 
 let HistoryString = localStorage.getItem("History") || [];
 let History = (typeof HistoryString === 'string') ? JSON.parse(HistoryString) : [];
-
-const FavoritesString = `
-Please come and help me
-Can I have air?
-Time for nebulizer and feeding
-Take me to the toilet, please
-Can I please go to my bed?
-Please hurry!
-No hurry
-`;
-let Favorites = FavoritesString.trim().split('\n').map(s => { return { text: s }; } );
+let Favorites = [
+	{ label: 'help', text: 'Please come and help me'},
+	{ label: 'air', text: 'Can I have air?'},
+	{ label: 'nebulizer', text: 'Time for nebulizer and feeding'},
+	{ label: 'toilet', text: 'Take me to the toilet, please'},
+	{ label: 'urinal', text: 'can I please use the urinal'},
+	{ label: 'bed', text: 'Can I please go to my bed?'},
+	{ label: 'hurry', text: 'Please hurry!'},
+	{ label: 'no rush', text: 'Take your time. Not urgent'},
+	{ label: 'Pepe', text: 'Can someone please help Pehpay? '}
+];
 
 export function main(props) {
 	let { voices } = props;

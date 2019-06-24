@@ -27,6 +27,9 @@ let css = `
   display: flex;
   padding: 0 5em;
 }
+.FavoriteContainer {
+  display: inline-block;
+}
 .Favorites button {
   display: inline-block;
   flex: 1;
@@ -67,7 +70,7 @@ export function Phrases(props) {
     <div class=Favorites>
       <div class=PhrasesSectionLabel>Favorites</div>
       ${Favorites.map(phrase => html`
-        <div class=PhraseRow>
+        <div class=FavoriteContainer>
           <button @click=${onSpeak} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
         </div>
       `)}
