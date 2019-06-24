@@ -66,12 +66,18 @@ export function main(props) {
 			}
 		},
 		History,
-		Favorites
+		Favorites,
+		currentText: ''
 	};
 
 	let addToHistory = (text, type) => {
 		History.unshift({ text, type, timestamp: new Date() });
 		localStorage.setItem("History", JSON.stringify(History));
+		update();
+	}
+
+	let onTextChange = (text) => {
+		state.currentText = text;
 		update();
 	}
 
@@ -113,10 +119,9 @@ export function main(props) {
 		}
 	}
 
-	let TextEntryRowProps = { initialText: '', speak, stash };
-	let PhrasesProps = { History, Favorites, speak };
-
 	let update = () => {
+		let TextEntryRowProps = { initialText: '', speak, stash, onTextChange };
+		let PhrasesProps = { History, Favorites, speak, filterString: state.currentText};
 		render(html`
 			<style>${css}</style>
 			<div class=main>

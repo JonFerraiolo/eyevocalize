@@ -41,7 +41,7 @@ let css = `
 `;
 
 export function TextEntryRow(props) {
-  let { speak, stash } = props;
+  let { speak, stash, onTextChange } = props;
   let text = props.initialText || '';
   let onKeyDown = e => {
     if (e.key === 'Enter') {
@@ -60,6 +60,9 @@ export function TextEntryRow(props) {
     } else {
       // just pass through to default processing, which will add the character
     }
+  }
+  let onInput = e => {
+    onTextChange(document.getElementById('TextEntryRowTextArea').value);
   }
   let onSpeak = () => {
     let text = document.getElementById('TextEntryRowTextArea').value;
@@ -83,7 +86,7 @@ export function TextEntryRow(props) {
   <style>${css} </style>
   <div class=TextEntryRow>
     <label class=TextEntryLabel for=TextEntryRowTextArea>Compose:</label
-    ><textarea value=text id=TextEntryRowTextArea @keydown=${onKeyDown}></textarea
+    ><textarea value=text id=TextEntryRowTextArea @keydown=${onKeyDown} @input=${onInput}></textarea
     ><button class=TextEntrySpeak @click=${onSpeak}>Speak</button
     ><button class=TextEntrySpeak @click=${onStashAndClear}>Stash</button
     ><button class=TextEntryClear @click=${onClear}>Clear</button>

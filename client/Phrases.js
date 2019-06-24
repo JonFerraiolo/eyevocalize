@@ -52,7 +52,10 @@ let css = `
 `;
 
 export function Phrases(props) {
-  let { speak, History, Favorites } = props;
+  let { speak, History, Favorites, filterString } = props;
+  let filters = (typeof filterString  === 'string') ?
+    filterString.toLowerCase().replace(/\s+/g, '').trim().split(' ') :
+    [];
   let onSpeak = e => {
     speak(e.target.phraseContent);
   };
@@ -61,7 +64,11 @@ export function Phrases(props) {
   <div class=Phrases>
     <div class=History>
       <div class=PhrasesSectionLabel>History</div>
-      ${History.map(phrase => html`
+      ${History.filter(phrase => {
+        return filters.every(filter => {
+          return phrase.text.toLowerCase().includes(filter);
+        });
+      }).map(phrase => html`
         <div class=PhraseRow>
           <button @click=${onSpeak} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
         </div>
