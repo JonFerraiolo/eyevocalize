@@ -1,8 +1,6 @@
 
 import { TextEntryRow, TextEntryRowSetFocus } from './TextEntryRow.js';
 import { Settings } from './Settings.js';
-import { DefaultPhrases } from './DefaultPhrases.js';
-import { BuildPhrases } from './BuildPhrases.js';
 import { Phrases } from './Phrases.js';
 import { html, render } from 'https://unpkg.com/lit-html?module';
 
@@ -38,7 +36,19 @@ body {
 }
 `;
 
-let phrases = BuildPhrases(DefaultPhrases);
+let HistoryString = localStorage.getItem("History") || [];
+let History = (typeof HistoryString === 'string') ? JSON.parse(HistoryString) : [];
+
+const FavoritesString = `
+Please come and help me
+Can I have air?
+Time for nebulizer and feeding
+Take me to the toilet, please
+Can I please go to my bed?
+Please hurry!
+No hurry
+`;
+let Favorites = FavoritesString.trim().split('\n').map(s => { return { text: s }; } );
 
 export function main(props) {
 	let { voices } = props;
@@ -55,8 +65,15 @@ export function main(props) {
 				showSettings();
 			}
 		},
-		phrases
+		History,
+		Favorites
 	};
+
+	let addToHistory = (text, type) => {
+		History.unshift({ text, type, timestamp: new Date() });
+		localStorage.setItem("History", JSON.stringify(History));
+		update();
+	}
 
 	let showSettings = () => {
 		// Don't show settings for the time being.
@@ -65,8 +82,7 @@ export function main(props) {
 		render(Settings(props), document.getElementById('root'));
 	}
 
-	// Create a new utterance for the specified text and add it to
-	// the queue.
+	// Add text to the voice synthesis queue
 	function speak(text) {
 		if (text.length > 0) {
 			let voice = voices.find(v => {
@@ -85,23 +101,31 @@ export function main(props) {
 				msg.pitch = 1;
 				msg.voice = voice;
 				window.speechSynthesis.speak(msg);
+				addToHistory(text, 'speak')
 			}
 		}
 	}
 
-	let TextEntryRowProps = {
-		initialText: '',
-		speak
+	// Add text to the voice synthesis queue
+	function stash(text) {
+		if (text.length > 0) {
+			addToHistory(text, 'stash')
+		}
+	}
+
+	let TextEntryRowProps = { initialText: '', speak, stash };
+	let PhrasesProps = { History, Favorites, speak };
+
+	let update = () => {
+		render(html`
+			<style>${css}</style>
+			<div class=main>
+				${TextEntryRow(TextEntryRowProps)}
+				${Phrases(PhrasesProps)}
+			</div>
+		`, document.body);
+		TextEntryRowSetFocus();
 	};
-	let PhrasesProps = { phrases, speak };
+	update();
 
-	render(html`
-		<style>${css}</style>
-		<div class=main>
-			${TextEntryRow(TextEntryRowProps)}
-			${Phrases(PhrasesProps)}
-		</div>
-	`, document.body);
-
-	TextEntryRowSetFocus();
 }

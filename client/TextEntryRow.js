@@ -41,20 +41,39 @@ let css = `
 `;
 
 export function TextEntryRow(props) {
-  let { speak } = props;
+  let { speak, stash } = props;
   let text = props.initialText || '';
-  let onKeyPress = e => {
+  let onKeyDown = e => {
     if (e.key === 'Enter') {
-      e.preventDefault();
-      onSpeak();
+      let shift = e.getModifierState("Shift");
+      let control = e.getModifierState("Control");
+      let meta = e.getModifierState("Meta");
+      if (shift && !control && !meta) {
+        // just pass through to default processing, which will add a newline
+      } else if (!shift && (control || meta)) {
+        e.preventDefault();
+        onStashAndClear();
+      } else {
+        e.preventDefault();
+        onSpeak();
+      }
+    } else {
+      // just pass through to default processing, which will add the character
     }
   }
   let onSpeak = () => {
     let text = document.getElementById('TextEntryRowTextArea').value;
     if (text.length > 0) {
-      speak(text) ;
+      speak(text);
+      onClear();
     }
-    TextEntryRowSetFocus();
+  }
+  let onStashAndClear = () => {
+    let text = document.getElementById('TextEntryRowTextArea').value;
+    if (text.length > 0) {
+      stash(text);
+      onClear();
+    }
   }
   let onClear = e => {
     document.getElementById('TextEntryRowTextArea').value = '';
@@ -64,8 +83,9 @@ export function TextEntryRow(props) {
   <style>${css} </style>
   <div class=TextEntryRow>
     <label class=TextEntryLabel for=TextEntryRowTextArea>Compose:</label
-    ><textarea value=text id=TextEntryRowTextArea @keypress=${onKeyPress}></textarea
+    ><textarea value=text id=TextEntryRowTextArea @keydown=${onKeyDown}></textarea
     ><button class=TextEntrySpeak @click=${onSpeak}>Speak</button
+    ><button class=TextEntrySpeak @click=${onStashAndClear}>Stash</button
     ><button class=TextEntryClear @click=${onClear}>Clear</button>
   </div>`;
 }

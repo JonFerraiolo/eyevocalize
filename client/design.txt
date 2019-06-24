@@ -12,16 +12,6 @@ Application state
     download, upload
     settings
 Data:
-  Export / import format
-  myphrases.txt is default file name for export
-  Each phrase gets its own line
-  Each line format: [tag, tag,... ] {weight} Phrase, where [] {}  are delimiters
-    Lines starting with # are comment line, will be stripped on import
-    Blank lines are ignored, will be stripped on import
-    White space before and after phrase will be stripped on import
-    At least one tag is recommended; otherwise, text will only appear in history
-    weight is optional, range from 0-9=highest, default=0
-  Software provides a default set of tagged phrases
   Ui allows
     download of all
     upload and merge
