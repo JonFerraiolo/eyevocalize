@@ -66,26 +66,20 @@ export function main(props) {
 			}
 		},
 		History,
-		Favorites,
-		currentText: ''
+		Favorites
 	};
-
-	let addToHistory = (text, type) => {
-		History.unshift({ text, type, timestamp: new Date() });
-		localStorage.setItem("History", JSON.stringify(History));
-		update();
-	}
-
-	let onTextChange = (text) => {
-		state.currentText = text;
-		update();
-	}
 
 	let showSettings = () => {
 		// Don't show settings for the time being.
 		// Will make into a popup
 		const props = Object.assign({}, state.settings);
 		render(Settings(props), document.getElementById('root'));
+	}
+
+	let addToHistory = (text, type) => {
+		History.unshift({ text, type, timestamp: new Date() });
+		localStorage.setItem("History", JSON.stringify(History));
+		update();
 	}
 
 	// Add text to the voice synthesis queue
@@ -112,16 +106,25 @@ export function main(props) {
 		}
 	}
 
-	// Add text to the voice synthesis queue
+	// Add text tohistory without speaking
 	function stash(text) {
 		if (text.length > 0) {
 			addToHistory(text, 'stash')
 		}
 	}
 
-	let update = () => {
-		let TextEntryRowProps = { initialText: '', speak, stash, onTextChange };
-		let PhrasesProps = { History, Favorites, speak, filterString: state.currentText};
+	let search = (text) => {
+		update(text);
+	}
+
+	// The text area control has been cleared
+	function clear() {
+		update();
+	}
+
+	let update = searchString => {
+		let TextEntryRowProps = { initialText: '', speak, stash, search, clear };
+		let PhrasesProps = { History, Favorites, speak, searchString };
 		render(html`
 			<style>${css}</style>
 			<div class=main>

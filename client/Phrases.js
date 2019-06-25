@@ -27,6 +27,9 @@ let css = `
   display: flex;
   padding: 0 5em;
 }
+.History button {
+  text-align: left;
+}
 .FavoriteContainer {
   display: inline-block;
 }
@@ -52,23 +55,25 @@ let css = `
 `;
 
 export function Phrases(props) {
-  let { speak, History, Favorites, filterString } = props;
-  let filters = (typeof filterString  === 'string') ?
-    filterString.toLowerCase().replace(/\s+/g, '').trim().split(' ') :
+  let { speak, History, Favorites, searchString } = props;
+  let searchTokens = (typeof searchString  === 'string') ?
+    searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
     [];
   let onSpeak = e => {
     speak(e.target.phraseContent);
   };
+  let filteredPhrases = searchTokens.length === 0 ? History :
+    History.filter(phrase => {
+      return searchTokens.some(token => {
+        return phrase.text.toLowerCase().includes(token);
+      });
+    });
   return html`
   <style>${css}</style>
   <div class=Phrases>
     <div class=History>
       <div class=PhrasesSectionLabel>History</div>
-      ${History.filter(phrase => {
-        return filters.every(filter => {
-          return phrase.text.toLowerCase().includes(filter);
-        });
-      }).map(phrase => html`
+      ${filteredPhrases.map(phrase => html`
         <div class=PhraseRow>
           <button @click=${onSpeak} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
         </div>
