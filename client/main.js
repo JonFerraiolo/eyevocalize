@@ -1,5 +1,5 @@
 
-import { TextEntryRow, TextEntryRowSetFocus } from './TextEntryRow.js';
+import { TextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { Settings } from './Settings.js';
 import { Phrases } from './Phrases.js';
 import { html, render } from 'https://unpkg.com/lit-html?module';
@@ -47,7 +47,11 @@ let Favorites = [
 	{ label: 'bed', text: 'Can I please go to my bed?'},
 	{ label: 'hurry', text: 'Please hurry!'},
 	{ label: 'no rush', text: 'Take your time. Not urgent'},
-	{ label: 'Pepe', text: 'Can someone please help Pehpay? '}
+	{ label: 'Pepe', text: 'Can someone please help Peppay? '},
+	{ label: 'tubing', text: 'Please pull the blue tubing, you know, the tubing that goes from the breathing machine to my face mask, please pull it outside of the bed as much as possible. '},
+	{ label: 'face up', text: 'Please roll me a little so that my body is flat on the bed and my head is facing straight up. '},
+	{ label: 'head', text: 'Please straighten my head '},
+	{ label: 'testing', text: 'Please ignore what comes out of the computer for the next couple of minutes. I am just testing the software. '}
 ];
 
 export function main(props) {
@@ -84,6 +88,7 @@ export function main(props) {
 
 	// Add text to the voice synthesis queue
 	function speak(text) {
+		text = (typeof text === 'string') ? text : TextEntryRowGetText();
 		if (text.length > 0) {
 			let voice = voices.find(v => {
 				return v.name === state.settings.voiceName;
@@ -101,19 +106,23 @@ export function main(props) {
 				msg.pitch = 1;
 				msg.voice = voice;
 				window.speechSynthesis.speak(msg);
-				addToHistory(text, 'speak')
+				TextEntryRowSetText('');
+				addToHistory(text, 'speak');
 			}
 		}
 	}
 
 	// Add text tohistory without speaking
 	function stash(text) {
+		text = (typeof text === 'string') ? text : TextEntryRowGetText();
 		if (text.length > 0) {
+			TextEntryRowSetText('');
 			addToHistory(text, 'stash')
 		}
 	}
 
-	let search = (text) => {
+	let search = text => {
+		text = (typeof text === 'string') ? text : TextEntryRowGetText();
 		update(text);
 	}
 
@@ -124,7 +133,7 @@ export function main(props) {
 
 	let update = searchString => {
 		let TextEntryRowProps = { initialText: '', speak, stash, search, clear };
-		let PhrasesProps = { History, Favorites, speak, searchString };
+		let PhrasesProps = { History, Favorites, speak, searchString, TextEntryRowSetText, TextEntryRowSetFocus };
 		render(html`
 			<style>${css}</style>
 			<div class=main>
@@ -135,5 +144,34 @@ export function main(props) {
 		TextEntryRowSetFocus();
 	};
 	update();
+
+	document.addEventListener('keydown', e => {
+		let shift = e.getModifierState("Shift");
+    let control = e.getModifierState("Control");
+    let meta = e.getModifierState("Meta");
+    if (e.key === 'Enter') {
+      if (shift && !control && !meta) {
+        // just pass through to default processing, which will add a newline
+      } else if (!shift && (control || meta)) {
+        e.preventDefault();
+        stash();
+      } else {
+        e.preventDefault();
+        speak();
+      }
+    } else if (e.key === 's' && !shift && (control || meta)) {
+      e.preventDefault();
+      search();
+		} else if (e.key === '.' && !shift && (control || meta)) {
+			// Control+period speaks the most recent entry in the History
+			let text = History.length > 0 ? History[0].text : '';
+			if (text.length > 0) {
+				e.preventDefault();
+				speak(text);
+			}
+    } else {
+      // just pass through to default processing, which will add the character
+    }
+	}, false);
 
 }

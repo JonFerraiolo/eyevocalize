@@ -55,12 +55,21 @@ let css = `
 `;
 
 export function Phrases(props) {
-  let { speak, History, Favorites, searchString } = props;
+  let { speak, History, Favorites, searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
     [];
-  let onSpeak = e => {
-    speak(e.target.phraseContent);
+  let onClick = e => {
+    let shift = e.getModifierState("Shift");
+    let control = e.getModifierState("Control");
+    let meta = e.getModifierState("Meta");
+    let text = e.target.phraseContent;
+    if (!shift && (control || meta)) {
+      TextEntryRowSetText(text);
+      TextEntryRowSetFocus();
+    } else if (!shift && !control && !meta) {
+      speak(text);
+    }
   };
   let filteredPhrases = searchTokens.length === 0 ? History :
     History.filter(phrase => {
@@ -75,7 +84,7 @@ export function Phrases(props) {
       <div class=PhrasesSectionLabel>History</div>
       ${filteredPhrases.map(phrase => html`
         <div class=PhraseRow>
-          <button @click=${onSpeak} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
+          <button @click=${onClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
         </div>
       `)}
     </div>
@@ -83,7 +92,7 @@ export function Phrases(props) {
       <div class=PhrasesSectionLabel>Favorites</div>
       ${Favorites.map(phrase => html`
         <div class=FavoriteContainer>
-          <button @click=${onSpeak} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
+          <button @click=${onClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
         </div>
       `)}
     </div>
