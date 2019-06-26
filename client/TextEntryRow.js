@@ -62,7 +62,11 @@ export function TextEntryRow(props) {
 
 export function TextEntryRowSetFocus() {
   setTimeout(()  => {
-    document.getElementById('TextEntryRowTextArea').focus();
+    let textarea = document.getElementById('TextEntryRowTextArea');
+    textarea.focus();
+    let len = textarea.value.length;
+    textarea.setSelectionRange(len, len);
+
   }, 0);
 }
 

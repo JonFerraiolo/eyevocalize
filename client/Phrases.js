@@ -55,7 +55,7 @@ let css = `
 `;
 
 export function Phrases(props) {
-  let { speak, History, Favorites, searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
+  let { speak, playAudio, History, Favorites, searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
     [];
@@ -64,11 +64,17 @@ export function Phrases(props) {
     let control = e.getModifierState("Control");
     let meta = e.getModifierState("Meta");
     let text = e.target.phraseContent;
+    let label  = e.target.phraseLabel;
+    let audio = e.target.phraseAudio;
     if (!shift && (control || meta)) {
       TextEntryRowSetText(text);
       TextEntryRowSetFocus();
     } else if (!shift && !control && !meta) {
-      speak(text);
+      if (audio) {
+        playAudio(label, audio);
+      } else {
+        speak(text);
+      }
     }
   };
   let filteredPhrases = searchTokens.length === 0 ? History :
@@ -92,7 +98,7 @@ export function Phrases(props) {
       <div class=PhrasesSectionLabel>Favorites</div>
       ${Favorites.map(phrase => html`
         <div class=FavoriteContainer>
-          <button @click=${onClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
+          <button @click=${onClick} .phraseContent=${phrase.text} .phraseLabel=${phrase.label} .phraseAudio=${phrase.audio}>${phrase.label || phrase.text}</button>
         </div>
       `)}
     </div>

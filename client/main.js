@@ -39,6 +39,7 @@ body {
 let HistoryString = localStorage.getItem("History") || [];
 let History = (typeof HistoryString === 'string') ? JSON.parse(HistoryString) : [];
 let Favorites = [
+	{ label: 'thanks', text: 'Thank you. You are an angel.'},
 	{ label: 'help', text: 'Please come and help me'},
 	{ label: 'air', text: 'Can I have air?'},
 	{ label: 'nebulizer', text: 'Time for nebulizer and feeding'},
@@ -51,6 +52,9 @@ let Favorites = [
 	{ label: 'tubing', text: 'Please pull the blue tubing, you know, the tubing that goes from the breathing machine to my face mask, please pull it outside of the bed as much as possible. '},
 	{ label: 'face up', text: 'Please roll me a little so that my body is flat on the bed and my head is facing straight up. '},
 	{ label: 'head', text: 'Please straighten my head '},
+	{ label: 'Disappointed!', text: 'ignore this', audio: 'http://www.montypython.net/sounds/wanda/disappointed.wav'},
+	{ label: 'Inconceivable!', text: 'ignore this', audio: 'http://www.moviesoundclips.net/download.php?id=2900&ft=mp3'},
+	{ label: 'Excellent!', text: 'ignore this', audio: 'http://www.billandted.org/sounds/ea/eaexcellent.mp3'},
 	{ label: 'testing', text: 'Please ignore what comes out of the computer for the next couple of minutes. I am just testing the software. '}
 ];
 
@@ -112,6 +116,16 @@ export function main(props) {
 		}
 	}
 
+	// play audio from a URL
+	function playAudio(label, url) {
+		if (url && url.length > 0) {
+			var audio = new Audio(url);
+			audio.play();
+			TextEntryRowSetText('');
+			addToHistory(label, 'audio', url);
+		}
+	}
+
 	// Add text tohistory without speaking
 	function stash(text) {
 		text = (typeof text === 'string') ? text : TextEntryRowGetText();
@@ -133,7 +147,7 @@ export function main(props) {
 
 	let update = searchString => {
 		let TextEntryRowProps = { initialText: '', speak, stash, search, clear };
-		let PhrasesProps = { History, Favorites, speak, searchString, TextEntryRowSetText, TextEntryRowSetFocus };
+		let PhrasesProps = { History, Favorites, speak, playAudio, searchString, TextEntryRowSetText, TextEntryRowSetFocus };
 		render(html`
 			<style>${css}</style>
 			<div class=main>
