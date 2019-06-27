@@ -7,7 +7,7 @@ let css = `
   display: flex;
   flex-direction: row;
 }
-.History, .Favorites {
+.StashAndHistory, .Favorites {
   flex: 1;
   overflow: auto;
   height: 100%;
@@ -20,14 +20,21 @@ let css = `
   text-align: center;
   border: 1px solid black;
 }
-.History .PhrasesSectionLabel {
+.Stash .PhrasesSectionLabel {
   border-right: none;
+}
+.Favorites {
+  padding-left: 0.5em;
+}
+.FavoritesCategoryLabel {
+  font-size: 90%;
+  color: #ccc;
 }
 .PhraseRow {
   display: flex;
   padding: 0 5em;
 }
-.History button {
+.History button, .Stash button {
   text-align: left;
 }
 .FavoriteContainer {
@@ -55,7 +62,7 @@ let css = `
 `;
 
 export function Phrases(props) {
-  let { speak, playAudio, History, Favorites, searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
+  let { speak, playAudio, Stash, History, Favorites, searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
     [];
@@ -77,28 +84,63 @@ export function Phrases(props) {
       }
     }
   };
-  let filteredPhrases = searchTokens.length === 0 ? History :
-    History.filter(phrase => {
+  let filteredStash = searchTokens.length === 0 ? Stash :
+    Stash.filter(phrase => {
       return searchTokens.some(token => {
-        return phrase.text.toLowerCase().includes(token);
+        return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
+                (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
       });
     });
+  let filteredHistory = searchTokens.length === 0 ? History :
+    History.filter(phrase => {
+      return searchTokens.some(token => {
+        return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
+                (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
+      });
+    });
+  let filteredFavorites = Favorites;
+  if (searchTokens.length > 0) {
+    filteredFavorites = JSON.parse(JSON.stringify(Favorites));  // deep clone
+    filteredFavorites.forEach(category => {
+      category.items = category.items.filter(phrase => {
+        return searchTokens.some(token => {
+          return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
+                  (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
+        });
+      });
+    });
+    filteredFavorites = filteredFavorites.filter(category => {
+      return category.items.length > 0;
+    });
+  }
   return html`
   <style>${css}</style>
   <div class=Phrases>
-    <div class=History>
-      <div class=PhrasesSectionLabel>History</div>
-      ${filteredPhrases.map(phrase => html`
+    <div class=StashAndHistory>
+      <div class=History>
+      <div class=PhrasesSectionLabel>Stash</div>
+      ${filteredStash.map(phrase => html`
         <div class=PhraseRow>
           <button @click=${onClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
         </div>
       `)}
+      <div class=PhrasesSectionLabel>History</div>
+      ${filteredHistory.map(phrase => html`
+        <div class=PhraseRow>
+          <button @click=${onClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
+        </div>
+      `)}
+      </div>
     </div>
     <div class=Favorites>
       <div class=PhrasesSectionLabel>Favorites</div>
-      ${Favorites.map(phrase => html`
-        <div class=FavoriteContainer>
-          <button @click=${onClick} .phraseContent=${phrase.text} .phraseLabel=${phrase.label} .phraseAudio=${phrase.audio}>${phrase.label || phrase.text}</button>
+      ${filteredFavorites.map(category => html`
+        <div class=FavoritesCategoryLabel>${category.label}</div>
+        ${category.items.map(phrase => html`
+          <div class=FavoriteContainer>
+            <button @click=${onClick} .phraseContent=${phrase.text} .phraseLabel=${phrase.label} .phraseAudio=${phrase.audio}>${phrase.label || phrase.text}</button>
+          </div>
+        `)}
         </div>
       `)}
     </div>
