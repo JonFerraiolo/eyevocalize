@@ -36,19 +36,25 @@ body {
 }
 `;
 
-let StashString = localStorage.getItem("Stash") || [];
-let Stash = (typeof StashString === 'string') ? JSON.parse(StashString) : [];
-let HistoryString = localStorage.getItem("History") || [];
-let History = (typeof HistoryString === 'string') ? JSON.parse(HistoryString) : [];
+let initialStash = { expanded: true, items: [] };
+let StashString = localStorage.getItem("Stash");
+let Stash = (typeof StashString === 'string') ? JSON.parse(StashString) : initialStash;
+if (Array.isArray(Stash)) { Stash = { expanded: true, items: Stash } ;}  // FIXME temporary
+
+let initialHistory = { expanded: true, items: [] };
+let HistoryString = localStorage.getItem("History");
+let History = (typeof HistoryString === 'string') ? JSON.parse(HistoryString) : initialHistory;
+if (Array.isArray(History)) { History = { expanded: true, items: History } ;}  // FIXME temporary
+
 let Favorites = [
-	{ label: 'Basic', items: [
+	{ label: 'Basic', expanded: true, items: [
 		{ label: 'nevermind', text: 'Sorry. False alarm. Nevermind what I just said.'},
 		{ label: 'thanks', text: 'Thank you.'},
 		{ label: 'thanka', text: 'Thank you. You are an angel.'},
 		{ label: 'help', text: 'Please come and help me'},
 		{ label: 'testing', text: 'Please ignore what comes out of the computer for the next couple of minutes. I am just testing the software. '},
 	]},
-	{ label: 'Care Requests', items: [
+	{ label: 'Care Requests', expanded: true, items: [
 		{ label: 'air', text: 'Can I have air?'},
 		{ label: 'mask', text: 'Can you please fix my breathing mask?'},
 		{ label: 'nebulizer', text: 'Time for nebulizer and feeding'},
@@ -63,7 +69,7 @@ let Favorites = [
 		{ label: 'face up', text: 'Please roll me a little so that my body is flat on the bed and my head is facing straight up. '},
 		{ label: 'head', text: 'Please straighten my head '},
 	]},
-	{ label: 'Adjustments', items: [
+	{ label: 'Adjustments', expanded: true, items: [
 		{ label: 'down', text: 'Please move it down. '},
 		{ label: 'up', text: 'Please move it up. '},
 		{ label: 'left', text: 'Please move it to my left. '},
@@ -72,7 +78,7 @@ let Favorites = [
 		{ label: 'tilt fwd', text: 'Can you please tilt the wheelchair forward?'},
 		{ label: 'tilt back', text: 'Can you please tilt the wheelchair backward?'},
 	]},
-	{ label: 'Other', items: [
+	{ label: 'Other', expanded: true, items: [
 		{ label: 'sliding', text: 'Can you please close the sliding glass doors?'},
 		{ label: 'Pepe', text: 'Can someone please help Peppay? '},
 		{ label: 'Disappointed!', text: 'ignore this', audio: 'http://www.montypython.net/sounds/wanda/disappointed.wav'},
@@ -109,13 +115,13 @@ export function main(props) {
 	}
 
 	let addToStash = (text, type) => {
-		Stash.push({ text, type, timestamp: new Date() });
+		Stash.items.push({ text, type, timestamp: new Date() });
 		localStorage.setItem("Stash", JSON.stringify(Stash));
 		update();
 	}
 
 	let addToHistory = (text, type) => {
-		History.unshift({ text, type, timestamp: new Date() });
+		History.items.unshift({ text, type, timestamp: new Date() });
 		localStorage.setItem("History", JSON.stringify(History));
 		update();
 	}
@@ -175,9 +181,18 @@ export function main(props) {
 		update();
 	}
 
+  function triggerUpdate() {
+    // FIXME we are saving and redrawing the whole world 
+    localStorage.setItem("Stash", JSON.stringify(Stash));
+    localStorage.setItem("History", JSON.stringify(History));
+    localStorage.setItem("Favorites", JSON.stringify(Favorites));
+    update();
+  }
+
 	let update = searchString => {
 		let TextEntryRowProps = { initialText: '', speak, stash, search, clear };
-		let PhrasesProps = { Stash, History, Favorites, speak, playAudio, searchString, TextEntryRowSetText, TextEntryRowSetFocus };
+		let PhrasesProps = { Stash, History, Favorites, speak, playAudio, triggerUpdate,
+      searchString, TextEntryRowSetText, TextEntryRowSetFocus };
 		render(html`
 			<style>${css}</style>
 			<div class=main>
