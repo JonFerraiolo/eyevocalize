@@ -1,5 +1,6 @@
 
 import { render, html } from 'https://unpkg.com/lit-html?module';
+import { updateStash } from './Stash.js';
 
 let css = `
 .Phrases  {
@@ -132,7 +133,7 @@ export function updatePhrases(parentElement, props) {
     obj.expanded = !obj.expanded;
     triggerUpdate();  // FIXME this is update the whole world. Only need to update this section.
   };
-  let onClick = e => {
+  let onPhraseClick = e => {
     let shift = e.getModifierState("Shift");
     let control = e.getModifierState("Control");
     let meta = e.getModifierState("Meta");
@@ -150,19 +151,11 @@ export function updatePhrases(parentElement, props) {
       }
     }
   };
-  let onEditStash = e => {
-    e.preventDefault();
-    debugger;
-  };
   let onEditHistory = e => {
     e.preventDefault();
     debugger;
   };
   let onEditFavorites = e => {
-    e.preventDefault();
-    debugger;
-  };
-  let onHelpStash = e => {
     e.preventDefault();
     debugger;
   };
@@ -174,16 +167,6 @@ export function updatePhrases(parentElement, props) {
     e.preventDefault();
     debugger;
   };
-  let filteredStash = Stash;
-  if (searchTokens.length > 0) {
-    filteredStash = JSON.parse(JSON.stringify(Stash));  // deep clone
-    filteredStash.items = filteredStash.items.filter(phrase => {
-      return searchTokens.some(token => {
-        return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
-                (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
-      });
-    });
-  }
   let filteredHistory = History;
   if (searchTokens.length > 0) {
     filteredHistory = JSON.parse(JSON.stringify(History));  // deep clone
@@ -215,23 +198,13 @@ export function updatePhrases(parentElement, props) {
     let originalDataCategory = Favorites[category.categoryIndex];
     category.titleContent = buildTitleWithCollapseExpandArrows(originalDataCategory, category.label);
   });
-  let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Stash");
   let HistoryTitle = buildTitleWithCollapseExpandArrows(History, "History");
+  let StashProps = { Stash, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
   render(html`
   <style>${css}</style>
   <div class=Phrases>
     <div class=StashAndHistory>
-      <div class=PhrasesSectionLabel>
-        ${StashTitle}${rightSideIcons(onEditStash, onHelpStash)}
-      </div>
-      ${filteredStash.expanded ?
-        html`${filteredStash.items.map(phrase =>
-          html`
-            <div class=PhraseRow>
-              <button @click=${onClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
-            </div>
-          `
-        )}` : ''}
+      <div id=StashContainer></div>
       <div class=PhrasesSectionLabel>
         ${HistoryTitle}${rightSideIcons(onEditHistory, onHelpHistory)}
       </div>
@@ -239,7 +212,7 @@ export function updatePhrases(parentElement, props) {
         html`${filteredHistory.items.map(phrase =>
           html`
             <div class=PhraseRow>
-              <button @click=${onClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
+              <button @click=${onPhraseClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
             </div>
           `
         )}` : ''}
@@ -252,11 +225,12 @@ export function updatePhrases(parentElement, props) {
           html`${category.items.map(phrase =>
             html`
               <div class=FavoriteContainer>
-                <button @click=${onClick} .phraseContent=${phrase.text} .phraseLabel=${phrase.label} .phraseAudio=${phrase.audio}>${phrase.label || phrase.text}</button>
+                <button @click=${onPhraseClick} .phraseContent=${phrase.text} .phraseLabel=${phrase.label} .phraseAudio=${phrase.audio}>${phrase.label || phrase.text}</button>
               </div>
             `
           )}` : ''}
       `)}
     </div>
   </div>`, parentElement);
+  updateStash(document.getElementById('StashContainer'), StashProps);
 }
