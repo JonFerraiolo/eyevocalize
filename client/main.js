@@ -1,5 +1,5 @@
 
-import { TextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
+import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { Settings } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
 import { fromRight, fromLeft} from './animSlide.js';
@@ -231,7 +231,7 @@ export function main(props) {
       <div class=main>
         <div class=mainleft>
           <div class=mainleftcontent>
-            ${TextEntryRow(TextEntryRowProps)}
+            <div id=TextEntryRowContainer></div>
             <div id=PhrasesContainer></div>
           </div>
         </div>
@@ -239,6 +239,7 @@ export function main(props) {
       </div>
       </div>
 		`, document.body);
+    updateTextEntryRow(document.getElementById('TextEntryRowContainer'), TextEntryRowProps);
     updatePhrases(document.getElementById('PhrasesContainer'), PhrasesProps);
 		TextEntryRowSetFocus();
 	};

@@ -1,5 +1,5 @@
 
-import { html } from 'https://unpkg.com/lit-html?module';
+import { render, html } from 'https://unpkg.com/lit-html?module';
 
 let css = `
 .TextEntryRow {
@@ -40,7 +40,7 @@ let css = `
 }
 `;
 
-export function TextEntryRow(props) {
+export function updateTextEntryRow(parentElement, props) {
   let { speak, stash, search, clear } = props;
   let text = props.initialText || '';
   let onClear = e => {
@@ -48,7 +48,7 @@ export function TextEntryRow(props) {
     clear();
     TextEntryRowSetFocus();
   }
-  return html`
+  render(html`
   <style>${css} </style>
   <div class=TextEntryRow>
     <label class=TextEntryLabel for=TextEntryRowTextArea>Compose:</label
@@ -57,7 +57,7 @@ export function TextEntryRow(props) {
     ><button class=TextEntrySpeak @click=${stash}>Stash</button
     ><button class=TextEntrySpeak @click=${search}>Search</button
     ><button class=TextEntryClear @click=${onClear}>Clear</button>
-  </div>`;
+  </div>`, parentElement);
 }
 
 export function TextEntryRowSetFocus() {
