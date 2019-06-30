@@ -24,33 +24,18 @@ Data:
       https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures#Emulating_private_methods_with_closures
       Exported API: phrases.{addTag(text,tag,weight),use(tx),removeTag(tx,tg),setWeight(tx)}
 UI:
-  Speech text control: editable text area (auto-grows), plus speak+clear, speak, clear buttons
-    https://github.com/JonKFerraiolo/BPLearn/blob/master/client/util/resizeableTextarea.js
-  Second row:
-    Search, filters tags and saved text, with x for clear
-    List of current tags, separated by "and" or "or"
-      Clicking on (x) next to a tag removes it from list
-    clear all tags button
-    toggle and-vs-or button
-  Phrases on left, Tags on right
-    Phrases
-      List of saved text strings (history or myphrases)
-      If no tags selected, shows history
-      Else, scrolling list of phrases matching tags, sorted by weight & #timesused
-      Each text is a horizontal control
-        Text (press means replace speech text, speak, clear speech text)
-        Badge showing number of times used
-        Weight (used for sorting)
-          Click this and popup appears with buttons for 1=highest to 9=default, close by click away
-        Speak it now
-        Add to speech text
-        Delete from history (are you sure prompt)
-        Add tag ( cursor changes )
-    History
-      Groupings
-        Moments ago
-        Today
-        This week
-        Distant past
-    Tags
-      2D list of buttons with tag as label for button, alphabetically
+  History
+    Groupings
+      Moments ago
+      Today
+      This week
+      Distant past
+  Edit Favorites
+    regular Favorites display, but short editing instruction message at top
+    also, add a new favorite button and add a new category, reorder categories
+    click a category or a button to edit
+    editing ui slides in from right
+    for category, edit label, plus ability to reorder the buttons
+    for buttons, edit label, choose text or audio, edit value, edit category
+    drag and drop available for rearranging
+     

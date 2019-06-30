@@ -2,6 +2,7 @@
 import { TextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { Settings } from './Settings.js';
 import { Phrases } from './Phrases.js';
+import { fromRight, fromLeft} from './animSlide.js';
 import { html, render } from 'https://unpkg.com/lit-html?module';
 
 let css = `
@@ -25,12 +26,40 @@ body {
 }
 .main {
   width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #FFFFFF;
+  /* for left/right slide animations. See animSlide.js */
+  overflow: hidden;
+  white-space: nowrap;
+}
+.mainleft, .mainright {
+  width: 100%;
+  height: 100%;
+	display: inline-block;
+  vertical-align: top;
+  white-space: normal;
+}
+.mainleftcontent {
+  width: 100%;
+  height: 100%;
 	display: flex;
 	flex-direction: column;
   padding: 1em;
-  background: #FFFFFF;
-	height: 100%;
 }
+.slideFromRightAnim {
+  -webkit-animation-name: slideFromRight; -webkit-animation-duration: 1s; -webkit-animation-timing-function: linear;
+  animation-name: slideLeft; animation-duration: 1s; animation-timing-function: linear;
+}
+@-webkit-keyframes slideFromRight { from { margin-left: 0; } to { margin-left: -100%; } }
+@keyframes slideFromRight { from { margin-left: 0; } to { margin-left: -100%; } }
+.undoSlideFromRightAnim {
+  -webkit-animation-name: undoSlideFromRight; -webkit-animation-duration: 1s; -webkit-animation-timing-function: linear;
+  animation-name: undoSlideFromRight; animation-duration: 1s; animation-timing-function: linear;
+}
+@-webkit-keyframes undoSlideFromRight { from { margin-left: -100%; } to { margin-left: 0; } }
+@keyframes undoSlideFromRight { from { margin-left: -100%; } to { margin-left: 0; } }
 .nospeechsupport {
   font-size: 2em;
 }
@@ -182,7 +211,7 @@ export function main(props) {
 	}
 
   function triggerUpdate() {
-    // FIXME we are saving and redrawing the whole world 
+    // FIXME we are saving and redrawing the whole world
     localStorage.setItem("Stash", JSON.stringify(Stash));
     localStorage.setItem("History", JSON.stringify(History));
     localStorage.setItem("Favorites", JSON.stringify(Favorites));
@@ -195,10 +224,16 @@ export function main(props) {
       searchString, TextEntryRowSetText, TextEntryRowSetFocus };
 		render(html`
 			<style>${css}</style>
-			<div class=main>
-				${TextEntryRow(TextEntryRowProps)}
-				${Phrases(PhrasesProps)}
-			</div>
+      <div class=main>
+        <div class=mainleft>
+          <div class=mainleftcontent>
+            ${TextEntryRow(TextEntryRowProps)}
+            ${Phrases(PhrasesProps)}
+          </div>
+        </div>
+        <div class=mainright></div>
+      </div>
+      </div>
 		`, document.body);
 		TextEntryRowSetFocus();
 	};

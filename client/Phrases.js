@@ -78,15 +78,40 @@ let css = `
 .Favorites button:active {
   box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1) inset;
 }
+.rightsideicons {
+  float: right;
+  padding-right: 0.25em;
+}
+.editicon, .editicon:link, .editicon:visited, .helpicon, .helpicon:link, .helpicon:visited {
+  display: inline-block;
+  text-decoration: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+  padding: 0 0.6em;
+}
+.editicon {
+  background-image: url(images/editicon.svg);
+  width: 1em;
+  height: 1em;
+  vertical-align: top;
+}
+.helpicon {
+  background-image: url(images/helpicon.svg);
+  width: 0.75em;
+  height: 0.75em;
+  vertical-align: 0%;
+}
 `;
 
-/*
-const expandArrowSpan = html`<span class=collapsearrow>&#x25B2;</span>`;
-const collapseArrowSpan = html`<span class=expandarrow>&#x25BC;</span>`;
-*/
 const expandArrowSpan = html`<span class=collapsearrow>&#x2304;</span>`;
 const collapseArrowSpan = html`<span class=expandarrow>&#x2303;</span>`;
 
+let rightSideIcons = (onEdit, onHelp) => {
+  return html`<span class=rightsideicons
+  ><a href="" @click=${onEdit} class=editicon></a
+  ><a href="" @click=${onHelp} class=helpicon></a
+  ></span>`;
+};
 
 export function Phrases(props) {
   let { speak, playAudio, triggerUpdate, Stash, History, Favorites,
@@ -121,6 +146,30 @@ export function Phrases(props) {
         speak(text);
       }
     }
+  };
+  let onEditStash = e => {
+    e.preventDefault();
+    debugger;
+  };
+  let onEditHistory = e => {
+    e.preventDefault();
+    debugger;
+  };
+  let onEditFavorites = e => {
+    e.preventDefault();
+    debugger;
+  };
+  let onHelpStash = e => {
+    e.preventDefault();
+    debugger;
+  };
+  let onHelpHistory = e => {
+    e.preventDefault();
+    debugger;
+  };
+  let onHelpFavorites = e => {
+    e.preventDefault();
+    debugger;
   };
   let filteredStash = Stash;
   if (searchTokens.length > 0) {
@@ -169,7 +218,12 @@ export function Phrases(props) {
   <style>${css}</style>
   <div class=Phrases>
     <div class=StashAndHistory>
-      <div class=PhrasesSectionLabel>${StashTitle}</div>
+      <div class=PhrasesSectionLabel>
+        ${StashTitle}
+        ${filteredStash.expanded ?
+          html`${rightSideIcons(onEditStash, onHelpStash)}`
+        : ''}
+      </div>
       ${filteredStash.expanded ?
         html`${filteredStash.items.map(phrase =>
           html`
@@ -178,7 +232,12 @@ export function Phrases(props) {
             </div>
           `
         )}` : ''}
-      <div class=PhrasesSectionLabel>${HistoryTitle}</div>
+      <div class=PhrasesSectionLabel>
+        ${HistoryTitle}
+        ${filteredHistory.expanded ?
+          html`${rightSideIcons(onEditHistory, onHelpHistory)}`
+        : ''}
+      </div>
       ${filteredHistory.expanded ?
         html`${filteredHistory.items.map(phrase =>
           html`
@@ -189,7 +248,7 @@ export function Phrases(props) {
         )}` : ''}
     </div>
     <div class=Favorites>
-      <div class=PhrasesSectionLabel>Favorites</div>
+      <div class=PhrasesSectionLabel>Favorites${rightSideIcons(onEditFavorites, onHelpFavorites)}</div>
       ${filteredFavorites.map(category => html`
         <div class=FavoritesCategoryLabel>${category.titleContent}</div>
         ${category.expanded ?
@@ -200,7 +259,6 @@ export function Phrases(props) {
               </div>
             `
           )}` : ''}
-        </div>
       `)}
     </div>
   </div>`;
