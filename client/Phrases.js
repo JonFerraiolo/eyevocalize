@@ -1,15 +1,16 @@
 
-import { html } from 'https://unpkg.com/lit-html?module';
+import { render, html } from 'https://unpkg.com/lit-html?module';
 
 let css = `
 .Phrases  {
-  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: row;
 }
 .StashAndHistory, .Favorites {
   flex: 1;
   overflow: auto;
+  min-height: 0px;
   height: 100%;
   display: inline-block;
 }
@@ -39,6 +40,8 @@ let css = `
 }
 .Favorites {
   padding-left: 0.5em;
+  min-height: 0px;
+  overflow: auto;
 }
 .FavoritesCategoryLabel {
   font-size: 90%;
@@ -113,7 +116,7 @@ let rightSideIcons = (onEdit, onHelp) => {
   ></span>`;
 };
 
-export function Phrases(props) {
+export function updatePhrases(parentElement, props) {
   let { speak, playAudio, triggerUpdate, Stash, History, Favorites,
     searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
   let searchTokens = (typeof searchString  === 'string') ?
@@ -214,15 +217,12 @@ export function Phrases(props) {
   });
   let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Stash");
   let HistoryTitle = buildTitleWithCollapseExpandArrows(History, "History");
-  return html`
+  render(html`
   <style>${css}</style>
   <div class=Phrases>
     <div class=StashAndHistory>
       <div class=PhrasesSectionLabel>
-        ${StashTitle}
-        ${filteredStash.expanded ?
-          html`${rightSideIcons(onEditStash, onHelpStash)}`
-        : ''}
+        ${StashTitle}${rightSideIcons(onEditStash, onHelpStash)}
       </div>
       ${filteredStash.expanded ?
         html`${filteredStash.items.map(phrase =>
@@ -233,10 +233,7 @@ export function Phrases(props) {
           `
         )}` : ''}
       <div class=PhrasesSectionLabel>
-        ${HistoryTitle}
-        ${filteredHistory.expanded ?
-          html`${rightSideIcons(onEditHistory, onHelpHistory)}`
-        : ''}
+        ${HistoryTitle}${rightSideIcons(onEditHistory, onHelpHistory)}
       </div>
       ${filteredHistory.expanded ?
         html`${filteredHistory.items.map(phrase =>
@@ -261,5 +258,5 @@ export function Phrases(props) {
           )}` : ''}
       `)}
     </div>
-  </div>`;
+  </div>`, parentElement);
 }

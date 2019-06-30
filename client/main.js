@@ -1,7 +1,7 @@
 
 import { TextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { Settings } from './Settings.js';
-import { Phrases } from './Phrases.js';
+import { updatePhrases } from './Phrases.js';
 import { fromRight, fromLeft} from './animSlide.js';
 import { html, render } from 'https://unpkg.com/lit-html?module';
 
@@ -47,6 +47,10 @@ body {
 	display: flex;
 	flex-direction: column;
   padding: 1em;
+}
+#PhrasesContainer {
+  flex: 1;
+  min-height: 0px;
 }
 .slideFromRightAnim {
   -webkit-animation-name: slideFromRight; -webkit-animation-duration: 1s; -webkit-animation-timing-function: linear;
@@ -146,13 +150,13 @@ export function main(props) {
 	let addToStash = (text, type) => {
 		Stash.items.push({ text, type, timestamp: new Date() });
 		localStorage.setItem("Stash", JSON.stringify(Stash));
-		update();
+		updateMain();
 	}
 
 	let addToHistory = (text, type) => {
 		History.items.unshift({ text, type, timestamp: new Date() });
 		localStorage.setItem("History", JSON.stringify(History));
-		update();
+		updateMain();
 	}
 
 	// Add text to the voice synthesis queue
@@ -202,12 +206,12 @@ export function main(props) {
 
 	let search = text => {
 		text = (typeof text === 'string') ? text : TextEntryRowGetText();
-		update(text);
+		updateMain(text);
 	}
 
 	// The text area control has been cleared
 	function clear() {
-		update();
+		updateMain();
 	}
 
   function triggerUpdate() {
@@ -215,10 +219,10 @@ export function main(props) {
     localStorage.setItem("Stash", JSON.stringify(Stash));
     localStorage.setItem("History", JSON.stringify(History));
     localStorage.setItem("Favorites", JSON.stringify(Favorites));
-    update();
+    updateMain();
   }
 
-	let update = searchString => {
+	let updateMain = searchString => {
 		let TextEntryRowProps = { initialText: '', speak, stash, search, clear };
 		let PhrasesProps = { Stash, History, Favorites, speak, playAudio, triggerUpdate,
       searchString, TextEntryRowSetText, TextEntryRowSetFocus };
@@ -228,16 +232,17 @@ export function main(props) {
         <div class=mainleft>
           <div class=mainleftcontent>
             ${TextEntryRow(TextEntryRowProps)}
-            ${Phrases(PhrasesProps)}
+            <div id=PhrasesContainer></div>
           </div>
         </div>
         <div class=mainright></div>
       </div>
       </div>
 		`, document.body);
+    updatePhrases(document.getElementById('PhrasesContainer'), PhrasesProps);
 		TextEntryRowSetFocus();
 	};
-	update();
+	updateMain();
 
 	document.addEventListener('keydown', e => {
 		let shift = e.getModifierState("Shift");
