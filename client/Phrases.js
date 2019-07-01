@@ -1,6 +1,7 @@
 
 import { render, html } from 'https://unpkg.com/lit-html?module';
 import { updateStash } from './Stash.js';
+import { updateHistory } from './History.js';
 
 let css = `
 .Phrases  {
@@ -151,15 +152,7 @@ export function updatePhrases(parentElement, props) {
       }
     }
   };
-  let onEditHistory = e => {
-    e.preventDefault();
-    debugger;
-  };
   let onEditFavorites = e => {
-    e.preventDefault();
-    debugger;
-  };
-  let onHelpHistory = e => {
     e.preventDefault();
     debugger;
   };
@@ -167,16 +160,6 @@ export function updatePhrases(parentElement, props) {
     e.preventDefault();
     debugger;
   };
-  let filteredHistory = History;
-  if (searchTokens.length > 0) {
-    filteredHistory = JSON.parse(JSON.stringify(History));  // deep clone
-    filteredHistory.items = filteredHistory.items.filter(phrase => {
-      return searchTokens.some(token => {
-        return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
-                (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
-      });
-    });
-  }
   let filteredFavorites = JSON.parse(JSON.stringify(Favorites));  // deep clone
   filteredFavorites.forEach((category, index) => {
     category.categoryIndex = index;
@@ -198,24 +181,14 @@ export function updatePhrases(parentElement, props) {
     let originalDataCategory = Favorites[category.categoryIndex];
     category.titleContent = buildTitleWithCollapseExpandArrows(originalDataCategory, category.label);
   });
-  let HistoryTitle = buildTitleWithCollapseExpandArrows(History, "History");
   let StashProps = { Stash, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
+  let HistoryProps = { History, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
   render(html`
   <style>${css}</style>
   <div class=Phrases>
     <div class=StashAndHistory>
       <div id=StashContainer></div>
-      <div class=PhrasesSectionLabel>
-        ${HistoryTitle}${rightSideIcons(onEditHistory, onHelpHistory)}
-      </div>
-      ${filteredHistory.expanded ?
-        html`${filteredHistory.items.map(phrase =>
-          html`
-            <div class=PhraseRow>
-              <button @click=${onPhraseClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
-            </div>
-          `
-        )}` : ''}
+      <div id=HistoryContainer></div>
     </div>
     <div class=Favorites>
       <div class=PhrasesSectionLabel>Favorites${rightSideIcons(onEditFavorites, onHelpFavorites)}</div>
@@ -233,4 +206,5 @@ export function updatePhrases(parentElement, props) {
     </div>
   </div>`, parentElement);
   updateStash(document.getElementById('StashContainer'), StashProps);
+  updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
 }
