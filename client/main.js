@@ -2,10 +2,14 @@
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { Settings } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
+import { editStash } from './Stash.js';
 import { fromRight, fromLeft} from './animSlide.js';
 import { html, render } from 'https://unpkg.com/lit-html?module';
 
 let css = `
+:root {
+  --shadowColor: #e4e4e4;
+}
 *, *:before, *:after {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
@@ -53,19 +57,112 @@ body {
   min-height: 0px;
 }
 .slideFromRightAnim {
-  -webkit-animation-name: slideFromRight; -webkit-animation-duration: 1s; -webkit-animation-timing-function: linear;
-  animation-name: slideLeft; animation-duration: 1s; animation-timing-function: linear;
+  animation-name: slideFromRight; animation-duration: 1s; animation-timing-function: linear; animation-fill-mode: forwards;
 }
-@-webkit-keyframes slideFromRight { from { margin-left: 0; } to { margin-left: -100%; } }
 @keyframes slideFromRight { from { margin-left: 0; } to { margin-left: -100%; } }
 .undoSlideFromRightAnim {
-  -webkit-animation-name: undoSlideFromRight; -webkit-animation-duration: 1s; -webkit-animation-timing-function: linear;
-  animation-name: undoSlideFromRight; animation-duration: 1s; animation-timing-function: linear;
+  animation-name: undoSlideFromRight; animation-duration: 1s; animation-timing-function: linear; animation-fill-mode: forwards;
 }
-@-webkit-keyframes undoSlideFromRight { from { margin-left: -100%; } to { margin-left: 0; } }
 @keyframes undoSlideFromRight { from { margin-left: -100%; } to { margin-left: 0; } }
 .nospeechsupport {
   font-size: 2em;
+}
+.SlideRightTitle {
+  font-size: 110%;
+  text-align: center;
+  padding: 0.5em 0;
+  line-height: 150%;
+}
+.SlideRightBackArrow {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  background-image: url(images/arrowback.svg);
+  background-size: contain;
+  background-repeat: no-peat;
+  margin-left: 1em;
+  float: left;
+  vertical-align: middle;
+}
+.skinnyScreenParent {
+  background: #666;
+  width: 100%;
+  height: 100%;
+}
+.skinnyScreenChild {
+  max-width: 500px;
+  height: 100%;
+  margin: 0 auto;
+  background: white;
+}
+.skinnyScreenChild .ScreenInstructions {
+  padding: 0.5em 1.5em;
+  font-size: 90%;
+}
+.skinnyScreenChild .SelectLinksRow {
+  padding: 0.5em 1.5em 0;
+  display: flex;
+  justify-content: space-around;
+  font-size: 95%;
+}
+.SelectLinksRow a, .SelectLinksRow a:link, .SelectLinksRow a:visited {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.SelectLinksRow a:hover {
+  color: darkblue;
+}
+.skinnyScreenChild .ButtonRow {
+  padding: 1em 1.5em;
+  display: flex;
+  justify-content: space-around;
+}
+.skinnyScreenChild .ButtonRow button{
+  display: inline-block;
+  zoom: 1;
+  padding: 6px 20px;
+  margin: 0;
+  cursor: pointer;
+  border: 1px solid #bbb;
+  overflow: visible;
+  font: bold 13px arial, helvetica, sans-serif;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color .2s ease-out;
+  background-clip: padding-box; /* Fix bleeding */
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 2px 2px -1px rgba(0, 0, 0, .5), 0 1px 0 rgba(255, 255, 255, .3) inset;
+  text-shadow: 0 1px 0 rgba(255,255,255, .9);
+  user-select: none;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0,0,0,.2);
+  background-image: linear-gradient(top, rgba(255,255,255,.3), rgba(255,255,255,0));
+  background-color: #2e9cca; /*23:https://visme.co/blog/website-color-schemes/,25274d,464866,aaabb8,29648a,*/
+  border-color: #269CE9;
+}
+.skinnyScreenChild .ButtonRow button:hover{
+  background: #29648a;
+}
+.skinnyScreenChild .ButtonRow button:active{
+  background: #269CE9;
+  position: relative;
+  top: 1px;
+  text-shadow: none;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .3) inset;
+}
+.skinnyScreenChild .ButtonRow button[disabled],
+.skinnyScreenChild .ButtonRow button[disabled]:hover,
+.skinnyScreenChild .ButtonRow button[disabled]:active{
+  opacity: 0.4;
+}
+.PhraseRow button.selected {
+  color: black;
+  background-color: #ddd;
+  border-color: #29648a;
+}
+.PhraseRow button.selected .checkmark {
+  color: #25274d;
 }
 `;
 
@@ -148,7 +245,7 @@ export function main(props) {
 	}
 
 	let addToStash = (text, type) => {
-		Stash.items.push({ text, type, timestamp: new Date() });
+		Stash.items.unshift({ text, type, timestamp: new Date() });
 		localStorage.setItem("Stash", JSON.stringify(Stash));
 		updateMain();
 	}
@@ -214,6 +311,41 @@ export function main(props) {
 		updateMain();
 	}
 
+  function buildSlideRightTitle(title, returnFunc) {
+    let onClickReturn = e => {
+      e.preventDefault();
+      returnFunc();
+    }
+    return html`<div class=SlideRightTitle>
+      <a href="" @click=${onClickReturn} class=SlideRightBackArrow></a><span class=SlideRightTitleText>${title}</span>
+    </div>`;
+  }
+
+  function onEditStash() {
+    let props = { Stash, onStashChange, onEditStashReturn, buildSlideRightTitle, speak };
+    editStash(document.querySelector('.mainright'), props);
+    let animParams = {
+      leftContentDiv: document.querySelector('.mainleft'),
+      animClassName: 'slideFromRightAnim'
+    };
+    fromRight(animParams);
+  }
+
+  function onEditStashReturn() {
+    updateMain();
+    let animParams = {
+      leftContentDiv: document.querySelector('.mainleft'),
+      origAnimClassName: 'slideFromRightAnim',
+      undoAnimClassName: 'undoSlideFromRightAnim'
+    };
+    fromLeft(animParams);
+  }
+
+  function onStashChange(newStash) {
+    Stash = JSON.parse(JSON.stringify(newStash));  // deep clone
+    localStorage.setItem("Stash", JSON.stringify(Stash));
+  }
+
   function triggerUpdate() {
     // FIXME we are saving and redrawing the whole world
     localStorage.setItem("Stash", JSON.stringify(Stash));
@@ -224,7 +356,8 @@ export function main(props) {
 
 	let updateMain = searchString => {
 		let TextEntryRowProps = { initialText: '', speak, stash, search, clear };
-		let PhrasesProps = { Stash, History, Favorites, speak, playAudio, triggerUpdate,
+		let PhrasesProps = { Stash, History, Favorites, speak, playAudio,
+      onEditStash, triggerUpdate,
       searchString, TextEntryRowSetText, TextEntryRowSetFocus };
 		render(html`
 			<style>${css}</style>

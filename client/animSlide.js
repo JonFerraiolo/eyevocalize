@@ -19,10 +19,11 @@
  *     .slideParent { width:<somevalue>; overflow:hidden; white-space:nowrap; }
  *     .leftContentDiv, .rightContentDiv { width:<somevalue>; display:inline-block; }
  *     .slideFromRightAnim {
- *        -webkit-animation-name: slideFromRight; -webkit-animation-duration: <duration>; -webkit-animation-timing-function: <function>;
- *        animation-name: slideLeft; animation-duration: <duration>; animation-timing-function: <function>;
+ *        animation-name: slideFromRight;
+ *        animation-duration: <duration: eg, 1s>;
+ *        animation-timing-function: <function: eg, linear>;
+ *        animation-fill-mode: forwards;
  *      }
- *      @-webkit-keyframes slideFromRight { from { margin-left: 0; } to { margin-left: -100%; } }
  *      @keyframes slideFromRight { from { margin-left: 0; } to { margin-left: -100%; } }
  *   Then to cause the slide-from-right to happen, issue this call:
  *      slide.fromRight(params);
@@ -33,10 +34,8 @@
  * @param {function} [params.animEndCallback] Called when the animation is finished
  */
 export function fromRight(params) {
-	var leftContentDiv = params.leftContentDiv;
-	var animClassName = params.animClassName;
-	var animEndCallback = params.animEndCallback;
-	var animEndListener = function(e) {
+  let { leftContentDiv, animClassName, animEndCallback } = params;
+	let animEndListener = function(e) {
 		leftContentDiv.removeEventListener('webkitAnimationEnd', animEndListener, false);
 		leftContentDiv.removeEventListener('animationend', animEndListener, false);
 		if (animEndCallback) {
@@ -47,7 +46,7 @@ export function fromRight(params) {
 	leftContentDiv.removeEventListener('animationend', animEndListener, false);
 	leftContentDiv.addEventListener('webkitAnimationEnd', animEndListener, false);
 	leftContentDiv.addEventListener('animationend', animEndListener, false);
-	cls.add(leftContentDiv, animClassName);
+	leftContentDiv.classList.add(animClassName);
 };
 
 /**
@@ -60,27 +59,27 @@ export function fromRight(params) {
  *   (Similar DOM and CSS setup as fromRight())
  *   Additional CSS:
  *     .undoSlideFromRightAnim {
- *        -webkit-animation-name: undoSlideFromRight; -webkit-animation-duration: <duration>; -webkit-animation-timing-function: <function>;
- *        animation-name: undoSlideFromRight; animation-duration: <duration>; animation-timing-function: <function>;
+ *        animation-name: undoSlideFromRight;
+ *        animation-duration: <duration: eg, 1s>;
+ *        animation-timing-function: <function: eg, linear>;
+ *        animation-fill-mode: forwards;
  *      }
- *      @-webkit-keyframes undoSlideFromRight { from { margin-left: -100%; } to { margin-left: 0; } }
  *      @keyframes undoSlideFromRight { from { margin-left: -100%; } to { margin-left: 0; } }
  *   Then to cause the slide-from-right to happen, issue this call:
  *      slide.fromLeft(params);
  *
  * @param {object} params Various parameters
  * @param {Element} params.leftContentDiv Contains the content before the animation
- * @param {string} params.animClassName Class name to add to leftContentDiv to do a reverse animation
+ * @param {string} params.origAnimClassName Class name that was added to leftContentDiv to do original animation
+ * @param {string} params.undoAnimClassName Class name to add to leftContentDiv to do a reverse animation
  * @param {function} [params.animEndCallback] Called when the animation is finished
  */
 export function fromLeft(params) {
-	var leftContentDiv = params.leftContentDiv;
-	var animClassName = params.animClassName;
-	var animEndCallback = params.animEndCallback;
-	var animEndListener = function(e) {
+  let { leftContentDiv, origAnimClassName, undoAnimClassName, animEndCallback } = params;
+	let animEndListener = function(e) {
 		leftContentDiv.removeEventListener('webkitAnimationEnd', animEndListener, false);
 		leftContentDiv.removeEventListener('animationend', animEndListener, false);
-		cls.remove(leftContentDiv, animClassName);
+		leftContentDiv.classList.remove(undoAnimClassName);
 		if (animEndCallback) {
 			animEndCallback();
 		}
@@ -89,5 +88,6 @@ export function fromLeft(params) {
 	leftContentDiv.removeEventListener('animationend', animEndListener, false);
 	leftContentDiv.addEventListener('webkitAnimationEnd', animEndListener, false);
 	leftContentDiv.addEventListener('animationend', animEndListener, false);
-	cls.add(leftContentDiv, animClassName);
+  leftContentDiv.classList.add(undoAnimClassName);
+  leftContentDiv.classList.remove(origAnimClassName);
 };

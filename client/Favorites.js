@@ -16,10 +16,6 @@ let css = `
   cursor: pointer;
   color: #ccc;
 }
-.PhraseRow {
-  display: flex;
-  padding: 0 5em;
-}
 .FavoriteContainer {
   display: inline-block;
 }
@@ -46,11 +42,11 @@ let css = `
 
 export function updateFavorites(parentElement, props) {
   let { Favorites, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows } = props;
-  let onEditFavorites = e => {
+  let onClickEdit = e => {
     e.preventDefault();
     debugger;
   };
-  let onHelpFavorites = e => {
+  let onClickHelp = e => {
     e.preventDefault();
     debugger;
   };
@@ -78,7 +74,7 @@ export function updateFavorites(parentElement, props) {
   render(html`
   <style>${css}</style>
   <div class=Favorites>
-    <div class=PhrasesSectionLabel>Favorites${rightSideIcons(onEditFavorites, onHelpFavorites)}</div>
+    <div class=PhrasesSectionLabel>Favorites${rightSideIcons(onClickEdit, onClickHelp)}</div>
     ${filteredFavorites.map(category => html`
       <div class=FavoritesCategoryLabel>${category.titleContent}</div>
       ${category.expanded ?

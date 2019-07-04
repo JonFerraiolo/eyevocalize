@@ -8,11 +8,11 @@ let css = `
 
 export function updateHistory(parentElement, props) {
   let { History, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows } = props;
-  let onEditHistory = e => {
+  let onClickEdit = e => {
     e.preventDefault();
     debugger;
   };
-  let onHelpHistory = e => {
+  let onClickHelp = e => {
     e.preventDefault();
     debugger;
   };
@@ -31,7 +31,7 @@ export function updateHistory(parentElement, props) {
   <style>${css}</style>
   <div class=History>
     <div class=PhrasesSectionLabel>
-      ${HistoryTitle}${rightSideIcons(onEditHistory, onHelpHistory)}
+      ${HistoryTitle}${rightSideIcons(onClickEdit, onClickHelp)}
     </div>
     ${filteredHistory.expanded ?
       html`${filteredHistory.items.map(phrase =>

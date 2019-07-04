@@ -38,6 +38,13 @@ let css = `
   cursor: pointer;
   color: black;
 }
+.PhraseRow {
+  display: flex;
+  padding: 0 5em;
+}
+.skinnyScreenChild .PhraseRow {
+  padding: 0 1.5em;
+}
 .Stash .PhrasesSectionLabel {
   border-right: none;
 }
@@ -80,7 +87,7 @@ let rightSideIcons = (onEdit, onHelp) => {
 };
 
 export function updatePhrases(parentElement, props) {
-  let { speak, playAudio, triggerUpdate, Stash, History, Favorites,
+  let { speak, playAudio, onEditStash, triggerUpdate, Stash, History, Favorites,
     searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
@@ -113,7 +120,7 @@ export function updatePhrases(parentElement, props) {
       }
     }
   };
-  let StashProps = { Stash, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
+  let StashProps = { Stash, searchTokens, onPhraseClick, onEditStash, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
   let HistoryProps = { History, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
   let FavoritesProps = { Favorites, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
   render(html`
