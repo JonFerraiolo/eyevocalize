@@ -37,7 +37,7 @@ export function updateHistory(parentElement, props) {
       html`${filteredHistory.items.map(phrase =>
         html`
           <div class=PhraseRow>
-            <button @click=${onPhraseClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
+            <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
           </div>
         `
       )}` : ''}

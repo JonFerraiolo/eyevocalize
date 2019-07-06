@@ -171,56 +171,75 @@ body {
 }
 `;
 
-let initialStash = { expanded: true, items: [] };
+let currentVersion = 2;
+
+let initialStash = { version: currentVersion, expanded: true, items: [] };
 let StashString = localStorage.getItem("Stash");
-let Stash = (typeof StashString === 'string') ? JSON.parse(StashString) : initialStash;
-if (Array.isArray(Stash)) { Stash = { expanded: true, items: Stash } ;}  // FIXME temporary
+let Stash;
+try {
+  Stash = (typeof StashString === 'string') ? JSON.parse(StashString) : initialStash;
+} catch(e) {
+  Stash = initialStash;
+}
+if (typeof Stash.version != 'number'|| Stash.version < currentVersion) {
+  Stash = initialStash;
+}
 
-let initialHistory = { expanded: true, items: [] };
+let initialHistory = { version: currentVersion, expanded: true, items: [] };
 let HistoryString = localStorage.getItem("History");
-let History = (typeof HistoryString === 'string') ? JSON.parse(HistoryString) : initialHistory;
-if (Array.isArray(History)) { History = { expanded: true, items: History } ;}  // FIXME temporary
+let History;
+try {
+  History = (typeof HistoryString === 'string') ? JSON.parse(HistoryString) : initialHistory;
+} catch(e) {
+  History = initialHistory;
+}
+if (typeof History.version != 'number'|| History.version < currentVersion) {
+  History = initialHistory;
+}
 
-let Favorites = [
-	{ label: 'Basic', expanded: true, items: [
-		{ label: 'nevermind', text: 'Sorry. False alarm. Nevermind what I just said.'},
-		{ label: 'thanks', text: 'Thank you.'},
-		{ label: 'thanka', text: 'Thank you. You are an angel.'},
-		{ label: 'help', text: 'Please come and help me'},
-		{ label: 'testing', text: 'Please ignore what comes out of the computer for the next couple of minutes. I am just testing the software. '},
-	]},
-	{ label: 'Care Requests', expanded: true, items: [
-		{ label: 'air', text: 'Can I have air?'},
-		{ label: 'mask', text: 'Can you please fix my breathing mask?'},
-		{ label: 'nebulizer', text: 'Time for nebulizer and feeding'},
-		{ label: 'toilet', text: 'Take me to the toilet, please'},
-		{ label: 'urinal', text: 'can I please use the urinal'},
-		{ label: 'bed', text: 'Can I please go to my bed?'},
-		{ label: 'hurry', text: 'Please hurry!'},
-		{ label: 'no rush', text: 'Take your time. Not urgent'},
-		{ label: 'cold', text: 'I am a little cold. Could I please have something more over me?'},
-		{ label: 'warm', text: 'I am a little warm. Could you please take something off of me?'},
-		{ label: 'tubing', text: 'Please pull the blue tubing, you know, the tubing that goes from the breathing machine to my face mask, please pull it outside of the bed as much as possible. '},
-		{ label: 'face up', text: 'Please roll me a little so that my body is flat on the bed and my head is facing straight up. '},
-		{ label: 'head', text: 'Please straighten my head '},
-	]},
-	{ label: 'Adjustments', expanded: true, items: [
-		{ label: 'down', text: 'Please move it down. '},
-		{ label: 'up', text: 'Please move it up. '},
-		{ label: 'left', text: 'Please move it to my left. '},
-		{ label: 'right', text: 'Please move it to my right. '},
-		{ label: 'chair pos', text: 'Can you please fix the position of the wheelchair?'},
-		{ label: 'tilt fwd', text: 'Can you please tilt the wheelchair forward?'},
-		{ label: 'tilt back', text: 'Can you please tilt the wheelchair backward?'},
-	]},
-	{ label: 'Other', expanded: true, items: [
-		{ label: 'sliding', text: 'Can you please close the sliding glass doors?'},
-		{ label: 'Pepe', text: 'Can someone please help Peppay? '},
-		{ label: 'Disappointed!', text: 'ignore this', audio: 'http://www.montypython.net/sounds/wanda/disappointed.wav'},
-		{ label: 'Inconceivable!', text: 'ignore this', audio: 'http://www.moviesoundclips.net/download.php?id=2900&ft=mp3'},
-		{ label: 'Excellent!', text: 'ignore this', audio: 'http://www.billandted.org/sounds/ea/eaexcellent.mp3'},
-	]}
-];
+let Favorites = {
+  version: currentVersion,
+  categories: [
+  	{ label: 'Basic', expanded: true, items: [
+  		{ type: 'text', label: 'nevermind', text: 'Sorry. False alarm. Nevermind what I just said.'},
+  		{ type: 'text', label: 'thanks', text: 'Thank you.'},
+  		{ type: 'text', label: 'thanka', text: 'Thank you. You are an angel.'},
+  		{ type: 'text', label: 'help', text: 'Please come and help me'},
+  		{ type: 'text', label: 'testing', text: 'Please ignore what comes out of the computer for the next couple of minutes. I am just testing the software. '},
+  	]},
+  	{ label: 'Care Requests', expanded: true, items: [
+  		{ type: 'text', label: 'air', text: 'Can I have air?'},
+  		{ type: 'text', label: 'mask', text: 'Can you please fix my breathing mask?'},
+  		{ type: 'text', label: 'nebulizer', text: 'Time for nebulizer and feeding'},
+  		{ type: 'text', label: 'toilet', text: 'Take me to the toilet, please'},
+  		{ type: 'text', label: 'urinal', text: 'can I please use the urinal'},
+  		{ type: 'text', label: 'bed', text: 'Can I please go to my bed?'},
+  		{ type: 'text', label: 'hurry', text: 'Please hurry!'},
+  		{ type: 'text', label: 'no rush', text: 'Take your time. Not urgent'},
+  		{ type: 'text', label: 'cold', text: 'I am a little cold. Could I please have something more over me?'},
+  		{ type: 'text', label: 'warm', text: 'I am a little warm. Could you please take something off of me?'},
+  		{ type: 'text', label: 'tubing', text: 'Please pull the blue tubing, you know, the tubing that goes from the breathing machine to my face mask, please pull it outside of the bed as much as possible. '},
+  		{ type: 'text', label: 'face up', text: 'Please roll me a little so that my body is flat on the bed and my head is facing straight up. '},
+  		{ type: 'text', label: 'head', text: 'Please straighten my head '},
+  	]},
+  	{ label: 'Adjustments', expanded: true, items: [
+  		{ type: 'text', label: 'down', text: 'Please move it down. '},
+  		{ type: 'text', label: 'up', text: 'Please move it up. '},
+  		{ type: 'text', label: 'left', text: 'Please move it to my left. '},
+  		{ type: 'text', label: 'right', text: 'Please move it to my right. '},
+  		{ type: 'text', label: 'chair pos', text: 'Can you please fix the position of the wheelchair?'},
+  		{ type: 'text', label: 'tilt fwd', text: 'Can you please tilt the wheelchair forward?'},
+  		{ type: 'text', label: 'tilt back', text: 'Can you please tilt the wheelchair backward?'},
+  	]},
+  	{ label: 'Other', expanded: true, items: [
+  		{ type: 'text', label: 'sliding', text: 'Can you please close the sliding glass doors?'},
+  		{ type: 'text', label: 'Pepe', text: 'Can someone please help Peppay? '},
+  		{ type: 'audio', label: 'Disappointed!', url: 'http://www.montypython.net/sounds/wanda/disappointed.wav'},
+  		{ type: 'audio', label: 'Inconceivable!', url: 'http://www.moviesoundclips.net/download.php?id=2900&ft=mp3'},
+  		{ type: 'audio', label: 'Excellent!', url: 'http://www.billandted.org/sounds/ea/eaexcellent.mp3'},
+  	]}
+  ]
+};
 
 export function main(props) {
 	let { voices } = props;
@@ -249,14 +268,16 @@ export function main(props) {
 		render(Settings(props), document.getElementById('root'));
 	}
 
-	let addToStash = (text, type) => {
-		Stash.items.unshift({ text, type, timestamp: new Date() });
+	let addToStash = phrase => {
+    phrase = Object.assign({ timestamp: new Date() }, phrase);
+		Stash.items.unshift(phrase);
 		localStorage.setItem("Stash", JSON.stringify(Stash));
 		updateMain();
 	}
 
-	let addToHistory = (text, type) => {
-		History.items.unshift({ text, type, timestamp: new Date() });
+	let addToHistory = obj => {
+    obj = Object.assign({ timestamp: new Date() }, obj);
+		History.items.unshift(obj);
 		localStorage.setItem("History", JSON.stringify(History));
 		updateMain();
 	}
@@ -282,7 +303,7 @@ export function main(props) {
 				msg.voice = voice;
 				window.speechSynthesis.speak(msg);
 				TextEntryRowSetText('');
-				addToHistory(text, 'speak');
+				addToHistory({ type: 'text', text });
 			}
 		}
 	}
@@ -293,7 +314,7 @@ export function main(props) {
 			var audio = new Audio(url);
 			audio.play();
 			TextEntryRowSetText('');
-			addToHistory(label, 'audio', url);
+			addToHistory({type:'audio', label, url });
 		}
 	}
 
@@ -302,7 +323,7 @@ export function main(props) {
 		text = (typeof text === 'string') ? text : TextEntryRowGetText();
 		if (text.length > 0) {
 			TextEntryRowSetText('');
-			addToStash(text, 'stash')
+			addToStash({ type: 'text', text });
 		}
 	}
 

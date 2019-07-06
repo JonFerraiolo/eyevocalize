@@ -17,7 +17,7 @@ let css = `
 let cloneOnlyPermanentProperties = localStash => {
   let newStash = JSON.parse(JSON.stringify(localStash));  // deep clone
   newStash.items = newStash.items.map(item => {
-    return { text: item.text, label: item.label, audio: item.audio };
+    return { type: item.type, text: item.text, label: item.label, url: item.url };
   });
   return newStash;
 };
@@ -52,7 +52,7 @@ export function updateStash(parentElement, props) {
       html`${filteredStash.items.map(phrase =>
         html`
           <div class=PhraseRow>
-            <button @click=${onPhraseClick} .phraseContent=${phrase.text}>${phrase.label || phrase.text}</button>
+            <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
           </div>
         `
       )}` : ''}

@@ -106,15 +106,13 @@ export function updatePhrases(parentElement, props) {
     let shift = e.getModifierState("Shift");
     let control = e.getModifierState("Control");
     let meta = e.getModifierState("Meta");
-    let text = e.target.phraseContent;
-    let label  = e.target.phraseLabel;
-    let audio = e.target.phraseAudio;
+    let { type, text, label, url } = e.target.phraseObject;
     if (!shift && (control || meta)) {
-      TextEntryRowSetText(text);
+      TextEntryRowSetText(type==='text' ? text : label );
       TextEntryRowSetFocus();
     } else if (!shift && !control && !meta) {
-      if (audio) {
-        playAudio(label, audio);
+      if (type === 'audio') {
+        playAudio(label, url);
       } else {
         speak(text);
       }

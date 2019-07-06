@@ -51,7 +51,7 @@ export function updateFavorites(parentElement, props) {
     debugger;
   };
   let filteredFavorites = JSON.parse(JSON.stringify(Favorites));  // deep clone
-  filteredFavorites.forEach((category, index) => {
+  filteredFavorites.categories.forEach((category, index) => {
     category.categoryIndex = index;
     category.items = category.items.filter(phrase => {
       if (searchTokens.length === 0) {
@@ -64,24 +64,24 @@ export function updateFavorites(parentElement, props) {
       }
     });
   });
-  filteredFavorites = filteredFavorites.filter(category => {
+  filteredFavorites.categories = filteredFavorites.categories.filter(category => {
     return category.items.length > 0;
   });
-  filteredFavorites.forEach(category => {
-    let originalDataCategory = Favorites[category.categoryIndex];
+  filteredFavorites.categories.forEach(category => {
+    let originalDataCategory = Favorites.categories[category.categoryIndex];
     category.titleContent = buildTitleWithCollapseExpandArrows(originalDataCategory, category.label);
   });
   render(html`
   <style>${css}</style>
   <div class=Favorites>
     <div class=PhrasesSectionLabel>Favorites${rightSideIcons(onClickEdit, onClickHelp)}</div>
-    ${filteredFavorites.map(category => html`
+    ${filteredFavorites.categories.map(category => html`
       <div class=FavoritesCategoryLabel>${category.titleContent}</div>
       ${category.expanded ?
         html`${category.items.map(phrase =>
           html`
             <div class=FavoriteContainer>
-              <button @click=${onPhraseClick} .phraseContent=${phrase.text} .phraseLabel=${phrase.label} .phraseAudio=${phrase.audio}>${phrase.label || phrase.text}</button>
+              <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
             </div>
           `
         )}` : ''}

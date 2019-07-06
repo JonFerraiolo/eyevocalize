@@ -7,13 +7,16 @@ let css = `
 `;
 
 export function EditPhrase(props) {
-  let { parentElement, title, doItButtonLabel, doItCallback, cancelCallback, speak, text, label, audio } = props;
+  let { phrase, parentElement, title, doItButtonLabel, doItCallback, cancelCallback, speak, playAudio } = props;
+  phrase = phrase || {};
+  let { type, text, label, url } = phrase;
+  type = type || 'text';
   text = text || '';
   label = label || '';
-  audio = audio || '';
+  url = url || '';
   let onClickDoit = e => {
     e.preventDefault();
-    doItCallback({ text, label, audio });
+    doItCallback({ type, text, label, url });
   };
   let onClickCancel = e => {
     e.preventDefault();
