@@ -96,7 +96,7 @@ body {
   background: white;
 }
 .skinnyScreenChild .ScreenInstructions {
-  padding: 0.5em 1.5em;
+  padding: 0.5em 1.75em 1em;
   font-size: 90%;
 }
 .skinnyScreenChild .SelectLinksRow {
@@ -106,12 +106,12 @@ body {
   font-size: 95%;
 }
 .SelectLinksRow a, .SelectLinksRow a:link, .SelectLinksRow a:visited {
-  color: blue;
+  color: 25274d;
   text-decoration: underline;
   cursor: pointer;
 }
 .SelectLinksRow a:hover {
-  color: darkblue;
+  color: blue;
 }
 .skinnyScreenChild .ButtonRow {
   padding: 1em 1.5em;
@@ -121,7 +121,7 @@ body {
 .skinnyScreenChild .ButtonRow button{
   display: inline-block;
   zoom: 1;
-  padding: 6px 20px;
+  padding: 2px 15px;
   margin: 0;
   cursor: pointer;
   border: 1px solid #bbb;
@@ -135,7 +135,7 @@ body {
   box-shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 2px 2px -1px rgba(0, 0, 0, .5), 0 1px 0 rgba(255, 255, 255, .3) inset;
   text-shadow: 0 1px 0 rgba(255,255,255, .9);
   user-select: none;
-  color: #fff;
+  color: #003;
   text-shadow: 0 1px 0 rgba(0,0,0,.2);
   background-image: linear-gradient(top, rgba(255,255,255,.3), rgba(255,255,255,0));
   background-color: #2e9cca; /*23:https://visme.co/blog/website-color-schemes/,25274d,464866,aaabb8,29648a,*/
@@ -154,7 +154,12 @@ body {
 .skinnyScreenChild .ButtonRow button[disabled],
 .skinnyScreenChild .ButtonRow button[disabled]:hover,
 .skinnyScreenChild .ButtonRow button[disabled]:active{
+  color: #ccc;
   opacity: 0.4;
+}
+.ButtonRow button .arrowButton {
+  font-size: 200%;
+  font-weight:bold
 }
 .PhraseRow button.selected {
   color: black;

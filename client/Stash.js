@@ -1,5 +1,6 @@
 
 import { render, html } from 'https://unpkg.com/lit-html?module';
+import { showPopup } from './popup.js';
 // import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js';
 
 let css = `
@@ -83,6 +84,9 @@ export function editStash(parentElement, props) {
   let onClickAddItem = e => {
     e.preventDefault();
   };
+  let onClickEditItem = e => {
+    e.preventDefault();
+  };
   let onClickRemoveSelected = e => {
     e.preventDefault();
     localStash.items = localStash.items.filter(item => !item.selected);
@@ -111,6 +115,38 @@ export function editStash(parentElement, props) {
     onStashChange(cloneOnlyPermanentProperties(localStash));
     localUpdate();
   };
+  let onClickMoveToTop = e => {
+    e.preventDefault();
+    for (let n=localStash.items.length, toPosition=0, fromPosition=1; fromPosition<n; fromPosition++) {
+      let toItem = localStash.items[toPosition];
+      let fromItem = localStash.items[fromPosition];
+      if (fromItem.selected && !toItem.selected) {
+        localStash.items.splice(fromPosition, 1);
+        localStash.items.splice(toPosition, 0, fromItem);
+      }
+      if (localStash.items[toPosition].selected) {
+        toPosition++;
+      }
+    }
+    onStashChange(cloneOnlyPermanentProperties(localStash));
+    localUpdate();
+  };
+  let onClickMoveToBottom = e => {
+    e.preventDefault();
+    for (let n=localStash.items.length, toPosition=n-1, fromPosition=n-2; fromPosition>=0; fromPosition--) {
+      let toItem = localStash.items[toPosition];
+      let fromItem = localStash.items[fromPosition];
+      if (fromItem.selected && !toItem.selected) {
+        localStash.items.splice(fromPosition, 1);
+        localStash.items.splice(toPosition, 0, fromItem);
+      }
+      if (localStash.items[toPosition].selected) {
+        toPosition--;
+      }
+    }
+    onStashChange(cloneOnlyPermanentProperties(localStash));
+    localUpdate();
+  };
   let localStash = JSON.parse(JSON.stringify(Stash));  // deep clone
   localStash.items.forEach((item, index) => {
     item.selected = false;
@@ -120,6 +156,12 @@ export function editStash(parentElement, props) {
       item.cls = item.selected ? 'selected' : '';
       item.checkmark = item.selected ? html`<span class=checkmark>&#x2714;</span>` : '';
     });
+    let enableEditItem = localStash.items.reduce((accumulator, item) => {
+      if (item.selected) {
+        accumulator++;
+      }
+      return accumulator;
+    }, 0) === 1;
     let enableRemoveSelected = localStash.items.some(item => item.selected);
     let enableMoveUp = localStash.items.some((item, index, arr) =>
       item.selected && (index > 0 && !arr[index-1].selected));
@@ -132,7 +174,6 @@ export function editStash(parentElement, props) {
         ${buildSlideRightTitle("Manage Stash", onEditStashReturn)}
         <div class=ScreenInstructions>
           Click items in the list below to select and deselect.
-          Use the commands at the bottom to take actions.
         </div>
         <div class=editStashPhraseRows>
           ${localStash.items.map((phrase, index) => {
@@ -150,10 +191,24 @@ export function editStash(parentElement, props) {
           <a href="" @click=${onClickDeselectAll}>Deselect All</a>
         </div>
         <div class=ButtonRow>
-          <button @click=${onClickAddItem}>New<br/>Item</button>
-          <button @click=${onClickRemoveSelected} ?disabled=${!enableRemoveSelected}>Remove<br/>Selected</button>
-          <button @click=${onClickMoveUp} ?disabled=${!enableMoveUp}>Move<br/>Up</button>
-          <button @click=${onClickMoveDown} ?disabled=${!enableMoveDown}>Move<br/>Down</button>
+        <button @click=${onClickAddItem}
+          title="Add a new item to the top of the list">New</button>
+        <button @click=${onClickEditItem} ?disabled=${!enableEditItem}
+          title="Edit the selected item">Edit</button>
+          <button @click=${onClickRemoveSelected} ?disabled=${!enableRemoveSelected}
+            title="Delete selected items">Delete</button>
+          <button @click=${onClickMoveUp} ?disabled=${!enableMoveUp}
+            title="Move selected items up one position">
+            <span class=arrowButton>&#x1f851;</span></button>
+          <button @click=${onClickMoveDown} ?disabled=${!enableMoveDown}
+            title="Move selected items down one position">
+            <span class=arrowButton>&#x1f853;</span></button>
+          <button @click=${onClickMoveToTop} ?disabled=${!enableMoveUp}
+            title="Move selected items to the start of the list">
+            <span class=arrowButton>&#x2b71;</span></button>
+          <button @click=${onClickMoveToBottom} ?disabled=${!enableMoveDown}
+            title="Move selected items to the end of the list">
+            <span class=arrowButton>&#x2b73;</span></button>
         </div>
       </div>
     </div>`, parentElement);
