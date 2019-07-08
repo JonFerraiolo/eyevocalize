@@ -14,16 +14,9 @@ let css = `
 }
 `;
 
-let cloneOnlyPermanentProperties = localStash => {
-  let newStash = JSON.parse(JSON.stringify(localStash));  // deep clone
-  newStash.items = newStash.items.map(item => {
-    return { type: item.type, text: item.text, label: item.label, url: item.url };
-  });
-  return newStash;
-};
-
 export function updateStash(parentElement, props) {
-  let { Stash, searchTokens, onPhraseClick, speak, onEditStash, rightSideIcons, buildTitleWithCollapseExpandArrows } = props;
+  let { Stash, searchTokens, onPhraseClick, speak, onEditStash, rightSideIcons,
+    buildTitleWithCollapseExpandArrows, cloneOnlyPermanentProperties } = props;
   let onClickEdit = e => {
     e.preventDefault();
     onEditStash();

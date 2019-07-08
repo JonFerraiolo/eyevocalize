@@ -3,7 +3,9 @@ import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntr
 import { Settings } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
 import { editStash } from './Stash.js';
-import { fromRight, fromLeft} from './animSlide.js';
+import { fromRight, fromLeft } from './animSlide.js';
+import { showPopup, hidePopup } from './popup.js';
+import { playYoutubeVideo, stopYoutubeVideo } from './youtube.js';
 import { html, render } from 'https://unpkg.com/lit-html?module';
 
 let css = `
@@ -236,7 +238,9 @@ let Favorites = {
   		{ type: 'text', label: 'Pepe', text: 'Can someone please help Peppay? '},
   		{ type: 'audio', label: 'Disappointed!', url: 'http://www.montypython.net/sounds/wanda/disappointed.wav'},
   		{ type: 'audio', label: 'Inconceivable!', url: 'http://www.moviesoundclips.net/download.php?id=2900&ft=mp3'},
-  		{ type: 'audio', label: 'Excellent!', url: 'http://www.billandted.org/sounds/ea/eaexcellent.mp3'},
+      { type: 'audio', label: 'Excellent!', url: 'http://www.billandted.org/sounds/ea/eaexcellent.mp3'},
+      { type: 'youtube', label: 'kenny', videoId: 'kXxr9A_UBG4', startAt: 10, endAt: 16 },
+      { type: 'youtube', label: 'missed it', videoId: 'oPwrodxghrw', startAt: 2.5, endAt: 7.5 },
   	]}
   ]
 };
@@ -309,12 +313,49 @@ export function main(props) {
 	}
 
 	// play audio from a URL
-	function playAudio(label, url) {
+	function playAudio(phrase) {
+    let { url } = phrase;
 		if (url && url.length > 0) {
 			var audio = new Audio(url);
 			audio.play();
 			TextEntryRowSetText('');
-			addToHistory({type:'audio', label, url });
+			addToHistory(Object.assign({}, phrase));
+		}
+	}
+
+	// play YouTube video from a videoId
+	function playYouTube(phrase) {
+    let { videoId, startAt, endAt } = phrase;
+    let cleanupAlreadyDone = false;
+		if (videoId && videoId.length > 0) {
+      let params = {
+        content: `<div id="youtubePlayerDiv"></div>`,
+        refNode: document.querySelector('.main'),
+        hideCallback: () => {
+          if (!cleanupAlreadyDone) {
+            stopYoutubeVideo();
+            popupRootElement.innerHTML = '';
+            cleanupAlreadyDone = true;
+          }
+        }
+      };
+      let popupRootElement = showPopup(params);
+      let youtubeParams = {
+        playerDivId: 'youtubePlayerDiv',
+        width: 300,
+        height: 300,
+        videoId,
+        startAt,
+        endAt,
+        doneCallback: function() {
+          popupRootElement.innerHTML = '';
+          cleanupAlreadyDone = true;
+          hidePopup();
+        }
+      };
+      playYoutubeVideo(youtubeParams);
+			TextEntryRowSetText('');
+			addToHistory(Object.assign({}, phrase));
 		}
 	}
 
@@ -382,7 +423,7 @@ export function main(props) {
 
 	let updateMain = searchString => {
 		let TextEntryRowProps = { initialText: '', speak, stash, search, clear };
-		let PhrasesProps = { Stash, History, Favorites, speak, playAudio,
+		let PhrasesProps = { Stash, History, Favorites, speak, playAudio, playYouTube,
       onEditStash, triggerUpdate,
       searchString, TextEntryRowSetText, TextEntryRowSetFocus };
 		render(html`
@@ -395,7 +436,6 @@ export function main(props) {
           </div>
         </div>
         <div class=mainright></div>
-      </div>
       </div>
 		`, document.body);
     updateTextEntryRow(document.getElementById('TextEntryRowContainer'), TextEntryRowProps);

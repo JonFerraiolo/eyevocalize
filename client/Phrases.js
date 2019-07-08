@@ -79,6 +79,15 @@ let css = `
 const expandArrowSpan = html`<span class=collapsearrow>&#x2304;</span>`;
 const collapseArrowSpan = html`<span class=expandarrow>&#x2303;</span>`;
 
+let cloneOnlyPermanentProperties = localStash => {
+  let newStash = JSON.parse(JSON.stringify(localStash));  // deep clone
+  newStash.items = newStash.items.map(item => {
+    return { type: item.type, text: item.text, label: item.label, url: item.url,
+      videoId: item.videoId, startAt: item.startAt, endAt: item.endAt };
+  });
+  return newStash;
+};
+
 let rightSideIcons = (onEdit, onHelp) => {
   return html`<span class=rightsideicons
   ><a href="" @click=${onEdit} class=editicon></a
@@ -87,7 +96,7 @@ let rightSideIcons = (onEdit, onHelp) => {
 };
 
 export function updatePhrases(parentElement, props) {
-  let { speak, playAudio, onEditStash, triggerUpdate, Stash, History, Favorites,
+  let { speak, playAudio, playYouTube, onEditStash, triggerUpdate, Stash, History, Favorites,
     searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
@@ -106,19 +115,23 @@ export function updatePhrases(parentElement, props) {
     let shift = e.getModifierState("Shift");
     let control = e.getModifierState("Control");
     let meta = e.getModifierState("Meta");
-    let { type, text, label, url } = e.target.phraseObject;
+    let phrase = e.target.phraseObject;
+    let { type, text, label, url } = phrase;
     if (!shift && (control || meta)) {
       TextEntryRowSetText(type==='text' ? text : label );
       TextEntryRowSetFocus();
     } else if (!shift && !control && !meta) {
-      if (type === 'audio') {
-        playAudio(label, url);
+      if (type === 'youtube') {
+        playYouTube(phrase);
+      } else if (type === 'audio') {
+        playAudio(phrase);
       } else {
         speak(text);
       }
     }
   };
-  let StashProps = { Stash, searchTokens, onPhraseClick, onEditStash, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
+  let StashProps = { Stash, searchTokens, onPhraseClick, onEditStash, speak, rightSideIcons,
+    buildTitleWithCollapseExpandArrows, cloneOnlyPermanentProperties };
   let HistoryProps = { History, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
   let FavoritesProps = { Favorites, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
   render(html`

@@ -44,7 +44,7 @@ export function showPopup(params) {
 		popupUnderlay.addEventListener('click', function(e) {
 			e.stopPropagation();
 			if (clickAwayToClose) {
-				this.hide();
+				hidePopup();
 			}
 		}.bind(this), false);
 		document.body.appendChild(popupUnderlay);
