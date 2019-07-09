@@ -1,6 +1,8 @@
 
 import { render, html } from 'https://unpkg.com/lit-html?module';
 import { showPopup } from './popup.js';
+import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
+import { cloneOnlyPermanentProperties } from './Phrases.js';
 // import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js';
 
 let css = `
@@ -14,9 +16,45 @@ let css = `
 }
 `;
 
+let Stash;
+let triggerUpdate;
+
+export function initializeStash(props) {
+  let { currentVersion } = props;
+  triggerUpdate = props.triggerUpdate;
+  let initialStash = { version: currentVersion, expanded: true, items: [] };
+  let StashString = localStorage.getItem("Stash");
+  try {
+    Stash = (typeof StashString === 'string') ? JSON.parse(StashString) : initialStash;
+  } catch(e) {
+    Stash = initialStash;
+  }
+  if (typeof Stash.version != 'number'|| Stash.version < currentVersion) {
+    Stash = initialStash;
+  }
+  return Stash;
+}
+
+// Add text tohistory without speaking
+export function stash(text) {
+	text = (typeof text === 'string') ? text : TextEntryRowGetText();
+	if (text.length > 0) {
+		TextEntryRowSetText('');
+		let phrase = { type: 'text', text, timestamp: new Date() };
+    Stash.items.unshift(phrase);
+    localStorage.setItem("Stash", JSON.stringify(Stash));
+    triggerUpdate();
+	}
+}
+
+function onStashChange(newStash) {
+  Stash = JSON.parse(JSON.stringify(newStash));  // deep clone
+  localStorage.setItem("Stash", JSON.stringify(Stash));
+}
+
 export function updateStash(parentElement, props) {
-  let { Stash, searchTokens, onPhraseClick, speak, onEditStash, rightSideIcons,
-    buildTitleWithCollapseExpandArrows, cloneOnlyPermanentProperties } = props;
+  let { searchTokens, onPhraseClick, speak, onEditStash, rightSideIcons,
+    buildTitleWithCollapseExpandArrows } = props;
   let onClickEdit = e => {
     e.preventDefault();
     onEditStash();
@@ -53,7 +91,7 @@ export function updateStash(parentElement, props) {
 }
 
 export function editStash(parentElement, props) {
-  let { Stash, onStashChange, onEditStashReturn, buildSlideRightTitle, speak } = props;
+  let { onEditStashReturn, buildSlideRightTitle, speak } = props;
   let onItemClick = e => {
     e.preventDefault();
     let phrase = e.currentTarget.phraseObject;

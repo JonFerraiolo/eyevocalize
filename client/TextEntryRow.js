@@ -1,4 +1,5 @@
 
+import { stash } from './Stash.js';
 import { render, html } from 'https://unpkg.com/lit-html?module';
 
 let css = `
@@ -41,7 +42,7 @@ let css = `
 `;
 
 export function updateTextEntryRow(parentElement, props) {
-  let { speak, stash, search, clear } = props;
+  let { speak, search, clear } = props;
   let text = props.initialText || '';
   let onClear = e => {
     document.getElementById('TextEntryRowTextArea').value = '';

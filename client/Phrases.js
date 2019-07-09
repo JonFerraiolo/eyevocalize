@@ -3,6 +3,7 @@ import { render, html } from 'https://unpkg.com/lit-html?module';
 import { updateStash } from './Stash.js';
 import { updateHistory } from './History.js';
 import { updateFavorites } from './Favorites.js';
+import { playYoutube } from './vocalize.js';
 
 let css = `
 .Phrases  {
@@ -78,12 +79,12 @@ let css = `
 
 const expandArrowSpan = html`<span class=collapsearrow>&#x2304;</span>`;
 const collapseArrowSpan = html`<span class=expandarrow>&#x2303;</span>`;
-
-let cloneOnlyPermanentProperties = localStash => {
+export function cloneOnlyPermanentProperties(localStash) {
   let newStash = JSON.parse(JSON.stringify(localStash));  // deep clone
   newStash.items = newStash.items.map(item => {
     return { type: item.type, text: item.text, label: item.label, url: item.url,
-      videoId: item.videoId, startAt: item.startAt, endAt: item.endAt };
+      videoId: item.videoId, startAt: item.startAt, endAt: item.endAt,
+      timestamp: item.timestamp };
   });
   return newStash;
 };
@@ -96,7 +97,7 @@ let rightSideIcons = (onEdit, onHelp) => {
 };
 
 export function updatePhrases(parentElement, props) {
-  let { speak, playAudio, playYouTube, onEditStash, triggerUpdate, Stash, History, Favorites,
+  let { speak, playAudio, onEditStash, triggerUpdate, Favorites,
     searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
@@ -109,7 +110,7 @@ export function updatePhrases(parentElement, props) {
     e.preventDefault();
     let obj = e.currentTarget.objToToggle;
     obj.expanded = !obj.expanded;
-    triggerUpdate();  // FIXME this is update the whole world. Only need to update this section.
+    triggerUpdate();
   };
   let onPhraseClick = e => {
     let shift = e.getModifierState("Shift");
@@ -122,17 +123,18 @@ export function updatePhrases(parentElement, props) {
       TextEntryRowSetFocus();
     } else if (!shift && !control && !meta) {
       if (type === 'youtube') {
-        playYouTube(phrase);
+        playYoutube(phrase);
       } else if (type === 'audio') {
         playAudio(phrase);
       } else {
         speak(text);
       }
+      triggerUpdate();
     }
   };
-  let StashProps = { Stash, searchTokens, onPhraseClick, onEditStash, speak, rightSideIcons,
+  let StashProps = { searchTokens, onPhraseClick, onEditStash, speak, rightSideIcons,
     buildTitleWithCollapseExpandArrows, cloneOnlyPermanentProperties };
-  let HistoryProps = { History, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
+  let HistoryProps = { searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
   let FavoritesProps = { Favorites, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
   render(html`
   <style>${css}</style>

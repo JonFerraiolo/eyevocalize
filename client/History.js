@@ -6,8 +6,30 @@ let css = `
 }
 `;
 
+let History;
+
+export function initializeHistory(props) {
+  let { currentVersion } = props;
+  let initialHistory = { version: currentVersion, expanded: true, items: [] };
+  let HistoryString = localStorage.getItem("History");
+  try {
+    History = (typeof HistoryString === 'string') ? JSON.parse(HistoryString) : initialHistory;
+  } catch(e) {
+    History = initialHistory;
+  }
+  if (typeof History.version != 'number'|| History.version < currentVersion) {
+    History = initialHistory;
+  }
+}
+
+export function addToHistory(obj) {
+  obj = Object.assign({ timestamp: new Date() }, obj);
+	History.items.unshift(obj);
+	localStorage.setItem("History", JSON.stringify(History));
+};
+
 export function updateHistory(parentElement, props) {
-  let { History, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows } = props;
+  let { searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows } = props;
   let onClickEdit = e => {
     e.preventDefault();
     debugger;
@@ -42,4 +64,8 @@ export function updateHistory(parentElement, props) {
         `
       )}` : ''}
   </div>`, parentElement);
+}
+
+export function editHistory(parentElement, props) {
+
 }

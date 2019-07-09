@@ -1,4 +1,8 @@
 
+import { showPopup, hidePopup } from './popup.js';
+import { addToHistory } from './History.js';
+import { TextEntryRowSetText } from './TextEntryRow.js';
+
 // from https://developers.google.com/youtube/iframe_api_reference
 let youtubeScriptElement = document.createElement('script');
 youtubeScriptElement.src = "https://www.youtube.com/iframe_api";
@@ -10,7 +14,7 @@ window.onYouTubeIframeAPIReady = function() {
 
 let youtubePlayer;
 
-export function playYoutubeVideo(params) {
+function invokeYoutubePlayAPI(params) {
   let { playerDivId, width, height, videoId, startAt, endAt, doneCallback } = params;
   if (!youtubeAPIReady) {
     console.error('YouTube API not ready when attempting to play video: '+videoId);
@@ -44,6 +48,42 @@ export function playYoutubeVideo(params) {
       doneCallback();
     }
   }
+}
+
+// play YouTube video from a videoId
+export function playYoutubeVideo(phrase) {
+  let { videoId, startAt, endAt } = phrase;
+  let cleanupAlreadyDone = false;
+	if (videoId && videoId.length > 0) {
+    let params = {
+      content: `<div id="youtubePlayerDiv"></div>`,
+      refNode: document.querySelector('.main'),
+      hideCallback: () => {
+        if (!cleanupAlreadyDone) {
+          stopYoutubeVideo();
+          popupRootElement.innerHTML = '';
+          cleanupAlreadyDone = true;
+        }
+      }
+    };
+    let popupRootElement = showPopup(params);
+    let youtubeParams = {
+      playerDivId: 'youtubePlayerDiv',
+      width: 300,
+      height: 300,
+      videoId,
+      startAt,
+      endAt,
+      doneCallback: function() {
+        popupRootElement.innerHTML = '';
+        cleanupAlreadyDone = true;
+        hidePopup();
+      }
+    };
+    invokeYoutubePlayAPI(youtubeParams);
+		TextEntryRowSetText('');
+		addToHistory(Object.assign({}, phrase));
+	}
 }
 
 export function stopYoutubeVideo(params) {
