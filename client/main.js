@@ -22,7 +22,7 @@ export function main() {
   initializeVocalize(initializationProps);
   initializeStash(initializationProps);
   initializeHistory(initializationProps);
-  let Favorites = initializeFavorites(initializationProps);
+  initializeFavorites(initializationProps);
 
 	let showSettings = () => {
 		// Don't show Settings for the time being.
@@ -41,40 +41,76 @@ export function main() {
 		updateMain();
 	}
 
+  /**
+   * Returns a block of lit-html nodes that can be used to render
+   * the title row of a screen that slides in from the right.
+   * @param {string} title Title that will appear at the top
+   * @param {function} [returnFunc] Optional function that
+   *   is called when user clicks on back arrow that will appear at top/left.
+   *   If this param isn't provided, the arrow won't appear.
+   * @returns {lit-html html`` return object} renderable object for the title
+   */
   function buildSlideRightTitle(title, returnFunc) {
     let onClickReturn = e => {
       e.preventDefault();
       returnFunc();
     }
     return html`<div class=SlideRightTitle>
-      <a href="" @click=${onClickReturn} class=SlideRightBackArrow></a><span class=SlideRightTitleText>${title}</span>
+      ${returnFunc ? html`<a href="" @click=${onClickReturn} class=SlideRightBackArrow></a>` : '' }
+      <span class=SlideRightTitleText>${title}</span>
     </div>`;
   }
 
-  function onEditStash() {
-    let props = { onEditStashReturn, buildSlideRightTitle, speak };
-    editStash(document.querySelector('.mainright'), props);
+  function slideInScreenShow(leftContentDiv, rightContentDiv, params) {
+    let { renderFunc, renderFuncParams} = params;
+    renderFunc(rightContentDiv, renderFuncParams);
     let animParams = {
-      leftContentDiv: document.querySelector('.mainleft'),
+      leftContentDiv,
       animClassName: 'slideFromRightAnim'
     };
     fromRight(animParams);
   }
 
-  function onEditStashReturn() {
-    updateMain();
+  function slideInScreenHide(leftContentDiv) {
     let animParams = {
-      leftContentDiv: document.querySelector('.mainleft'),
+      leftContentDiv,
       origAnimClassName: 'slideFromRightAnim',
       undoAnimClassName: 'undoSlideFromRightAnim'
     };
     fromLeft(animParams);
   }
 
+  function secondLevelScreenShow(params) {
+    slideInScreenShow(document.querySelector('.mainleft'),
+      document.querySelector('.mainright'), params);
+  }
+
+  function secondLevelScreenHide() {
+    slideInScreenHide(document.querySelector('.mainleft'));
+  }
+
+  function thirdLevelScreenShow(params) {
+    slideInScreenShow(document.querySelector('.secondlevelleft'),
+      document.querySelector('.secondlevelright'), params);
+  }
+
+  function thirdLevelScreenHide() {
+    slideInScreenHide(document.querySelector('.secondlevelleft'));
+  }
+
+  function onEditStash() {
+    let renderFuncParams = { onEditStashReturn, buildSlideRightTitle, thirdLevelScreenShow, thirdLevelScreenHide };
+    secondLevelScreenShow({ renderFunc: editStash, renderFuncParams });
+  }
+
+  function onEditStashReturn() {
+    updateMain();
+    secondLevelScreenHide();
+  }
+
 	let updateMain = searchString => {
-		let TextEntryRowProps = { initialText: '', speak, stash, search, clear };
-		let PhrasesProps = { Favorites, speak, playAudio,
-      onEditStash, triggerUpdate,
+		let TextEntryRowProps = { initialText: '', stash, search, clear };
+		let PhrasesProps = { onEditStash, triggerUpdate,
       searchString, TextEntryRowSetText, TextEntryRowSetFocus };
 		render(html`
 			<style>${css}</style>
@@ -85,7 +121,10 @@ export function main() {
             <div id=PhrasesContainer></div>
           </div>
         </div>
-        <div class=mainright></div>
+        <div class=mainright>
+          <div class=secondlevelleft></div>
+          <div class=secondlevelright></div>
+        </div>
       </div>
 		`, document.body);
     updateTextEntryRow(document.getElementById('TextEntryRowContainer'), TextEntryRowProps);

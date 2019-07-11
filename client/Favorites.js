@@ -40,9 +40,11 @@ let css = `
 }
 `;
 
+let Favorites;
+
 export function initializeFavorites(props) {
   let { currentVersion } = props;
-  return {
+  Favorites = {
     version: currentVersion,
     categories: [
     	{ label: 'Basic', expanded: true, items: [
@@ -90,7 +92,7 @@ export function initializeFavorites(props) {
 };
 
 export function updateFavorites(parentElement, props) {
-  let { Favorites, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows } = props;
+  let { searchTokens, onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } = props;
   let onClickEdit = e => {
     e.preventDefault();
     debugger;

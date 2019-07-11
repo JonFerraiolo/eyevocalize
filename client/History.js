@@ -29,7 +29,7 @@ export function addToHistory(obj) {
 };
 
 export function updateHistory(parentElement, props) {
-  let { searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows } = props;
+  let { searchTokens, onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } = props;
   let onClickEdit = e => {
     e.preventDefault();
     debugger;

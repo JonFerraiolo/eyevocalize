@@ -6,17 +6,20 @@ let css = `
 }
 `;
 
-export function EditPhrase(props) {
-  let { phrase, parentElement, title, doItButtonLabel, doItCallback, cancelCallback, speak, playAudio } = props;
+export function EditPhrase(parentElement, params) {
+  let { phrase, title, doItButtonLabel, doItCallback, cancelCallback } = params;
   phrase = phrase || {};
-  let { type, text, label, url } = phrase;
+  let { type, text, label, url, videoId, startAt, endAt } = phrase;
   type = type || 'text';
   text = text || '';
   label = label || '';
   url = url || '';
+  videoId = videoId || '';
+  startAt = startAt || '';
+  endAt = endAt || '';
   let onClickDoit = e => {
     e.preventDefault();
-    doItCallback({ type, text, label, url });
+    doItCallback({ type, text, label, url, videoId, startAt, endAt });
   };
   let onClickCancel = e => {
     e.preventDefault();

@@ -1,9 +1,9 @@
 
 import { render, html } from 'https://unpkg.com/lit-html?module';
+import { speak, playAudio, playYoutube } from './vocalize.js';
 import { updateStash } from './Stash.js';
 import { updateHistory } from './History.js';
 import { updateFavorites } from './Favorites.js';
-import { playYoutube } from './vocalize.js';
 
 let css = `
 .Phrases  {
@@ -97,7 +97,7 @@ let rightSideIcons = (onEdit, onHelp) => {
 };
 
 export function updatePhrases(parentElement, props) {
-  let { speak, playAudio, onEditStash, triggerUpdate, Favorites,
+  let { onEditStash, triggerUpdate,
     searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
@@ -132,10 +132,10 @@ export function updatePhrases(parentElement, props) {
       triggerUpdate();
     }
   };
-  let StashProps = { searchTokens, onPhraseClick, onEditStash, speak, rightSideIcons,
+  let StashProps = { searchTokens, onPhraseClick, onEditStash, rightSideIcons,
     buildTitleWithCollapseExpandArrows, cloneOnlyPermanentProperties };
-  let HistoryProps = { searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
-  let FavoritesProps = { Favorites, searchTokens, onPhraseClick, speak, rightSideIcons, buildTitleWithCollapseExpandArrows };
+  let HistoryProps = { searchTokens, onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows };
+  let FavoritesProps = { searchTokens, onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows };
   render(html`
   <style>${css}</style>
   <div class=Phrases>

@@ -3,6 +3,7 @@ import { render, html } from 'https://unpkg.com/lit-html?module';
 import { showPopup } from './popup.js';
 import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { cloneOnlyPermanentProperties } from './Phrases.js';
+import { EditPhrase } from './EditPhrase.js';
 // import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js';
 
 let css = `
@@ -53,7 +54,7 @@ function onStashChange(newStash) {
 }
 
 export function updateStash(parentElement, props) {
-  let { searchTokens, onPhraseClick, speak, onEditStash, rightSideIcons,
+  let { searchTokens, onPhraseClick, onEditStash, rightSideIcons,
     buildTitleWithCollapseExpandArrows } = props;
   let onClickEdit = e => {
     e.preventDefault();
@@ -91,7 +92,7 @@ export function updateStash(parentElement, props) {
 }
 
 export function editStash(parentElement, props) {
-  let { onEditStashReturn, buildSlideRightTitle, speak } = props;
+  let { onEditStashReturn, thirdLevelScreenShow, thirdLevelScreenHide, buildSlideRightTitle } = props;
   let onItemClick = e => {
     e.preventDefault();
     let phrase = e.currentTarget.phraseObject;
@@ -114,6 +115,24 @@ export function editStash(parentElement, props) {
   };
   let onClickAddItem = e => {
     e.preventDefault();
+    let params = {
+      renderFunc: EditPhrase,
+      renderFuncParams: {
+        title: 'Add New Entry To Stash',
+        doItButtonLabel: 'Add to Stash',
+        doItCallback: function(phrase) {
+          // add phrase to Stash, go back to parent screen
+          debugger;
+          localUpdate();
+          thirdLevelScreenHide();
+        },
+        cancelCallback: function() {
+          // do nothing, go back to parent screen
+          thirdLevelScreenHide();
+        },
+      },
+    };
+    thirdLevelScreenShow(params);
   };
   let onClickEditItem = e => {
     e.preventDefault();
