@@ -5,6 +5,7 @@ import { updateStash } from './Stash.js';
 import { updateHistory } from './History.js';
 import { updateFavorites } from './Favorites.js';
 import { updateMain } from './main.js';
+import { TextEntryRowSetText, TextEntryRowSetFocus } from './TextEntryRow.js';
 
 let css = `
 .Phrases  {
@@ -80,6 +81,7 @@ let css = `
 
 const expandArrowSpan = html`<span class=collapsearrow>&#x2304;</span>`;
 const collapseArrowSpan = html`<span class=expandarrow>&#x2303;</span>`;
+
 export function cloneOnlyPermanentProperties(localStash) {
   let newStash = JSON.parse(JSON.stringify(localStash));  // deep clone
   newStash.items = newStash.items.map(item => {
@@ -90,52 +92,54 @@ export function cloneOnlyPermanentProperties(localStash) {
   return newStash;
 };
 
-let rightSideIcons = (onEdit, onHelp) => {
+export function rightSideIcons(onEdit, onHelp) {
   return html`<span class=rightsideicons
   ><a href="" @click=${onEdit} class=editicon></a
   ><a href="" @click=${onHelp} class=helpicon></a
   ></span>`;
 };
 
+export function onPhraseClick(e) {
+  let shift = e.getModifierState("Shift");
+  let control = e.getModifierState("Control");
+  let meta = e.getModifierState("Meta");
+  let phrase = e.target.phraseObject;
+  let { type, text, label, url } = phrase;
+  if (!shift && (control || meta)) {
+    TextEntryRowSetText(type==='text' ? text : label );
+    TextEntryRowSetFocus();
+  } else if (!shift && !control && !meta) {
+    if (type === 'youtube') {
+      playYoutube(phrase);
+    } else if (type === 'audio') {
+      playAudio(phrase);
+    } else {
+      speak(text);
+    }
+    updateMain();
+  }
+};
+
+let toggleCollapseExpand = e => {
+  e.preventDefault();
+  let obj = e.currentTarget.objToToggle;
+  obj.expanded = !obj.expanded;
+  updateMain();
+};
+
+export function buildTitleWithCollapseExpandArrows(obj, title) {
+  let arrow = obj.expanded ? collapseArrowSpan : expandArrowSpan;
+  return html`<a href="" @click=${toggleCollapseExpand} .objToToggle=${obj}>${title}${arrow}</a>`;
+};
+
 export function updatePhrases(parentElement, props) {
-  let { onEditStash, searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
+  let { searchString } = props;
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
     [];
-  let buildTitleWithCollapseExpandArrows = (obj, title) => {
-    let arrow = obj.expanded ? collapseArrowSpan : expandArrowSpan;
-    return html`<a href="" @click=${toggleCollapseExpand} .objToToggle=${obj}>${title}${arrow}</a>`;
-  };
-  let toggleCollapseExpand = e => {
-    e.preventDefault();
-    let obj = e.currentTarget.objToToggle;
-    obj.expanded = !obj.expanded;
-    updateMain();
-  };
-  let onPhraseClick = e => {
-    let shift = e.getModifierState("Shift");
-    let control = e.getModifierState("Control");
-    let meta = e.getModifierState("Meta");
-    let phrase = e.target.phraseObject;
-    let { type, text, label, url } = phrase;
-    if (!shift && (control || meta)) {
-      TextEntryRowSetText(type==='text' ? text : label );
-      TextEntryRowSetFocus();
-    } else if (!shift && !control && !meta) {
-      if (type === 'youtube') {
-        playYoutube(phrase);
-      } else if (type === 'audio') {
-        playAudio(phrase);
-      } else {
-        speak(text);
-      }
-      updateMain();
-    }
-  };
-  let StashProps = { searchTokens, onPhraseClick, onEditStash, rightSideIcons,
-    buildTitleWithCollapseExpandArrows, cloneOnlyPermanentProperties };
-  let HistoryProps = { searchTokens, onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows };
-  let FavoritesProps = { searchTokens, onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows };
+  let StashProps = { searchTokens };
+  let HistoryProps = { searchTokens };
+  let FavoritesProps = { searchTokens };
   render(html`
   <style>${css}</style>
   <div class=Phrases>

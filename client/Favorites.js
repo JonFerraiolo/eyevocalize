@@ -1,5 +1,6 @@
 
 import { render, html } from 'https://unpkg.com/lit-html?module';
+import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } from './Phrases.js';
 
 let css = `
 .Favorites {
@@ -92,7 +93,7 @@ export function initializeFavorites(props) {
 };
 
 export function updateFavorites(parentElement, props) {
-  let { searchTokens, onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } = props;
+  let { searchTokens } = props;
   let onClickEdit = e => {
     e.preventDefault();
     debugger;

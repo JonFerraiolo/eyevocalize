@@ -4,7 +4,9 @@ import { showPopup } from './popup.js';
 import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { cloneOnlyPermanentProperties } from './Phrases.js';
 import { EditPhrase } from './EditPhrase.js';
-import { updateMain } from './main.js';
+import { updateMain, buildSlideRightTitle, secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
+import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } from './Phrases.js';
+
 // import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js';
 
 let css = `
@@ -53,8 +55,7 @@ function onStashChange(newStash) {
 }
 
 export function updateStash(parentElement, props) {
-  let { searchTokens, onPhraseClick, onEditStash, rightSideIcons,
-    buildTitleWithCollapseExpandArrows } = props;
+  let { searchTokens } = props;
   let onClickEdit = e => {
     e.preventDefault();
     onEditStash();
@@ -90,8 +91,17 @@ export function updateStash(parentElement, props) {
   </div>`, parentElement);
 }
 
+function onEditStash() {
+  let renderFuncParams = { };
+  secondLevelScreenShow({ renderFunc: editStash, renderFuncParams });
+}
+
+function onEditStashReturn() {
+  updateMain();
+  secondLevelScreenHide();
+}
+
 export function editStash(parentElement, props) {
-  let { onEditStashReturn, thirdLevelScreenShow, thirdLevelScreenHide, buildSlideRightTitle } = props;
   let onItemClick = e => {
     e.preventDefault();
     let phrase = e.currentTarget.phraseObject;

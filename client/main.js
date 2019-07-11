@@ -18,13 +18,13 @@ let showSettings = () => {
 	render(editSettings(props), document.getElementById('root'));
 }
 
-let search = text => {
+export function search(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	updateMain(text);
-}
+};
 
 // The text area control has been cleared
-function clear() {
+export function clear() {
 	updateMain();
 }
 
@@ -37,7 +37,7 @@ function clear() {
  *   If this param isn't provided, the arrow won't appear.
  * @returns {lit-html html`` return object} renderable object for the title
  */
-function buildSlideRightTitle(title, returnFunc) {
+export function buildSlideRightTitle(title, returnFunc) {
   let onClickReturn = e => {
     e.preventDefault();
     returnFunc();
@@ -67,37 +67,27 @@ function slideInScreenHide(leftContentDiv) {
   fromLeft(animParams);
 }
 
-function secondLevelScreenShow(params) {
+export function secondLevelScreenShow(params) {
   slideInScreenShow(document.querySelector('.mainleft'),
     document.querySelector('.secondlevelleft'), params);
 }
 
-function secondLevelScreenHide() {
+export function secondLevelScreenHide() {
   slideInScreenHide(document.querySelector('.mainleft'));
 }
 
-function thirdLevelScreenShow(params) {
+export function thirdLevelScreenShow(params) {
   slideInScreenShow(document.querySelector('.secondlevelleft'),
     document.querySelector('.secondlevelright'), params);
 }
 
-function thirdLevelScreenHide() {
+export function thirdLevelScreenHide() {
   slideInScreenHide(document.querySelector('.secondlevelleft'));
 }
 
-function onEditStash() {
-  let renderFuncParams = { onEditStashReturn, buildSlideRightTitle, thirdLevelScreenShow, thirdLevelScreenHide };
-  secondLevelScreenShow({ renderFunc: editStash, renderFuncParams });
-}
-
-function onEditStashReturn() {
-  updateMain();
-  secondLevelScreenHide();
-}
-
 export function updateMain(searchString) {
-	let TextEntryRowProps = { initialText: '', stash, search, clear };
-	let PhrasesProps = { onEditStash, searchString, TextEntryRowSetText, TextEntryRowSetFocus };
+	let TextEntryRowProps = { initialText: '' };
+	let PhrasesProps = { searchString };
 	render(html`
 		<style>${css}</style>
     <div class=main>
