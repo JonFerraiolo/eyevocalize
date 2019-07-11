@@ -4,6 +4,7 @@ import { showPopup } from './popup.js';
 import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { cloneOnlyPermanentProperties } from './Phrases.js';
 import { EditPhrase } from './EditPhrase.js';
+import { updateMain } from './main.js';
 // import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js';
 
 let css = `
@@ -18,11 +19,9 @@ let css = `
 `;
 
 let Stash;
-let triggerUpdate;
 
 export function initializeStash(props) {
   let { currentVersion } = props;
-  triggerUpdate = props.triggerUpdate;
   let initialStash = { version: currentVersion, expanded: true, items: [] };
   let StashString = localStorage.getItem("Stash");
   try {
@@ -44,7 +43,7 @@ export function stash(text) {
 		let phrase = { type: 'text', text, timestamp: new Date() };
     Stash.items.unshift(phrase);
     localStorage.setItem("Stash", JSON.stringify(Stash));
-    triggerUpdate();
+    updateMain();
 	}
 }
 

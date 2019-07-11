@@ -4,6 +4,7 @@ import { speak, playAudio, playYoutube } from './vocalize.js';
 import { updateStash } from './Stash.js';
 import { updateHistory } from './History.js';
 import { updateFavorites } from './Favorites.js';
+import { updateMain } from './main.js';
 
 let css = `
 .Phrases  {
@@ -97,8 +98,7 @@ let rightSideIcons = (onEdit, onHelp) => {
 };
 
 export function updatePhrases(parentElement, props) {
-  let { onEditStash, triggerUpdate,
-    searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
+  let { onEditStash, searchString, TextEntryRowSetText, TextEntryRowSetFocus } = props;
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
     [];
@@ -110,7 +110,7 @@ export function updatePhrases(parentElement, props) {
     e.preventDefault();
     let obj = e.currentTarget.objToToggle;
     obj.expanded = !obj.expanded;
-    triggerUpdate();
+    updateMain();
   };
   let onPhraseClick = e => {
     let shift = e.getModifierState("Shift");
@@ -129,7 +129,7 @@ export function updatePhrases(parentElement, props) {
       } else {
         speak(text);
       }
-      triggerUpdate();
+      updateMain();
     }
   };
   let StashProps = { searchTokens, onPhraseClick, onEditStash, rightSideIcons,

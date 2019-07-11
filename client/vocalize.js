@@ -3,12 +3,7 @@ import { playYoutubeVideo } from './youtube.js' ;
 import { addToHistory } from './History.js' ;
 import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { getVoice } from './Settings.js';
-
-let triggerUpdate;
-
-export function initializeVocalize(props) {
-	triggerUpdate = props.triggerUpdate;
-};
+import { updateMain } from './main.js';
 
 // Add text to the voice synthesis queue
 export function speak(text) {
@@ -30,7 +25,7 @@ export function speak(text) {
 			window.speechSynthesis.speak(msg);
 			TextEntryRowSetText('');
 			addToHistory({ type: 'text', text });
-      triggerUpdate();
+      updateMain();
 		}
 	}
 };
