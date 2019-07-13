@@ -1,11 +1,15 @@
 
-import { render, html } from 'https://unpkg.com/lit-html?module';
+import { html, render } from 'https://unpkg.com/lit-html?module';
 import { buildSlideRightTitle } from './main.js';
 
 let css = `
 .EditPhraseContent {
   padding: 0.5em 1.75em 1em;
   font-size: 95%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
 }
 .EditPhraseTypeRadioButtons {
   display: flex;
@@ -34,10 +38,25 @@ let css = `
   border: 2px solid black;
   border-top: none;
   padding: 1em;
+  flex: 1;
+}
+.EditPhraseInputBlock {
+  margin: 0.75em 0;
+}
+.EditPhraseInputBlock label {
+  display: block;
+  font-size: 90%;
+}
+.EditPhraseInputBlock textarea,.EditPhraseInputBlock input {
+  width: 100%;
 }
 .EditPhraseInputBlock *:invalid {
   border-color: red;
   background: pink;
+}
+.EditPhrase .ButtonRow button {
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
 }
 `;
 
@@ -58,25 +77,28 @@ export function EditPhrase(parentElement, params) {
   let regexVideoId = new RegExp(patternVideoId);
   let patternSeconds = "^([0-9]*\.[0-9]+|[0-9]+)$";
   let regexSeconds = new RegExp(patternSeconds);
-  let enableDoit;
+  let enableTest, enableDoit;
   let validateData = () => {
-    enableDoit = false;
+    enableTest = enableDoit = false;
     if (type === 'text') {
-      enableDoit = text.trim().length > 0;
+      enableTest = enableDoit = text.trim().length > 0;
     } else if (type === 'audio') {
-      enableDoit = regexUrl.test(url) && label.trim().length > 0;
+      enableTest = regexUrl.test(url);
+      enableDoit = enableTest && label.trim().length > 0;
     } else if (type === 'youtube') {
-      enableDoit = label.trim().length > 0 && regexVideoId.test(videoId) &&
+      enableTest = regexVideoId.test(videoId) &&
         (startAt.length === 0 || regexSeconds.test(startAt)) &&
         (endAt.length === 0 || regexSeconds.test(endAt));
       if (regexSeconds.test(startAt) && regexSeconds.test(endAt)) {
         let startNum = parseFloat(startAt);
         let endNum = parseFloat(endAt);
         if (endNum <= startNum) {
-          enableDoit = false;
+          enableTest = false;
         }
       }
+      enableDoit = enableTest && label.trim().length > 0;
     }
+    document.getElementById('EditPhraseTestutton').disabled = !enableTest;
     document.getElementById('EditPhraseDoitButton').disabled = !enableDoit;
   };
   let onClickTab = e => {
@@ -95,6 +117,9 @@ export function EditPhrase(parentElement, params) {
     else if (field === 'startAt') startAt = value;
     else if (field === 'endAt') endAt = value;
     validateData();
+  };
+  let onClickTest = e => {
+    e.preventDefault();
   };
   let onClickDoit = e => {
     e.preventDefault();
@@ -173,7 +198,10 @@ export function EditPhrase(parentElement, params) {
             <div class=EditPhraseData>
               ${phraseData}
             </div>
-            <div class=ButtonRow>
+            <div class="ButtonRow EditPhraseTestButtonRow">
+              <button @click=${onClickTest}>Test</button>
+            </div>
+            <div class="ButtonRow EditPhraseDoitButtonRow">
               <button id=EditPhraseDoitButton @click=${onClickDoit}>${doItButtonLabel}</button>
               <button @click=${onClickCancel}>Cancel</button>
             </div>

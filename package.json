@@ -10,6 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1",
-    "lit-html": "^1.1.0"
+    "lit-html": "^1.1.1"
   }
 }

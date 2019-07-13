@@ -1,5 +1,5 @@
 
-import { html } from 'https://unpkg.com/lit-html?module';
+import { html, render } from 'https://unpkg.com/lit-html?module';
 
 let css = `
 input[type="range"] {
