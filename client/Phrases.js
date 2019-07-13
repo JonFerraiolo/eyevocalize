@@ -99,6 +99,18 @@ export function rightSideIcons(onEdit, onHelp) {
   ></span>`;
 };
 
+export function playPhrase(phrase) {
+  let { type } = phrase;
+  if (type === 'youtube') {
+    playYoutube(phrase);
+  } else if (type === 'audio') {
+    playAudio(phrase);
+  } else {
+    let { text } = phrase;
+    speak(text);
+  }
+};
+
 export function onPhraseClick(e) {
   let shift = e.getModifierState("Shift");
   let control = e.getModifierState("Control");
@@ -109,13 +121,7 @@ export function onPhraseClick(e) {
     TextEntryRowSetText(type==='text' ? text : label );
     TextEntryRowSetFocus();
   } else if (!shift && !control && !meta) {
-    if (type === 'youtube') {
-      playYoutube(phrase);
-    } else if (type === 'audio') {
-      playAudio(phrase);
-    } else {
-      speak(text);
-    }
+    playPhrase(phrase);
     updateMain();
   }
 };

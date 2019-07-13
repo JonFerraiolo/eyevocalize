@@ -16,6 +16,8 @@ let youtubePlayer;
 
 function invokeYoutubePlayAPI(params) {
   let { playerDivId, width, height, videoId, startAt, endAt, doneCallback } = params;
+  if (typeof startAt === 'string') startAt = parseFloat(startAt);
+  if (typeof endAt === 'string') endAt = parseFloat(endAt);
   if (!youtubeAPIReady) {
     console.error('YouTube API not ready when attempting to play video: '+videoId);
     return;

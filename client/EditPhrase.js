@@ -1,6 +1,7 @@
 
 import { html, render } from 'https://unpkg.com/lit-html?module';
 import { buildSlideRightTitle } from './main.js';
+import { playPhrase } from './Phrases.js';
 
 let css = `
 .EditPhraseContent {
@@ -37,8 +38,9 @@ let css = `
 .EditPhraseData {
   border: 2px solid black;
   border-top: none;
-  padding: 1em;
+  padding: 0 1em 0.4em;
   flex: 1;
+  font-size: 95%;
 }
 .EditPhraseInputBlock {
   margin: 0.75em 0;
@@ -54,9 +56,18 @@ let css = `
   border-color: red;
   background: pink;
 }
+.EditPhrase .ButtonRow.EditPhraseTestButtonRow {
+  padding-top: 0.75em;
+  padding-bottom: 0;
+}
 .EditPhrase .ButtonRow button {
   padding-top: 0.8em;
   padding-bottom: 0.8em;
+}
+.EditPhrase .ButtonRow.EditPhraseTestButtonRow button {
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  background-color: #f66;
 }
 `;
 
@@ -98,7 +109,7 @@ export function EditPhrase(parentElement, params) {
       }
       enableDoit = enableTest && label.trim().length > 0;
     }
-    document.getElementById('EditPhraseTestutton').disabled = !enableTest;
+    document.getElementById('EditPhraseTestButton').disabled = !enableTest;
     document.getElementById('EditPhraseDoitButton').disabled = !enableDoit;
   };
   let onClickTab = e => {
@@ -120,14 +131,24 @@ export function EditPhrase(parentElement, params) {
   };
   let onClickTest = e => {
     e.preventDefault();
+    let phrase = makePhrase();
+    playPhrase(phrase);
   };
   let onClickDoit = e => {
     e.preventDefault();
-    doItCallback({ type, text, label, url, videoId, startAt, endAt });
+    let phrase = makePhrase();
+    doItCallback(phrase);
   };
   let onClickCancel = e => {
     e.preventDefault();
     cancelCallback();
+  };
+  let makePhrase = () => {
+    let timestamp = new Date();
+    let phrase = type === 'audio' ? { type, label, url, timestamp } :
+      (type === 'youtube' ? { type, label, videoId, startAt, endAt, timestamp } :
+      { type, text, label, timestamp });
+    return phrase;
   };
   let buildTypeRadioButton = (id, value, label) => {
     let cls = 'EditPhraseTypeRadioButton' + (type===value ? ' EditPhraseTypeRadioButtonChecked' : '');
@@ -199,7 +220,7 @@ export function EditPhrase(parentElement, params) {
               ${phraseData}
             </div>
             <div class="ButtonRow EditPhraseTestButtonRow">
-              <button @click=${onClickTest}>Test</button>
+              <button id=EditPhraseTestButton @click=${onClickTest}>Test</button>
             </div>
             <div class="ButtonRow EditPhraseDoitButtonRow">
               <button id=EditPhraseDoitButton @click=${onClickDoit}>${doItButtonLabel}</button>

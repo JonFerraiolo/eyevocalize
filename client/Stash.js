@@ -37,14 +37,19 @@ export function initializeStash(props) {
   return Stash;
 }
 
-// Add text tohistory without speaking
+// Add phrase to Stash without speaking
+export function addToStash(phrase) {
+  Stash.items.unshift(phrase);
+  localStorage.setItem("Stash", JSON.stringify(Stash));
+};
+
+// Add text to Stash without speaking
 export function stash(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	if (text.length > 0) {
 		TextEntryRowSetText('');
 		let phrase = { type: 'text', text, timestamp: new Date() };
-    Stash.items.unshift(phrase);
-    localStorage.setItem("Stash", JSON.stringify(Stash));
+    addToStash(phrase);
     updateMain();
 	}
 }
@@ -131,7 +136,9 @@ export function editStash(parentElement, props) {
         doItButtonLabel: 'Add to Stash',
         doItCallback: function(phrase) {
           // add phrase to Stash, go back to parent screen
-          debugger;
+          addToStash(phrase);
+          localStash = JSON.parse(JSON.stringify(Stash));  // deep clone
+          initializeSelection();
           localUpdate();
           thirdLevelScreenHide();
         },
@@ -206,10 +213,11 @@ export function editStash(parentElement, props) {
     onStashChange(cloneOnlyPermanentProperties(localStash));
     localUpdate();
   };
-  let localStash = JSON.parse(JSON.stringify(Stash));  // deep clone
-  localStash.items.forEach((item, index) => {
-    item.selected = false;
-  });
+  let initializeSelection = () => {
+    localStash.items.forEach((item, index) => {
+      item.selected = false;
+    });
+  };
   let localUpdate = () => {
     localStash.items.forEach(item => {
       item.cls = item.selected ? 'selected' : '';
@@ -272,5 +280,7 @@ export function editStash(parentElement, props) {
       </div>
     </div>`, parentElement);
   };
+  let localStash = JSON.parse(JSON.stringify(Stash));  // deep clone
+  initializeSelection();
   localUpdate();
 }
