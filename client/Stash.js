@@ -43,6 +43,11 @@ export function addToStash(phrase) {
   localStorage.setItem("Stash", JSON.stringify(Stash));
 };
 
+function replaceStashEntry(index, phrase) {
+  Stash.items[index] = Object.assign({}, phrase);
+  localStorage.setItem("Stash", JSON.stringify(Stash));
+};
+
 // Add text to Stash without speaking
 export function stash(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
@@ -152,6 +157,28 @@ export function editStash(parentElement, props) {
   };
   let onClickEditItem = e => {
     e.preventDefault();
+    let index = localStash.items.findIndex(phrase => phrase.selected);
+    let phrase = Stash.items[index];
+    let params = {
+      renderFunc: EditPhrase,
+      renderFuncParams: {
+        phrase,
+        title: 'Edit Entry From Stash',
+        doItButtonLabel: 'Update Entry',
+        doItCallback: function(phrase) {
+          // add phrase to Stash, go back to parent screen
+          replaceStashEntry(index, phrase);
+          localStash = JSON.parse(JSON.stringify(Stash));  // deep clone
+          localUpdate();
+          thirdLevelScreenHide();
+        },
+        cancelCallback: function() {
+          // do nothing, go back to parent screen
+          thirdLevelScreenHide();
+        },
+      },
+    };
+    thirdLevelScreenShow(params);
   };
   let onClickRemoveSelected = e => {
     e.preventDefault();

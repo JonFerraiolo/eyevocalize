@@ -167,41 +167,41 @@ export function EditPhrase(parentElement, params) {
       phraseData = html`
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>Label:</label>
-          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
+          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'} value=${label}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseURl>URL for the audio clip:</label>
-          <textarea id=EditPhraseURl @input=${onInput} pattern=${patternUrl} .editPhraseField=${'url'}></textarea>
+          <textarea id=EditPhraseURl @input=${onInput} pattern=${patternUrl} .editPhraseField=${'url'} value=${url}></textarea>
         </div>
       `;
     } else if (type === 'youtube') {
       phraseData = html`
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>Label:</label>
-          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
+          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'} value=${label}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseVideoId>YouTube videoId for this clip:</label>
-          <input id=EditPhraseVideoId @input=${onInput} pattern=${patternVideoId} .editPhraseField=${'videoId'}></input>
+          <input id=EditPhraseVideoId @input=${onInput} pattern=${patternVideoId} .editPhraseField=${'videoId'} value=${videoId}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseStartAt>Start at: (seconds, default=0)</label>
-          <input id=EditPhraseStartAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'startAt'}></input>
+          <input id=EditPhraseStartAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'startAt'} value=${startAt}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseEndAt>End at: (seconds, default=end of clip)</label>
-          <input id=EditPhraseEndAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'endAt'}></input>
+          <input id=EditPhraseEndAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'endAt'} value=${endAt}></input>
         </div>
       `;
     } else {
       phraseData = html`
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseText>Text to be spoken:</label>
-          <textarea id=EditPhraseText @input=${onInput} .editPhraseField=${'text'}></textarea>
+          <textarea id=EditPhraseText @input=${onInput} .editPhraseField=${'text'} value=${text}></textarea>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>Optional label:</label>
-          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
+          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'} value=${label}></input>
         </div>
       `;
     }
