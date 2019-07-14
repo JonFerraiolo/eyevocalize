@@ -28,8 +28,8 @@ let css = `
   border-radius: 3px;
   border: 1px solid black;
   background: none;
-  font-size: 1rem;
-  padding: 0.3rem 0.8em;
+  font-size: 0.95rem;
+  padding: 0.15em 0.25em;
   color: black;
   text-align: left;
 }

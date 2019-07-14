@@ -10,26 +10,26 @@ let css = `
   display: flex;
   align-items: center;
   flex: 0;
-}
-.TextEntryRow > * {
+  font-size: 0.9rem;
 }
 .TextEntryRow textarea {
+  height: 2.75emem;
   font-family: Arial, sans-serif;
   flex: 1;
-  padding: 0.5em;
+  padding: 0.25em;
   font-size: 1em;
   border-radius: 3px;
   border: 1px solid #D9D9D9;
 }
 .TextEntryRow button {
-  height: 4em;
+  height: 2.75emem;
   display: inline-flex;
   align-items: center;
   border-radius: 3px;
   border: black;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   margin: 0 2px;
-  padding: 0.5rem 0.8em;
+  padding: 0.8em 0.8em;
   background: lightgreen;
   color: black;
   font-weight: bold;

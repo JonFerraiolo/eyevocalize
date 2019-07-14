@@ -49,7 +49,7 @@ body {
   height: 100%;
 	display: flex;
 	flex-direction: column;
-  padding: 1em;
+  padding: 0.25em 0.6em;
 }
 #PhrasesContainer {
   flex: 1;

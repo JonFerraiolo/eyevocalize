@@ -14,11 +14,16 @@ let css = `
   flex-direction: row;
 }
 .StashAndHistory, #FavoritesContainer {
-  flex: 1;
   overflow: auto;
   min-height: 0px;
   height: 100%;
   display: inline-block;
+}
+.StashAndHistory {
+  flex: 1;
+}
+#FavoritesContainer {
+  flex: 3;
 }
 .PhrasesSectionLabel {
   background: #eee;
@@ -26,6 +31,7 @@ let css = `
   line-height: 1.1;
   text-align: center;
   border: 1px solid black;
+  font-size: 0.9em;
 }
 .PhrasesSectionLabel .collapsearrow, .PhrasesSectionLabel .expandarrow,
     .FavoritesCategoryLabel .collapsearrow, .FavoritesCategoryLabel .expandarrow {
@@ -43,7 +49,7 @@ let css = `
 }
 .PhraseRow {
   display: flex;
-  padding: 0 5em;
+  padding: 0 6.5%;
 }
 .skinnyScreenChild .PhraseRow {
   padding: 0 1.5em;
@@ -53,6 +59,9 @@ let css = `
 }
 .History button, .Stash button {
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .rightsideicons {
   float: right;
