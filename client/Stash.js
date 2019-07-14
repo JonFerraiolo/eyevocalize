@@ -66,6 +66,10 @@ function onStashChange(newStash) {
 
 export function updateStash(parentElement, props) {
   let { searchTokens } = props;
+  let onClickAdd = e => {
+    e.preventDefault();
+    debugger;
+  };
   let onClickEdit = e => {
     e.preventDefault();
     onEditStash();
@@ -88,7 +92,7 @@ export function updateStash(parentElement, props) {
   <style>${css}</style>
   <div class=Stash>
     <div class=PhrasesSectionLabel>
-      ${StashTitle}${rightSideIcons(onClickEdit, onClickHelp)}
+      ${StashTitle}${rightSideIcons({ onClickAdd, onClickEdit, onClickHelp })}
     </div>
     ${filteredStash.expanded ?
       html`${filteredStash.items.map(phrase =>

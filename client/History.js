@@ -54,7 +54,7 @@ export function updateHistory(parentElement, props) {
   <style>${css}</style>
   <div class=History>
     <div class=PhrasesSectionLabel>
-      ${HistoryTitle}${rightSideIcons(onClickEdit, onClickHelp)}
+      ${HistoryTitle}${rightSideIcons({ onClickEdit, onClickHelp })}
     </div>
     ${filteredHistory.expanded ?
       html`${filteredHistory.items.map(phrase =>

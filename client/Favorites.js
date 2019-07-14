@@ -94,6 +94,10 @@ export function initializeFavorites(props) {
 
 export function updateFavorites(parentElement, props) {
   let { searchTokens } = props;
+  let onClickAdd = e => {
+    e.preventDefault();
+    debugger;
+  };
   let onClickEdit = e => {
     e.preventDefault();
     debugger;
@@ -126,7 +130,7 @@ export function updateFavorites(parentElement, props) {
   render(html`
   <style>${css}</style>
   <div class=Favorites>
-    <div class=PhrasesSectionLabel>Favorites${rightSideIcons(onClickEdit, onClickHelp)}</div>
+    <div class=PhrasesSectionLabel>Favorites${rightSideIcons({ onClickAdd, onClickEdit, onClickHelp })}</div>
     ${filteredFavorites.categories.map(category => html`
       <div class=FavoritesCategoryLabel>${category.titleContent}</div>
       ${category.expanded ?

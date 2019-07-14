@@ -58,20 +58,27 @@ let css = `
   float: right;
   padding-right: 0.25em;
 }
-.editicon, .editicon:link, .editicon:visited, .helpicon, .helpicon:link, .helpicon:visited {
+.rightsideicon, .rightsideicon:link, .rightsideicon:visited {
   display: inline-block;
   text-decoration: none;
   background-size: contain;
   background-repeat: no-repeat;
   padding: 0 0.6em;
 }
-.editicon {
+.rightsideicon.addicon {
+  background-image: url(images/addicon.svg);
+  width: 0.75em;
+  height: 0.75em;
+  vertical-align: 0%;
+  padding-right: 0.55em;
+}
+.rightsideicon.editicon {
   background-image: url(images/editicon.svg);
   width: 1em;
   height: 1em;
   vertical-align: top;
 }
-.helpicon {
+.rightsideicon.helpicon {
   background-image: url(images/helpicon.svg);
   width: 0.75em;
   height: 0.75em;
@@ -92,11 +99,12 @@ export function cloneOnlyPermanentProperties(localStash) {
   return newStash;
 };
 
-export function rightSideIcons(onEdit, onHelp) {
-  return html`<span class=rightsideicons
-  ><a href="" @click=${onEdit} class=editicon></a
-  ><a href="" @click=${onHelp} class=helpicon></a
-  ></span>`;
+export function rightSideIcons(params) {
+  let { onClickAdd, onClickEdit, onClickHelp } = params;
+  let add = onClickAdd ? html`<a href="" @click=${onClickAdd} class="rightsideicon addicon"></a>` : '';
+  let edit = onClickEdit ? html`<a href="" @click=${onClickEdit} class="rightsideicon editicon"></a>` : '';
+  let help = onClickHelp ? html`<a href="" @click=${onClickHelp} class="rightsideicon helpicon"></a>` : '';
+  return html`<span class=rightsideicons>${add}${edit}${help}</span>`;
 };
 
 export function playPhrase(phrase) {
