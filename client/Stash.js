@@ -1,5 +1,5 @@
 
-import { html, render } from 'https://unpkg.com/lit-html?module';
+import { html, render } from './lib/lit-html/lit-html.js';
 import { showPopup } from './popup.js';
 import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { cloneOnlyPermanentProperties } from './Phrases.js';

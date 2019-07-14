@@ -7,7 +7,7 @@ import { initializeHistory, addToHistory, editHistory } from './History.js';
 import { initializeFavorites, editFavorites } from './Favorites.js';
 import { fromRight, fromLeft } from './animSlide.js';
 import { speak, playAudio } from './vocalize.js';
-import { html, render } from 'https://unpkg.com/lit-html?module';
+import { html, render } from './lib/lit-html/lit-html.js';
 
 let css = `@import 'app.css';`;
 

@@ -1,7 +1,8 @@
 
 import { speak } from './vocalize.js';
 import { stash } from './Stash.js';
-import { html, render } from 'https://unpkg.com/lit-html?module';
+import { search, clear } from './main.js';
+import { html, render } from './lib/lit-html/lit-html.js';
 
 let css = `
 .TextEntryRow {
@@ -43,7 +44,6 @@ let css = `
 `;
 
 export function updateTextEntryRow(parentElement, props) {
-  let { search, clear } = props;
   let text = props.initialText || '';
   let onClear = e => {
     document.getElementById('TextEntryRowTextArea').value = '';

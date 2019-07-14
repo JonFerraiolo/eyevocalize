@@ -1,5 +1,5 @@
 
-import { html, render } from 'https://unpkg.com/lit-html?module';
+import { html, render } from './lib/lit-html/lit-html.js';
 import { speak, playAudio, playYoutube } from './vocalize.js';
 import { updateStash } from './Stash.js';
 import { updateHistory } from './History.js';
