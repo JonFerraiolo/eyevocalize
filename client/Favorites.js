@@ -69,11 +69,24 @@ export function initializeFavorites(props) {
     columns: [
       { categories: [
         	{ label: 'Clips', expanded: true, items: [
+            { type: 'youtube', label: 'johnny2', videoId: 'qswig8dcEAY', startAt: 65, endAt: 69 },
         		{ type: 'audio', label: 'Disappointed!', url: 'http://www.montypython.net/sounds/wanda/disappointed.wav'},
         		{ type: 'audio', label: 'Inconceivable!', url: 'http://www.moviesoundclips.net/download.php?id=2900&ft=mp3'},
             { type: 'audio', label: 'Excellent!', url: 'http://www.billandted.org/sounds/ea/eaexcellent.mp3'},
+            { type: 'youtube', label: 'gehrig1', videoId: 'qswig8dcEAY', startAt: 5, endAt: 16 },
+            { type: 'youtube', label: 'gehrig2', videoId: 'OyT4mPBe4YQ', startAt: 150, endAt: 165 },
+            { type: 'youtube', label: 'home', videoId: 'RPs2Y4FdGzM', startAt: 143, endAt: 150 },
+            { type: 'youtube', label: 'houston', videoId: 'Bti9_deF5gs', startAt: 25, endAt: 150 },
+            { type: 'youtube', label: 'crying', videoId: 'Xx8cCDthsuk', startAt: 50, endAt: 56 },
+            { type: 'youtube', label: 'pretty', videoId: 'lT8qgvgk1rU', startAt: 98, endAt: 106 },
             { type: 'youtube', label: 'kenny', videoId: 'kXxr9A_UBG4', startAt: 10, endAt: 16 },
-            { type: 'youtube', label: 'missed it', videoId: 'oPwrodxghrw', startAt: 2.5, endAt: 7.5 },
+            { type: 'youtube', label: 'missed', videoId: 'oPwrodxghrw', startAt: 2.5, endAt: 7.5 },
+            { type: 'youtube', label: 'to me?', videoId: 'tp6KExqs_3o', startAt: 0, endAt: 7.5 },
+            { type: 'youtube', label: 'les', videoId: 'dROwEc4VyJA', startAt: 84, endAt: 93 },
+            { type: 'youtube', label: 'yippie', videoId: '4XEaeOxqy_4', startAt: 20.5, endAt: 25 },
+            { type: 'youtube', label: 'gin', videoId: '09g2PzusuzI', startAt: 24, endAt: 31 },
+            { type: 'text', label: 'hello', text: "You had me at hello"},
+            { type: 'text', label: 'girl', text: "I'm just a girl, standing in front of a boy, asking him to love her"},
         	]},
         ]
       },
