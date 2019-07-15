@@ -69,7 +69,8 @@ export function initializeFavorites(props) {
     columns: [
       { categories: [
         	{ label: 'Clips', expanded: true, items: [
-            { type: 'youtube', label: 'johnny2', videoId: 'qswig8dcEAY', startAt: 65, endAt: 69 },
+            { type: 'youtube', label: 'johnny1', videoId: 'WZKmsA8bzao', startAt: 25.5, endAt: 39 },
+            { type: 'youtube', label: 'johnny2', videoId: 'gpCUMdfRa9w', startAt: 67, endAt: 71 },
         		{ type: 'audio', label: 'Disappointed!', url: 'http://www.montypython.net/sounds/wanda/disappointed.wav'},
         		{ type: 'audio', label: 'Inconceivable!', url: 'http://www.moviesoundclips.net/download.php?id=2900&ft=mp3'},
             { type: 'audio', label: 'Excellent!', url: 'http://www.billandted.org/sounds/ea/eaexcellent.mp3'},
@@ -83,8 +84,13 @@ export function initializeFavorites(props) {
             { type: 'youtube', label: 'missed', videoId: 'oPwrodxghrw', startAt: 2.5, endAt: 7.5 },
             { type: 'youtube', label: 'to me?', videoId: 'tp6KExqs_3o', startAt: 0, endAt: 7.5 },
             { type: 'youtube', label: 'les', videoId: 'dROwEc4VyJA', startAt: 84, endAt: 93 },
+            { type: 'youtube', label: 'friend', videoId: 'AVQ8byG2mY8', startAt: 11, endAt: 17 },
             { type: 'youtube', label: 'yippie', videoId: '4XEaeOxqy_4', startAt: 20.5, endAt: 25 },
+            { type: 'youtube', label: 'punk', videoId: 'a25EBFAu0', startAt: 31, endAt: 57 },
             { type: 'youtube', label: 'gin', videoId: '09g2PzusuzI', startAt: 24, endAt: 31 },
+            { type: 'youtube', label: 'bumpy', videoId: 'yKHUGvde7KU', startAt: 3, endAt: 10 },
+            { type: 'youtube', label: 'mad', videoId: 'tUY05_ZwFzg', startAt: 0, endAt: 999 },
+            { type: 'youtube', label: 'failure', videoId: 'V2f-MZ2HRHQ', startAt: 2, endAt: 999 },
             { type: 'text', label: 'hello', text: "You had me at hello"},
             { type: 'text', label: 'girl', text: "I'm just a girl, standing in front of a boy, asking him to love her"},
         	]},
