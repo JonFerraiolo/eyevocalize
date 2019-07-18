@@ -2,6 +2,7 @@
 import { showPopup, hidePopup } from './popup.js';
 import { addToHistory } from './History.js';
 import { TextEntryRowSetText } from './TextEntryRow.js';
+import { html, render } from './lib/lit-html/lit-html.js';
 
 // from https://developers.google.com/youtube/iframe_api_reference
 let youtubeScriptElement = document.createElement('script');
@@ -58,12 +59,12 @@ export function playYoutubeVideo(phrase) {
   let cleanupAlreadyDone = false;
 	if (videoId && videoId.length > 0) {
     let params = {
-      content: `<div id="youtubePlayerDiv"></div>`,
+      content: html`<div id=youtubePlayerDiv></div>`,
       refNode: document.querySelector('.main'),
       hideCallback: () => {
         if (!cleanupAlreadyDone) {
           stopYoutubeVideo();
-          popupRootElement.innerHTML = '';
+          render(html``, popupRootElement);
           cleanupAlreadyDone = true;
         }
       }
@@ -77,7 +78,7 @@ export function playYoutubeVideo(phrase) {
       startAt,
       endAt,
       doneCallback: function() {
-        popupRootElement.innerHTML = '';
+        render(html``, popupRootElement);
         cleanupAlreadyDone = true;
         hidePopup();
       }

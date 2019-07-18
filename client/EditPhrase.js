@@ -60,11 +60,7 @@ let css = `
   padding-top: 0.75em;
   padding-bottom: 0;
 }
-.EditPhrase .ButtonRow button {
-  padding-top: 0.8em;
-  padding-bottom: 0.8em;
-}
-.EditPhrase .ButtonRow.EditPhraseTestButtonRow button {
+#EditPhraseTestButton {
   padding-top: 0.2em;
   padding-bottom: 0.2em;
   background-color: #f66;
@@ -72,7 +68,7 @@ let css = `
 `;
 
 export function EditPhrase(parentElement, params) {
-  let { phrase, title, doItButtonLabel, doItCallback, cancelCallback } = params;
+  let { phrase, title, doItButtonLabel, doItCallback, cancelCallback,customControls } = params;
   phrase = phrase || {};
   let { type, text, label, url, videoId, startAt, endAt } = phrase;
   type = type || 'text';
@@ -82,6 +78,7 @@ export function EditPhrase(parentElement, params) {
   videoId = videoId || '';
   startAt = startAt || '';
   endAt = endAt || '';
+  customControls = customControls || '';
   let patternUrl = "^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$";
   let regexUrl = new RegExp(patternUrl);
   let patternVideoId = "^[A-Za-z0-9\-\._\~\:\@\$]{8,}$";
@@ -167,41 +164,41 @@ export function EditPhrase(parentElement, params) {
       phraseData = html`
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>Label:</label>
-          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'} value=${label}></input>
+          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseURl>URL for the audio clip:</label>
-          <textarea id=EditPhraseURl @input=${onInput} pattern=${patternUrl} .editPhraseField=${'url'} value=${url}></textarea>
+          <textarea id=EditPhraseURl @input=${onInput} pattern=${patternUrl} .editPhraseField=${'url'}></textarea>
         </div>
       `;
     } else if (type === 'youtube') {
       phraseData = html`
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>Label:</label>
-          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'} value=${label}></input>
+          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseVideoId>YouTube videoId for this clip:</label>
-          <input id=EditPhraseVideoId @input=${onInput} pattern=${patternVideoId} .editPhraseField=${'videoId'} value=${videoId}></input>
+          <input id=EditPhraseVideoId @input=${onInput} pattern=${patternVideoId} .editPhraseField=${'videoId'}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseStartAt>Start at: (seconds, default=0)</label>
-          <input id=EditPhraseStartAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'startAt'} value=${startAt}></input>
+          <input id=EditPhraseStartAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'startAt'}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseEndAt>End at: (seconds, default=end of clip)</label>
-          <input id=EditPhraseEndAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'endAt'} value=${endAt}></input>
+          <input id=EditPhraseEndAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'endAt'}></input>
         </div>
       `;
     } else {
       phraseData = html`
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseText>Text to be spoken:</label>
-          <textarea id=EditPhraseText @input=${onInput} .editPhraseField=${'text'} value=${text}></textarea>
+          <textarea id=EditPhraseText @input=${onInput} .editPhraseField=${'text'}></textarea>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>Optional label:</label>
-          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'} value=${label}></input>
+          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
         </div>
       `;
     }
@@ -219,10 +216,9 @@ export function EditPhrase(parentElement, params) {
             <div class=EditPhraseData>
               ${phraseData}
             </div>
-            <div class="ButtonRow EditPhraseTestButtonRow">
-              <button id=EditPhraseTestButton @click=${onClickTest}>Test</button>
-            </div>
+            ${customControls}
             <div class="ButtonRow EditPhraseDoitButtonRow">
+              <button id=EditPhraseTestButton @click=${onClickTest}>Test</button>
               <button id=EditPhraseDoitButton @click=${onClickDoit}>${doItButtonLabel}</button>
               <button @click=${onClickCancel}>Cancel</button>
             </div>
@@ -230,6 +226,19 @@ export function EditPhrase(parentElement, params) {
         </div>
       </div>
     </div>`, parentElement);
+    // lit-html mysteriously does not update the value properties with subsequent renders
+    if (type === 'text') {
+      document.getElementById('EditPhraseText').value = text;
+      document.getElementById('EditPhraseLabel').value = label;
+    } else if (type === 'audio') {
+      document.getElementById('EditPhraseLabel').value = label;
+      document.getElementById('EditPhraseURl').value = url;
+    } else if (type === 'youtube') {
+      document.getElementById('EditPhraseLabel').value = label;
+      document.getElementById('EditPhraseVideoId').value = videoId;
+      document.getElementById('EditPhraseStartAt').value = startAt;
+      document.getElementById('EditPhraseEndAt').value = endAt;
+    }
   };
   localUpdate();
   validateData();

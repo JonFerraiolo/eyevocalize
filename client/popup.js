@@ -1,11 +1,12 @@
 
+import { html, render } from './lib/lit-html/lit-html.js';
 
 let popupUnderlay, popupOverlay, hideCallback;
 
 /**
  * Show a popup.
  * @param {object} params Various parameters
- * @param {string} params.content Inner HTML for the popup
+ * @param {string} params.content lit-html value returned from html``
  * @param {Element} [params.refNode] Position the popup relative to this element (default: body)
  * @param {string} [params.refX] Alignment edge on refNode: left|center|right (default: center)
  * @param {string} [params.refY] Alignment edge on refNode: top|center|bottom (default: center)
@@ -62,7 +63,8 @@ export function showPopup(params) {
 	popupOverlay.style.opacity = 0;
 	popupOverlay.style.left = '0px';
 	popupOverlay.style.top = '0px';
-	popupOverlay.innerHTML = params.content;
+	render(params.content, popupOverlay);
+	//render(html`hello`, popupOverlay);
 	// setTimeout to allow browser time to apply styling and computer sizes
 	setTimeout(function(){
 		var refRect = refNode === document.body ?

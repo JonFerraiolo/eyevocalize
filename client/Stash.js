@@ -1,10 +1,10 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
-import { showPopup } from './popup.js';
 import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { cloneOnlyPermanentProperties } from './Phrases.js';
 import { EditPhrase } from './EditPhrase.js';
-import { updateMain, buildSlideRightTitle, secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
+import { updateMain, buildSlideRightTitle,
+  secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } from './Phrases.js';
 
 // import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js';
