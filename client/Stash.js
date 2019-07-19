@@ -7,8 +7,6 @@ import { updateMain, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } from './Phrases.js';
 
-// import { unsafeHTML } from 'https://unpkg.com/lit-html/directives/unsafe-html.js';
-
 let css = `
 .editStash .skinnyScreenChild {
   display: flex;
