@@ -1,7 +1,7 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
 import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
-import { cloneOnlyPermanentProperties } from './Phrases.js';
+import { deleteTemporaryProperties } from './Phrases.js';
 import { EditPhrase } from './EditPhrase.js';
 import { updateMain, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
@@ -46,6 +46,12 @@ function replaceStashEntry(index, phrase) {
   localStorage.setItem("Stash", JSON.stringify(Stash));
 };
 
+function traverseItems(aStash, func) {
+  aStash.items.forEach((item, itIndex) => {
+    func(item, aStash, itIndex);
+  });
+};
+
 // Add text to Stash without speaking
 export function stash(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
@@ -57,12 +63,11 @@ export function stash(text) {
 	}
 }
 
-function onStashChange(newStash) {
-  Stash = JSON.parse(JSON.stringify(newStash));  // deep clone
+function onStashChange() {
   localStorage.setItem("Stash", JSON.stringify(Stash));
 }
 
-export function updateStash(parentElement, props) {
+export function updateStash(props) {
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
@@ -86,21 +91,22 @@ export function updateStash(parentElement, props) {
     });
   }
   let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Stash");
-  render(html`
-  <style>${css}</style>
-  <div class=Stash>
+  return html`
+    <style>${css}</style>
     <div class=PhrasesSectionLabel>
       ${StashTitle}${rightSideIcons({ onClickAdd, onClickEdit, onClickHelp })}
     </div>
     ${filteredStash.expanded ?
-      html`${filteredStash.items.map(phrase =>
-        html`
-          <div class=PhraseRow>
-            <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
-          </div>
-        `
-      )}` : ''}
-  </div>`, parentElement);
+      html`<div class=StashContent>
+        ${filteredStash.items.map(phrase =>
+          html`
+            <div class=PhraseRow>
+              <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
+            </div>
+          `
+        )}
+      </div>` : ''}
+    `;
 }
 
 function onEditStash() {
@@ -171,6 +177,7 @@ export function editStash(parentElement, props) {
           // add phrase to Stash, go back to parent screen
           replaceStashEntry(index, phrase);
           localStash = JSON.parse(JSON.stringify(Stash));  // deep clone
+          localStash.items[index].selected = true;
           localUpdate();
           thirdLevelScreenHide();
         },
@@ -185,7 +192,9 @@ export function editStash(parentElement, props) {
   let onClickRemoveSelected = e => {
     e.preventDefault();
     localStash.items = localStash.items.filter(item => !item.selected);
-    onStashChange(cloneOnlyPermanentProperties(localStash));
+    Stash = JSON.parse(JSON.stringify(localStash));  // deep clone
+    traverseItems(Stash, deleteTemporaryProperties);
+    onStashChange();
     localUpdate();
   };
   let onClickMoveUp = e => {
@@ -196,7 +205,9 @@ export function editStash(parentElement, props) {
         [ localStash.items[i-1], localStash.items[i] ] = [ localStash.items[i], localStash.items[i-1] ];  // swap
       }
     }
-    onStashChange(cloneOnlyPermanentProperties(localStash));
+    Stash = JSON.parse(JSON.stringify(localStash));  // deep clone
+    traverseItems(Stash, deleteTemporaryProperties);
+    onStashChange();
     localUpdate();
   };
   let onClickMoveDown = e => {
@@ -207,7 +218,9 @@ export function editStash(parentElement, props) {
         [ localStash.items[i+1], localStash.items[i] ] = [ localStash.items[i], localStash.items[i+1] ];  // swap
       }
     }
-    onStashChange(cloneOnlyPermanentProperties(localStash));
+    Stash = JSON.parse(JSON.stringify(localStash));  // deep clone
+    traverseItems(Stash, deleteTemporaryProperties);
+    onStashChange();
     localUpdate();
   };
   let onClickMoveToTop = e => {
@@ -223,7 +236,9 @@ export function editStash(parentElement, props) {
         toPosition++;
       }
     }
-    onStashChange(cloneOnlyPermanentProperties(localStash));
+    Stash = JSON.parse(JSON.stringify(localStash));  // deep clone
+    traverseItems(Stash, deleteTemporaryProperties);
+    onStashChange();
     localUpdate();
   };
   let onClickMoveToBottom = e => {
@@ -239,7 +254,9 @@ export function editStash(parentElement, props) {
         toPosition--;
       }
     }
-    onStashChange(cloneOnlyPermanentProperties(localStash));
+    Stash = JSON.parse(JSON.stringify(localStash));  // deep clone
+    traverseItems(Stash, deleteTemporaryProperties);
+    onStashChange();
     localUpdate();
   };
   let initializeSelection = () => {

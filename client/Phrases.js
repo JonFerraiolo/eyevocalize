@@ -20,7 +20,14 @@ let css = `
   display: inline-block;
 }
 .StashAndHistory {
+  display: inline-flex;
+  flex-direction: column;
   flex: 1;
+}
+.StashContent, .HistoryContent {
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 #FavoritesContainer {
   flex: 3;
@@ -50,14 +57,18 @@ let css = `
 .PhraseRow {
   display: flex;
   padding: 0 6.5%;
+  text-align: left;
+}
+.PhraseRow button {
+  text-align: left;
 }
 .skinnyScreenChild .PhraseRow {
   padding: 0 1.5em;
 }
-.Stash .PhrasesSectionLabel {
+.StashAndHistory .PhrasesSectionLabel {
   border-right: none;
 }
-.History button, .Stash button {
+.HistoryContent button, .StashContent button {
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -97,15 +108,15 @@ let css = `
 
 const expandArrowSpan = html`<span class=collapsearrow>&#x2304;</span>`;
 const collapseArrowSpan = html`<span class=expandarrow>&#x2303;</span>`;
+const phrasePermanentProps = ['type', 'text', 'label', 'url', 'videoId',
+  'startAt', 'endAt',' timestamp'];
 
-export function cloneOnlyPermanentProperties(localStash) {
-  let newStash = JSON.parse(JSON.stringify(localStash));  // deep clone
-  newStash.items = newStash.items.map(item => {
-    return { type: item.type, text: item.text, label: item.label, url: item.url,
-      videoId: item.videoId, startAt: item.startAt, endAt: item.endAt,
-      timestamp: item.timestamp };
+export function deleteTemporaryProperties(phrase) {
+  Object.keys(phrase).forEach(key => {
+    if (!phrasePermanentProps.includes(key))  {
+      delete phrase[key];
+    }
   });
-  return newStash;
 };
 
 export function rightSideIcons(params) {
@@ -167,12 +178,10 @@ export function updatePhrases(parentElement, props) {
   <style>${css}</style>
   <div class=Phrases>
     <div class=StashAndHistory>
-      <div id=StashContainer></div>
-      <div id=HistoryContainer></div>
+      ${updateStash(StashProps)}
+      ${updateHistory(HistoryProps)}
     </div>
     <div id=FavoritesContainer></div>
   </div>`, parentElement);
-  updateStash(document.getElementById('StashContainer'), StashProps);
-  updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
   updateFavorites(document.getElementById('FavoritesContainer'), FavoritesProps);
 }

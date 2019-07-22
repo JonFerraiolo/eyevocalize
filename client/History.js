@@ -29,7 +29,7 @@ export function addToHistory(obj) {
 	localStorage.setItem("History", JSON.stringify(History));
 };
 
-export function updateHistory(parentElement, props) {
+export function updateHistory(props) {
   let { searchTokens } = props;
   let onClickEdit = e => {
     e.preventDefault();
@@ -50,21 +50,22 @@ export function updateHistory(parentElement, props) {
     });
   }
   let HistoryTitle = buildTitleWithCollapseExpandArrows(History, "History");
-  render(html`
-  <style>${css}</style>
-  <div class=History>
+  return html`
+    <style>${css}</style>
     <div class=PhrasesSectionLabel>
       ${HistoryTitle}${rightSideIcons({ onClickEdit, onClickHelp })}
     </div>
     ${filteredHistory.expanded ?
-      html`${filteredHistory.items.map(phrase =>
-        html`
-          <div class=PhraseRow>
-            <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
-          </div>
-        `
-      )}` : ''}
-  </div>`, parentElement);
+      html`<div class=HistoryContent>
+        ${filteredHistory.items.map(phrase =>
+          html`
+            <div class=PhraseRow>
+              <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
+            </div>
+          `
+        )}
+      </div>` : ''}
+    `;
 }
 
 export function editHistory(parentElement, props) {

@@ -12,36 +12,6 @@ let css = `
   height: 100%;
   flex: 1;
 }
-.EditPhraseTypeRadioButtons {
-  display: flex;
-}
-.EditPhraseTypeRadioButton {
-  flex: 1 1 0;
-  background: #f0f0f0;
-  border: 1px solid #888;
-  border-bottom: 2px solid black;
-  font-weight: normal;
-  padding: 0.25em 0.8em 0.45em 0.1em;
-  margin-left: -1px;
-  text-align: center;
-}
-.EditPhraseTypeRadioButton * {
-  vertical-align: middle;
-}
-.EditPhraseTypeRadioButtonChecked {
-  background: white;
-  border: 2px solid black;
-  border-bottom: 2px solid white;
-  font-weight: bold;
-  margin-left: 0;
-}
-.EditPhraseData {
-  border: 2px solid black;
-  border-top: none;
-  padding: 0 1em 0.4em;
-  flex: 1;
-  font-size: 95%;
-}
 .EditPhraseInputBlock {
   margin: 0.75em 0;
 }
@@ -148,12 +118,12 @@ export function EditPhrase(parentElement, params) {
     return phrase;
   };
   let buildTypeRadioButton = (id, value, label) => {
-    let cls = 'EditPhraseTypeRadioButton' + (type===value ? ' EditPhraseTypeRadioButtonChecked' : '');
+    let cls = 'TabControlRadioButton' + (type===value ? ' TabControlRadioButtonChecked' : '');
     return html`
-      <span class=${cls}>
-        <label for=${id} @click=${onClickTab} .EditPhraseValue=${value}>
+      <span class=${cls} @click=${onClickTab} .EditPhraseValue=${value}>
+        <label for=${id}>
           <input type=radio id=${id} name=EditPhraseType value=${value} ?checked=${type===value}></input
-          ><span class=EditPhraseTypeLabel>${label}</span>
+          ><span class=TabControlRadioButtonLabel>${label}</span>
         </label>
       </span>
     `;
@@ -208,12 +178,12 @@ export function EditPhrase(parentElement, params) {
         <div class=skinnyScreenChild>
           ${buildSlideRightTitle(title, null)}
           <div class=EditPhraseContent>
-            <div class=EditPhraseTypeRadioButtons>
+            <div class=TabControlRadioButtons>
               ${buildTypeRadioButton('EditPhraseTypeText', 'text', 'Spoken text')}
               ${buildTypeRadioButton('EditPhraseTypeAudio', 'audio', 'Web audio')}
               ${buildTypeRadioButton('EditPhraseTypeYoutube', 'youtube', 'YouTube video')}
             </div>
-            <div class=EditPhraseData>
+            <div class=TabControlRadioData>
               ${phraseData}
             </div>
             ${customControls}

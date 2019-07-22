@@ -78,7 +78,7 @@ body {
   height: 1.5em;
   background-image: url(images/arrowback.svg);
   background-size: contain;
-  background-repeat: no-peat;
+  background-repeat: no-repeat;
   margin-left: 1em;
   float: left;
   vertical-align: middle;
@@ -115,12 +115,12 @@ body {
 .SelectLinksRow a:hover {
   color: blue;
 }
-.skinnyScreenChild .ButtonRow {
+.skinnyScreenChild .ButtonRow, .EditFavoritesChild .ButtonRow {
   padding: 1em 1.5em;
   display: flex;
   justify-content: space-around;
 }
-.skinnyScreenChild .ButtonRow button{
+.skinnyScreenChild .ButtonRow button, .EditFavoritesChild .ButtonRow button {
   display: inline-block;
   zoom: 1;
   padding: 2px 15px;
@@ -141,10 +141,10 @@ body {
   background-color: #2e9cca; /*23:https://visme.co/blog/website-color-schemes/,25274d,464866,aaabb8,29648a,*/
   border-color: #269CE9;
 }
-.skinnyScreenChild .ButtonRow button:hover{
+.skinnyScreenChild .ButtonRow button:hover, .EditFavoritesChild .ButtonRow button:hover {
   background: #29648a;
 }
-.skinnyScreenChild .ButtonRow button:active{
+.skinnyScreenChild .ButtonRow button:active, .EditFavoritesChild .ButtonRow button:active{
   background: #269CE9;
   position: relative;
   top: 1px;
@@ -152,7 +152,10 @@ body {
 }
 .skinnyScreenChild .ButtonRow button[disabled],
 .skinnyScreenChild .ButtonRow button[disabled]:hover,
-.skinnyScreenChild .ButtonRow button[disabled]:active{
+.skinnyScreenChild .ButtonRow button[disabled]:active,
+.EditFavoritesChild .ButtonRow button[disabled],
+.EditFavoritesChild .ButtonRow button[disabled]:hover,
+.EditFavoritesChild .ButtonRow button[disabled]:active {
   color: #ccc;
   opacity: 0.4;
 }
@@ -167,4 +170,34 @@ body {
 }
 .PhraseRow button.selected .checkmark {
   color: #25274d;
+}
+.TabControlRadioButtons {
+  display: flex;
+}
+.TabControlRadioButton {
+  flex: 1 1 0;
+  background: #f0f0f0;
+  border: 1px solid #888;
+  border-bottom: 2px solid black;
+  font-weight: normal;
+  padding: 0.25em 0.8em 0.45em 0.1em;
+  margin-left: -1px;
+  text-align: center;
+}
+.TabControlRadioButton * {
+  vertical-align: middle;
+}
+.TabControlRadioButtonChecked {
+  background: white;
+  border: 2px solid black;
+  border-bottom: 2px solid white;
+  font-weight: bold;
+  margin-left: 0;
+}
+.TabControlRadioData {
+  border: 2px solid black;
+  border-top: none;
+  padding: 0 1em 0.4em;
+  flex: 1;
+  font-size: 95%;
 }

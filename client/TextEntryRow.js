@@ -68,7 +68,6 @@ export function TextEntryRowSetFocus() {
     textarea.focus();
     let len = textarea.value.length;
     textarea.setSelectionRange(len, len);
-
   }, 0);
 }
 
