@@ -49,7 +49,7 @@ export function buildSlideRightTitle(title, returnFunc) {
 }
 
 function slideInScreenShow(leftContentDiv, rightContentDiv, params) {
-  let { renderFunc, renderFuncParams} = params;
+  let { renderFunc, renderFuncParams } = params;
   renderFunc(rightContentDiv, renderFuncParams);
   let animParams = {
     leftContentDiv,

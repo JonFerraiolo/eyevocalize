@@ -6,7 +6,10 @@ let popupUnderlay, popupOverlay, hideCallback;
 /**
  * Show a popup.
  * @param {object} params Various parameters
- * @param {string} params.content lit-html value returned from html``
+ * @param {object|function} params.content if an function, call the given function to render the content.
+ *         this routine will pass the parent node for the content as the sole parameter to the function.
+ *         otherwise, content must be a lit-html value returned from html``
+ * @param {object} [params.contentFuncParams] if content is a function, pass this to the function
  * @param {Element} [params.refNode] Position the popup relative to this element (default: body)
  * @param {string} [params.refX] Alignment edge on refNode: left|center|right (default: center)
  * @param {string} [params.refY] Alignment edge on refNode: top|center|bottom (default: center)
@@ -22,6 +25,7 @@ let popupUnderlay, popupOverlay, hideCallback;
 export function showPopup(params) {
 	let clickAwayToClose, underlayOpacity;
 	var content = params.content;
+	let { contentFuncParams } = params;
 	var refNode = params.refNode || document.body;
 	var refX = params.refX || 'center';
 	var refY = params.refY || 'center';
@@ -63,8 +67,11 @@ export function showPopup(params) {
 	popupOverlay.style.opacity = 0;
 	popupOverlay.style.left = '0px';
 	popupOverlay.style.top = '0px';
-	render(params.content, popupOverlay);
-	//render(html`hello`, popupOverlay);
+	if (typeof content == 'function') {
+		content(popupOverlay, contentFuncParams);
+	} else {
+		render(params.content, popupOverlay);
+	}
 	// setTimeout to allow browser time to apply styling and computer sizes
 	setTimeout(function(){
 		var refRect = refNode === document.body ?
@@ -101,11 +108,11 @@ export function showPopup(params) {
 	return popupOverlay;
 }
 
-export function hidePopup() {
+export function hidePopup(hideCallbackParams) {
 	popupUnderlay.style.display = 'none';
 	popupOverlay.style.display = 'none';
 	if (hideCallback) {
-		hideCallback();
+		hideCallback(hideCallbackParams);
 		hideCallback = null;
 	}
 }

@@ -143,6 +143,9 @@ let css = `
   cursor: default;
   color: gray;
 }
+.FavoritesChooseCategoryListItem.selected {
+  background: #ccc;
+}
 `;
 
 let Favorites;
@@ -151,6 +154,7 @@ export function initializeFavorites(props) {
   let { currentVersion } = props;
   Favorites = {
     version: currentVersion,
+    lastChooseCategory: { columnIndex: 0, categoryIndex: 0, categoryLabel: null },
     columns: [
       { categories: [
         	{ label: 'Clips', expanded: true, items: [
@@ -238,9 +242,9 @@ export function initializeFavorites(props) {
 };
 
 // Add phrase to Favorites without speaking
-export function addToFavorites(phrase) {
-  // Favorites.items.unshift(phrase);
-  // localStorage.setItem("Favorites", JSON.stringify(Favorites));
+export function addToFavorites(phrase, columnIndex, categoryIndex) {
+  Favorites.columns[columnIndex].categories[categoryIndex].items.push(phrase);
+  // FIXME localStorage.setItem("Favorites", JSON.stringify(Favorites));
 };
 
 function replaceFavoritesEntry(columnIndex, categoryIndex, itemIndex, phrase) {
@@ -278,14 +282,16 @@ export function updateFavorites(parentElement, props) {
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
+    let customControlsParams = {};
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
         title: 'Add New Favorite',
         doItButtonLabel: 'Add Favorite',
         doItCallback: function(phrase) {
+          let { columnIndex, categoryIndex } = customControlsParams;
           // add phrase to Favorites, go back to parent screen
-          addToFavorites(phrase);
+          addToFavorites(phrase, columnIndex, categoryIndex);
           localUpdate();
           secondLevelScreenHide();
         },
@@ -293,16 +299,8 @@ export function updateFavorites(parentElement, props) {
           // do nothing, go back to parent screen
           secondLevelScreenHide();
         },
-        customControls: html`
-          <div class=FavoritesEditPhraseChooseCategory>
-            <label>Favorites category:</label
-            ><span class=FavoritesEditPhraseColumnCategory
-              ><span class=FavoritesEditPhraseColumn>[1]</span
-              ><span class=FavoritesEditPhraseCategory>Clips</span
-            ></span
-            ><button class=FavoritesAddItemCategoryButton @click=${onClickChangeCategory}>Change ...</button>
-          </div>
-        `,
+        customControlsFunc: buildChooseCategoryControl,
+        customControlsParams,
       },
     };
     secondLevelScreenShow(params);
@@ -387,19 +385,6 @@ export function editFavorites(parentElement, props) {
     onFavoritesChange();
     localUpdate();
   });
-  let buildChooseCategoryControl = ((columnIndex, categoryIndex) => {
-    // FIXME Incomplete
-    return html`
-      <div class=FavoritesEditPhraseChooseCategory>
-        <label>Favorites category:</label
-        ><span class=FavoritesEditPhraseColumnCategory
-          ><span class=FavoritesEditPhraseColumn>[1]</span
-          ><span class=FavoritesEditPhraseCategory>Clips</span
-        ></span
-        ><button class=FavoritesAddItemCategoryButton @click=${onClickChangeCategory}>Change ...</button>
-      </div>
-    `;
-  })
   let onClickTab = e => {
     e.preventDefault();
     editWhat = e.currentTarget.EditFavoritesEditWhatValue;
@@ -462,7 +447,8 @@ export function editFavorites(parentElement, props) {
           // do nothing, go back to parent screen
           thirdLevelScreenHide();
         },
-        customControls: buildChooseCategoryControl(columnIndex, categoryIndex),
+        customControlsFunc: buildChooseCategoryControl,
+        customControlsParams: { columnIndex, categoryIndex },
       },
     };
     thirdLevelScreenShow(params);
@@ -496,7 +482,8 @@ export function editFavorites(parentElement, props) {
           // do nothing, go back to parent screen
           thirdLevelScreenHide();
         },
-        customControls: buildChooseCategoryControl(columnIndex,categoryIndex),
+        customControlsFunc: buildChooseCategoryControl,
+        customControlsParams: { columnIndex, categoryIndex },
       },
     };
     thirdLevelScreenShow(params);
@@ -717,15 +704,46 @@ export function editFavorites(parentElement, props) {
   localUpdate();
 }
 
-let onClickChangeCategory = e => {
-  e.preventDefault();
-  FavoritesChooseCategoryPopupShow();
-}
+let buildChooseCategoryControl = (parentElement, customControlsParams) => {
+  let { columnIndex, categoryIndex } = customControlsParams;
+  let onClickChangeCategory = e => {
+    e.preventDefault();
+    FavoritesChooseCategoryPopupShow(customControlsParams);
+  }
+  if (typeof columnIndex != 'number' || typeof categoryIndex != 'number') {
+    columnIndex = categoryIndex = 0;
+  } else {
+    columnIndex = Favorites.lastChooseCategory.columnIndex;
+    categoryIndex = Favorites.lastChooseCategory.categoryIndex;
+  }
+  if (columnIndex < 0 || columnIndex >= Favorites.columns.length ||
+    categoryIndex < 0 || categoryIndex >= Favorites.columns[columnIndex].categories.length ||
+    Favorites.lastChooseCategory.categoryLabel != Favorites.columns[columnIndex].categories[categoryIndex].label) {
+    columnIndex = categoryIndex = 0;
+    Favorites.lastChooseCategory.categoryLabel = Favorites.columns[columnIndex].categories[categoryIndex].label;
+  }
+  customControlsParams.parentElement = parentElement;
+  customControlsParams.columnIndex = columnIndex;
+  customControlsParams.categoryIndex = categoryIndex;
+  render(html`
+    <div class=FavoritesEditPhraseChooseCategory>
+      <label>Favorites category:</label
+      ><span class=FavoritesEditPhraseColumnCategory
+        ><span class=FavoritesEditPhraseColumn>[${columnIndex+1}]</span
+        ><span class=FavoritesEditPhraseCategory>${Favorites.columns[columnIndex].categories[categoryIndex].label}</span
+      ></span
+      ><button class=FavoritesAddItemCategoryButton @click=${onClickChangeCategory}>Change ...</button>
+    </div>
+  `, parentElement);
+};
 
-let FavoritesChooseCategoryDialog = () => {
+let FavoritesChooseCategoryDialog = (parentElement, customControlsParams) => {
   let onClickExistingCategory = e => {
     e.preventDefault();
-    debugger;
+    let target = e.currentTarget;
+    selCol = target.FavoritesColumn;
+    selCat = target.FavoritesCategory;
+    localUpdate();
   };
   let onClickNewCategory = e => {
     e.preventDefault();
@@ -733,48 +751,58 @@ let FavoritesChooseCategoryDialog = () => {
   };
   let onClickDoit = e => {
     e.preventDefault();
-    debugger;
+    Favorites.lastChooseCategory.columnIndex = selCol;
+    Favorites.lastChooseCategory.categoryIndex = selCat;
+    Favorites.lastChooseCategory.categoryLabel = Favorites.columns[selCol].categories[selCat].label;
+    customControlsParams.columnIndex = selCol;
+    customControlsParams.categoryIndex = selCat;
+    hidePopup(customControlsParams);
   };
   let onClickCancel = e => {
     e.preventDefault();
-    debugger;
+    hidePopup(customControlsParams);
   };
-  let anySelected = true;
-  return html`<div class=FavoritesChooseCategory>
-    <div class=FavoritesChooseCategoryTitle>Choose a Favorites Category</div>
-    <div class=FavoritesChooseCategoryChooser>
-      <label>Categories:</label>
-      <span class=FavoritesChooseCategoryList>
-        ${Favorites.columns.map((column, columnIndex) => html`
-          ${column.categories.map(category => html`
-            <div @click=${onClickExistingCategory} .FavoritesCategory=${category.label} .FavoritesColumn=${columnIndex}
-              class=FavoritesChooseCategoryListItem>
+  let selCol = Favorites.lastChooseCategory.columnIndex;
+  let selCat = Favorites.lastChooseCategory.categoryIndex;
+  let localUpdate = () => {
+    render(html`<div class=FavoritesChooseCategory>
+      <div class=FavoritesChooseCategoryTitle>Choose a Favorites Category</div>
+      <div class=FavoritesChooseCategoryChooser>
+        <label>Categories:</label>
+        <span class=FavoritesChooseCategoryList>
+          ${Favorites.columns.map((column, columnIndex) => html`
+            ${column.categories.map((category, categoryIndex) => html`
+              <div @click=${onClickExistingCategory} .FavoritesCategory=${categoryIndex} .FavoritesColumn=${columnIndex}
+                class="FavoritesChooseCategoryListItem ${columnIndex === selCol && categoryIndex === selCat ? 'selected' : ''}">
+                <span class=CategoryColumn>[${columnIndex+1}]</span>
+                <span class=CategoryName>${category.label}</span>
+              </div>
+            `)}
+            <div @click=${onClickNewCategory} .FavoritesColumn=${columnIndex}
+              class="FavoritesChooseCategoryListItem FavoritesChooseCategoryListItemNew">
               <span class=CategoryColumn>[${columnIndex+1}]</span>
-              <span class=CategoryName>${category.label}</span>
+              <span class=CategoryName>New Category</span>
             </div>
           `)}
-          <div @click=${onClickNewCategory} .FavoritesColumn=${columnIndex}
-            class="FavoritesChooseCategoryListItem FavoritesChooseCategoryListItemNew">
-            <span class=CategoryColumn>[${columnIndex+1}]</span>
-            <span class=CategoryName>New Category</span>
-          </div>
-        `)}
-      </span>
-    </div>
-
-    <div class=FavoritesChooseCategoryButtonRow>
-      <button @click=${onClickDoit} ?disabled=${!anySelected} class=FavoritesChooseCategoryDoitButton>Select Category</button>
-      <button @click=${onClickCancel} class=FavoritesChooseCategoryCancelButton>Cancel</button>
-    </div>
-  </div>`;
+        </span>
+      </div>
+      <div class=FavoritesChooseCategoryButtonRow>
+        <button @click=${onClickDoit} class=FavoritesChooseCategoryDoitButton>Select Category</button>
+        <button @click=${onClickCancel} class=FavoritesChooseCategoryCancelButton>Cancel</button>
+      </div>
+    </div>`, parentElement);
+  };
+  localUpdate();
 };
 
-export function FavoritesChooseCategoryPopupShow() {
+export function FavoritesChooseCategoryPopupShow(hideCallbackParams) {
   let params = {
-    content: FavoritesChooseCategoryDialog(),
+    content: FavoritesChooseCategoryDialog,
+    contentFuncParams: hideCallbackParams,
     refNode: document.querySelector('.main'),
-    hideCallback: () => {
+    hideCallback: hideCallbackParams => {
       render(html``, popupRootElement);
+      buildChooseCategoryControl(hideCallbackParams.parentElement, hideCallbackParams);
     },
   };
   let popupRootElement = showPopup(params);

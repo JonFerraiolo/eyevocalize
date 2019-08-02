@@ -38,7 +38,7 @@ let css = `
 `;
 
 export function EditPhrase(parentElement, params) {
-  let { phrase, title, doItButtonLabel, doItCallback, cancelCallback,customControls } = params;
+  let { phrase, title, doItButtonLabel, doItCallback, cancelCallback, customControlsFunc, customControlsParams } = params;
   phrase = phrase || {};
   let { type, text, label, url, videoId, startAt, endAt } = phrase;
   type = type || 'text';
@@ -48,7 +48,6 @@ export function EditPhrase(parentElement, params) {
   videoId = videoId || '';
   startAt = startAt || '';
   endAt = endAt || '';
-  customControls = customControls || '';
   let patternUrl = "^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$";
   let regexUrl = new RegExp(patternUrl);
   let patternVideoId = "^[A-Za-z0-9\-\._\~\:\@\$]{8,}$";
@@ -186,7 +185,7 @@ export function EditPhrase(parentElement, params) {
             <div class=TabControlRadioData>
               ${phraseData}
             </div>
-            ${customControls}
+            <div class=EditPhraseCustomControls></div>
             <div class="ButtonRow EditPhraseDoitButtonRow">
               <button id=EditPhraseTestButton @click=${onClickTest}>Test</button>
               <button id=EditPhraseDoitButton @click=${onClickDoit}>${doItButtonLabel}</button>
@@ -196,6 +195,9 @@ export function EditPhrase(parentElement, params) {
         </div>
       </div>
     </div>`, parentElement);
+    if (customControlsFunc) {
+      customControlsFunc(document.querySelector('.EditPhraseCustomControls'), customControlsParams);
+    }
     // lit-html mysteriously does not update the value properties with subsequent renders
     if (type === 'text') {
       document.getElementById('EditPhraseText').value = text;
