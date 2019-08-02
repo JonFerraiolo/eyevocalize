@@ -299,6 +299,7 @@ export function updateFavorites(parentElement, props) {
           // do nothing, go back to parent screen
           secondLevelScreenHide();
         },
+        textLabelRequired: true,
         customControlsFunc: buildChooseCategoryControl,
         customControlsParams,
       },

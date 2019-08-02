@@ -38,7 +38,8 @@ let css = `
 `;
 
 export function EditPhrase(parentElement, params) {
-  let { phrase, title, doItButtonLabel, doItCallback, cancelCallback, customControlsFunc, customControlsParams } = params;
+  let { phrase, title, doItButtonLabel, doItCallback, cancelCallback,
+    textLabelRequired, customControlsFunc, customControlsParams } = params;
   phrase = phrase || {};
   let { type, text, label, url, videoId, startAt, endAt } = phrase;
   type = type || 'text';
@@ -48,6 +49,7 @@ export function EditPhrase(parentElement, params) {
   videoId = videoId || '';
   startAt = startAt || '';
   endAt = endAt || '';
+  if (typeof textLabelRequired != 'boolean') textLabelRequired = false;
   let patternUrl = "^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$";
   let regexUrl = new RegExp(patternUrl);
   let patternVideoId = "^[A-Za-z0-9\-\._\~\:\@\$]{8,}$";
@@ -58,7 +60,7 @@ export function EditPhrase(parentElement, params) {
   let validateData = () => {
     enableTest = enableDoit = false;
     if (type === 'text') {
-      enableTest = enableDoit = text.trim().length > 0;
+      enableTest = enableDoit = text.trim().length > 0 && (!textLabelRequired || label.trim().length > 0);
     } else if (type === 'audio') {
       enableTest = regexUrl.test(url);
       enableDoit = enableTest && label.trim().length > 0;
@@ -166,7 +168,7 @@ export function EditPhrase(parentElement, params) {
           <textarea id=EditPhraseText @input=${onInput} .editPhraseField=${'text'}></textarea>
         </div>
         <div class=EditPhraseInputBlock>
-          <label for=EditPhraseLabel>Optional label:</label>
+          <label for=EditPhraseLabel>${textLabelRequired ? 'Label:' : 'Optional label:'}</label>
           <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
         </div>
       `;
