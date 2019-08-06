@@ -39,7 +39,7 @@ let css = `
 
 export function EditPhrase(parentElement, params) {
   let { phrase, title, doItButtonLabel, doItCallback, cancelCallback,
-    textLabelRequired, customControlsFunc, customControlsParams } = params;
+    textLabelRequired, customControlsFunc, customControlsData } = params;
   phrase = phrase || {};
   let { type, text, label, url, videoId, startAt, endAt } = phrase;
   type = type || 'text';
@@ -198,7 +198,7 @@ export function EditPhrase(parentElement, params) {
       </div>
     </div>`, parentElement);
     if (customControlsFunc) {
-      customControlsFunc(document.querySelector('.EditPhraseCustomControls'), customControlsParams);
+      customControlsFunc(document.querySelector('.EditPhraseCustomControls'), customControlsData);
     }
     // lit-html mysteriously does not update the value properties with subsequent renders
     if (type === 'text') {

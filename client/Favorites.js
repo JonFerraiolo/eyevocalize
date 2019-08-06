@@ -143,8 +143,35 @@ let css = `
   cursor: default;
   color: gray;
 }
+.FavoritesChooseCategory {
+  background: white;
+  border: 2px solid black;
+  padding: 0.25em 1.5em;
+  font-size: 95%;
+}
+.FavoritesChooseCategoryTitle {
+  font-weight: 500;
+  padding: 0.2em 0;
+}
+.FavoritesChooseCategoryChooser {
+  font-size: 90%;
+}
+.FavoritesChooseCategoryChooser label {
+  font-size: 90%;;
+}
+.FavoritesChooseCategoryList {
+  border: 1px solid black;
+  padding: 0.2em;
+}
+.FavoritesChooseCategoryListItem.FavoritesChooseCategoryListItemNew {
+  font-style: italic;
+  padding-left: 1em;
+}
 .FavoritesChooseCategoryListItem.selected {
   background: #ccc;
+}
+.FavoritesChooseCategoryButtonRow {
+  padding: 0.75em 0;
 }
 `;
 
@@ -282,14 +309,14 @@ export function updateFavorites(parentElement, props) {
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
-    let customControlsParams = {};
+    let customControlsData = {};
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
         title: 'Add New Favorite',
         doItButtonLabel: 'Add Favorite',
         doItCallback: function(phrase) {
-          let { columnIndex, categoryIndex } = customControlsParams;
+          let { columnIndex, categoryIndex } = customControlsData;
           // add phrase to Favorites, go back to parent screen
           addToFavorites(phrase, columnIndex, categoryIndex);
           localUpdate();
@@ -301,7 +328,7 @@ export function updateFavorites(parentElement, props) {
         },
         textLabelRequired: true,
         customControlsFunc: buildChooseCategoryControl,
-        customControlsParams,
+        customControlsData,
       },
     };
     secondLevelScreenShow(params);
@@ -380,6 +407,7 @@ function onEditFavoritesReturn() {
 
 export function editFavorites(parentElement, props) {
   let editWhat = 'items';
+  let lastClickItemIndex = null, lastClickCategoryIndex = null, lastClickColumnIndex = null;
   let makeLocalChangesPermanent = (() => {
     Favorites = JSON.parse(JSON.stringify(localFavorites)); // deep clone
     traverseColumnsCategoriesItems(Favorites, deleteTemporaryProperties);
@@ -396,9 +424,45 @@ export function editFavorites(parentElement, props) {
     let objType = e.currentTarget.favoritesFlavor;
     let obj = e.currentTarget.favoritesObject;
     if (objType === editWhat) {
-      obj.selected = !obj.selected;
+      if (editWhat === 'items') {
+        let phrase = e.currentTarget.favoritesObject;
+        let colIndex = e.currentTarget.favoritesColumnIndex;
+        let catIndex = e.currentTarget.favoritesCategoryIndex;
+        let itIndex = e.currentTarget.favoritesItemIndex;
+        let shift = e.getModifierState("Shift");
+        let control = e.getModifierState("Control");
+        let meta = e.getModifierState("Meta");
+        if (control && !meta && !shift) {
+          // control click is toggle selection for the thing that was clicked on
+          phrase.selected = !phrase.selected;
+          lastClickColumnIndex = colIndex;
+          lastClickCategoryIndex = catIndex;
+          lastClickItemIndex = itIndex;
+        } else if (shift && !meta && !control && lastClickItemIndex != null &&
+            lastClickColumnIndex === colIndex && lastClickCategoryIndex === catIndex) {
+          // shift click is range selection
+          traverseColumnsCategoriesItems(localFavorites, item => {
+            item.selected = false;
+          });
+          let f = (lastClickItemIndex > itIndex) ? itIndex : lastClickItemIndex;
+          let l = (lastClickItemIndex > itIndex) ? lastClickItemIndex : itIndex;
+          let items = localFavorites.columns[colIndex].categories[catIndex].items;
+          for (let i=f; i<=l; i++) {
+            items[i].selected = true;
+          }
+        } else if (!control && !meta && (!shift || lastClickItemIndex === null)) {
+          // simple click deselects everything else but the item getting the click
+          traverseColumnsCategoriesItems(localFavorites, item => {
+            item.selected = false;
+          });
+          phrase.selected = true;
+          lastClickColumnIndex = colIndex;
+          lastClickCategoryIndex = catIndex;
+          lastClickItemIndex = itIndex;
+        }
+        localUpdate();
+      }
     }
-    localUpdate();
   };
   let onClickSelectAll = e => {
     // If editWhat==items, select all in categories with selected items
@@ -413,6 +477,7 @@ export function editFavorites(parentElement, props) {
         }
       });
       localUpdate();
+      lastClickItemIndex = null;
     }
   };
   let onClickDeselectAll = e => {
@@ -427,10 +492,11 @@ export function editFavorites(parentElement, props) {
       }
     });
     localUpdate();
+    lastClickItemIndex = null;
   };
   let onClickAddItem = e => {
     e.preventDefault();
-    let columnIndex = 0, categoryIndex = 0;  // FIXME
+    let customControlsData = {};
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
@@ -443,13 +509,15 @@ export function editFavorites(parentElement, props) {
           initializeSelection();
           localUpdate();
           thirdLevelScreenHide();
+          lastClickItemIndex = null;
         },
         cancelCallback: function() {
           // do nothing, go back to parent screen
           thirdLevelScreenHide();
         },
+        textLabelRequired: true,
         customControlsFunc: buildChooseCategoryControl,
-        customControlsParams: { columnIndex, categoryIndex },
+        customControlsData,
       },
     };
     thirdLevelScreenShow(params);
@@ -465,6 +533,7 @@ export function editFavorites(parentElement, props) {
         itemIndex = itIndex;
       }
     });
+    let customControlsData = { columnIndex, categoryIndex };
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
@@ -473,6 +542,7 @@ export function editFavorites(parentElement, props) {
         doItButtonLabel: 'Update Entry',
         doItCallback: function(phrase) {
           // add phrase to Favorites, go back to parent screen
+          // FIXME  wrong if user changes category
           replaceFavoritesEntry(columnIndex, categoryIndex, itemIndex, phrase);
           localFavorites = JSON.parse(JSON.stringify(Favorites));  // deep clone
           localFavorites.columns[columnIndex].categories[categoryIndex].items[itemIndex].selected = true;
@@ -483,8 +553,9 @@ export function editFavorites(parentElement, props) {
           // do nothing, go back to parent screen
           thirdLevelScreenHide();
         },
+        textLabelRequired: true,
         customControlsFunc: buildChooseCategoryControl,
-        customControlsParams: { columnIndex, categoryIndex },
+        customControlsData,
       },
     };
     thirdLevelScreenShow(params);
@@ -497,6 +568,7 @@ export function editFavorites(parentElement, props) {
       });
     }
     makeLocalChangesPermanent();
+    lastClickItemIndex = null;
   };
   let onClickMoveLeft = e => {
     e.preventDefault();
@@ -509,6 +581,7 @@ export function editFavorites(parentElement, props) {
       }
     });
     makeLocalChangesPermanent();
+    lastClickItemIndex = null;
   };
   let onClickMoveRight = e => {
     e.preventDefault();
@@ -521,6 +594,7 @@ export function editFavorites(parentElement, props) {
       }
     });
     makeLocalChangesPermanent();
+    lastClickItemIndex = null;
   };
   let onClickMoveToTop = e => {
     e.preventDefault();
@@ -538,6 +612,7 @@ export function editFavorites(parentElement, props) {
       }
     });
     makeLocalChangesPermanent();
+    lastClickItemIndex = null;
   };
   let onClickMoveToBottom = e => {
     e.preventDefault();
@@ -555,6 +630,7 @@ export function editFavorites(parentElement, props) {
       }
     });
     makeLocalChangesPermanent();
+    lastClickItemIndex = null;
   };
   let initializeSelection = () => {
     traverseColumnsCategories(localFavorites, category => {
@@ -563,6 +639,7 @@ export function editFavorites(parentElement, props) {
         item.selected = false;
       });
     });
+    lastClickItemIndex = null;
   };
   let buildEditWhatRadioButton = (id, value, label) => {
     let cls = 'TabControlRadioButton' + (editWhat===value ? ' TabControlRadioButtonChecked' : '');
@@ -655,14 +732,16 @@ export function editFavorites(parentElement, props) {
             Click individual favorites below to select and deselect.
           </div>
           <div class=FavoritesColumns>
-            ${localFavorites.columns.map(column => html`
+            ${localFavorites.columns.map((column, colIndex) => html`
               <div class=FavoritesColumn>
-                ${column.categories.map(category => html`
+                ${column.categories.map((category, catIndex) => html`
                   <div @click=${onItemClick} .favoritesFlavor=${'categories'} .favoritesObject=${category} class=FavoritesCategoryLabel>${category.label}</div>
-                  ${html`${category.items.map((phrase,index) =>
+                  ${html`${category.items.map((phrase,itIndex) =>
                     html`
                       <div class=FavoriteContainer>
-                        <button @click=${onItemClick} .favoritesFlavor=${'items'} .favoritesObject=${phrase} class=${phrase.cls}>
+                        <button @click=${onItemClick} .favoritesFlavor=${'items'} .favoritesObject=${phrase}
+                            .favoritesColumnIndex=${colIndex} .favoritesCategoryIndex=${catIndex} .favoritesItemIndex=${itIndex}
+                            class=${phrase.cls}>
                           ${phrase.checkmark}
                           ${phrase.label || phrase.text}</button>
                       </div>
@@ -705,11 +784,11 @@ export function editFavorites(parentElement, props) {
   localUpdate();
 }
 
-let buildChooseCategoryControl = (parentElement, customControlsParams) => {
-  let { columnIndex, categoryIndex } = customControlsParams;
+let buildChooseCategoryControl = (parentElement, customControlsData) => {
+  let { columnIndex, categoryIndex } = customControlsData;
   let onClickChangeCategory = e => {
     e.preventDefault();
-    FavoritesChooseCategoryPopupShow(customControlsParams);
+    FavoritesChooseCategoryPopupShow(customControlsData);
   }
   if (typeof columnIndex != 'number' || typeof categoryIndex != 'number') {
     columnIndex = categoryIndex = 0;
@@ -723,9 +802,9 @@ let buildChooseCategoryControl = (parentElement, customControlsParams) => {
     columnIndex = categoryIndex = 0;
     Favorites.lastChooseCategory.categoryLabel = Favorites.columns[columnIndex].categories[categoryIndex].label;
   }
-  customControlsParams.parentElement = parentElement;
-  customControlsParams.columnIndex = columnIndex;
-  customControlsParams.categoryIndex = categoryIndex;
+  customControlsData.parentElement = parentElement;
+  customControlsData.columnIndex = columnIndex;
+  customControlsData.categoryIndex = categoryIndex;
   render(html`
     <div class=FavoritesEditPhraseChooseCategory>
       <label>Favorites category:</label
@@ -738,7 +817,7 @@ let buildChooseCategoryControl = (parentElement, customControlsParams) => {
   `, parentElement);
 };
 
-let FavoritesChooseCategoryDialog = (parentElement, customControlsParams) => {
+let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
   let onClickExistingCategory = e => {
     e.preventDefault();
     let target = e.currentTarget;
@@ -755,13 +834,13 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsParams) => {
     Favorites.lastChooseCategory.columnIndex = selCol;
     Favorites.lastChooseCategory.categoryIndex = selCat;
     Favorites.lastChooseCategory.categoryLabel = Favorites.columns[selCol].categories[selCat].label;
-    customControlsParams.columnIndex = selCol;
-    customControlsParams.categoryIndex = selCat;
-    hidePopup(customControlsParams);
+    customControlsData.columnIndex = selCol;
+    customControlsData.categoryIndex = selCat;
+    hidePopup(customControlsData);
   };
   let onClickCancel = e => {
     e.preventDefault();
-    hidePopup(customControlsParams);
+    hidePopup(customControlsData);
   };
   let selCol = Favorites.lastChooseCategory.columnIndex;
   let selCat = Favorites.lastChooseCategory.categoryIndex;
@@ -769,8 +848,8 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsParams) => {
     render(html`<div class=FavoritesChooseCategory>
       <div class=FavoritesChooseCategoryTitle>Choose a Favorites Category</div>
       <div class=FavoritesChooseCategoryChooser>
-        <label>Categories:</label>
-        <span class=FavoritesChooseCategoryList>
+        <label>Categories: (column# in brackets)</label>
+        <div class=FavoritesChooseCategoryList>
           ${Favorites.columns.map((column, columnIndex) => html`
             ${column.categories.map((category, categoryIndex) => html`
               <div @click=${onClickExistingCategory} .FavoritesCategory=${categoryIndex} .FavoritesColumn=${columnIndex}
@@ -785,7 +864,7 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsParams) => {
               <span class=CategoryName>New Category</span>
             </div>
           `)}
-        </span>
+        </div>
       </div>
       <div class=FavoritesChooseCategoryButtonRow>
         <button @click=${onClickDoit} class=FavoritesChooseCategoryDoitButton>Select Category</button>
@@ -800,7 +879,11 @@ export function FavoritesChooseCategoryPopupShow(hideCallbackParams) {
   let params = {
     content: FavoritesChooseCategoryDialog,
     contentFuncParams: hideCallbackParams,
-    refNode: document.querySelector('.main'),
+    refNode: document.querySelector('.EditPhraseCustomControls'),
+    refY: 'top',
+    popupY: 'bottom',
+    clickAwayToClose: false,
+    underlayOpacity: 0.85,
     hideCallback: hideCallbackParams => {
       render(html``, popupRootElement);
       buildChooseCategoryControl(hideCallbackParams.parentElement, hideCallbackParams);

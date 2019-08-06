@@ -19,7 +19,7 @@ export function speak(text) {
 			msg.pitch = parseFloat(pitchInput.value);
 			*/
 			msg.volume = 1;
-			msg.rate = 1;
+			msg.rate = 0.5;
 			msg.pitch = 1;
 			msg.voice = voice;
 			window.speechSynthesis.speak(msg);

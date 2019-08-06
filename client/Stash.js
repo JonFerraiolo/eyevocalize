@@ -120,10 +120,36 @@ function onEditStashReturn() {
 }
 
 export function editStash(parentElement, props) {
+  let lastClickItemIndex = null;
   let onItemClick = e => {
     e.preventDefault();
     let phrase = e.currentTarget.phraseObject;
-    phrase.selected = !phrase.selected;
+    let phraseIndex = e.currentTarget.phraseIndex;
+    let shift = e.getModifierState("Shift");
+    let control = e.getModifierState("Control");
+    let meta = e.getModifierState("Meta");
+    if (control && !meta && !shift) {
+      // t control click is toggle selection for the thing that was clicked on
+      phrase.selected = !phrase.selected;
+      lastClickItemIndex = phraseIndex;
+    } else if (shift && !meta && !control && lastClickItemIndex != null) {
+      // shift click is range selection
+      localStash.items.forEach(item => {
+        item.selected = false;
+      });
+      let f = (lastClickItemIndex > phraseIndex) ? phraseIndex : lastClickItemIndex;
+      let l = (lastClickItemIndex > phraseIndex) ? lastClickItemIndex : phraseIndex;
+      for (let i=f; i<=l; i++) {
+        localStash.items[i].selected = true;
+      }
+    } else if (!control && !meta && (!shift || lastClickItemIndex === null)) {
+      // simple click deselects everything else but the item getting the click
+      localStash.items.forEach(item => {
+        item.selected = false;
+      });
+      phrase.selected = true;
+      lastClickItemIndex = phraseIndex;
+    }
     localUpdate();
   };
   let onClickSelectAll = e => {
@@ -132,6 +158,7 @@ export function editStash(parentElement, props) {
       item.selected = true;
     });
     localUpdate();
+    lastClickItemIndex = null;
   };
   let onClickDeselectAll = e => {
     e.preventDefault();
@@ -139,6 +166,7 @@ export function editStash(parentElement, props) {
       item.selected = false;
     });
     localUpdate();
+    lastClickItemIndex = null;
   };
   let onClickAddItem = e => {
     e.preventDefault();
@@ -154,6 +182,7 @@ export function editStash(parentElement, props) {
           initializeSelection();
           localUpdate();
           thirdLevelScreenHide();
+          lastClickItemIndex = null;
         },
         cancelCallback: function() {
           // do nothing, go back to parent screen
@@ -196,6 +225,7 @@ export function editStash(parentElement, props) {
     traverseItems(Stash, deleteTemporaryProperties);
     onStashChange();
     localUpdate();
+    lastClickItemIndex = null;
   };
   let onClickMoveUp = e => {
     e.preventDefault();
@@ -209,6 +239,7 @@ export function editStash(parentElement, props) {
     traverseItems(Stash, deleteTemporaryProperties);
     onStashChange();
     localUpdate();
+    lastClickItemIndex = null;
   };
   let onClickMoveDown = e => {
     e.preventDefault();
@@ -222,6 +253,7 @@ export function editStash(parentElement, props) {
     traverseItems(Stash, deleteTemporaryProperties);
     onStashChange();
     localUpdate();
+    lastClickItemIndex = null;
   };
   let onClickMoveToTop = e => {
     e.preventDefault();
@@ -240,6 +272,7 @@ export function editStash(parentElement, props) {
     traverseItems(Stash, deleteTemporaryProperties);
     onStashChange();
     localUpdate();
+    lastClickItemIndex = null;
   };
   let onClickMoveToBottom = e => {
     e.preventDefault();
@@ -258,11 +291,14 @@ export function editStash(parentElement, props) {
     traverseItems(Stash, deleteTemporaryProperties);
     onStashChange();
     localUpdate();
+    lastClickItemIndex = null;
+
   };
   let initializeSelection = () => {
     localStash.items.forEach((item, index) => {
       item.selected = false;
     });
+    lastClickItemIndex = null;
   };
   let localUpdate = () => {
     localStash.items.forEach(item => {

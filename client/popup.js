@@ -83,7 +83,7 @@ export function showPopup(params) {
 		var rX = (refX == 'left' ? refRect.left : (refX == 'right' ? refRect.right : (refRect.left+refRect.right)/2));
 		var rY = (refY == 'top' ? refRect.top : (refY == 'bottom' ? refRect.bottom : (refRect.top+refRect.bottom)/2));
 		var x = (popupX == 'left' ? rX : (popupX == 'right' ? rX - w : rX - w/2));
-		var y = (popupY == 'top' ? rY : (popupX == 'bottom' ? rY - h : rY - h/2));
+		var y = (popupY == 'top' ? rY : (popupY == 'bottom' ? rY - h : rY - h/2));
 		x += offsetX;
 		y += offsetY;
 		// Make sure popup doesn't extend off end of viewport
