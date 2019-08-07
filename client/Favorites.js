@@ -150,8 +150,9 @@ let css = `
   font-size: 95%;
 }
 .FavoritesChooseCategoryTitle {
-  font-weight: 500;
-  padding: 0.2em 0;
+  font-weight: 700;
+  padding: 0.6em 0;
+  text-align: center;
 }
 .FavoritesChooseCategoryChooser {
   font-size: 90%;
@@ -162,16 +163,43 @@ let css = `
 .FavoritesChooseCategoryList {
   border: 1px solid black;
   padding: 0.2em;
+  display: flex;
+}
+.FavoritesChooseCategoryColumn {
+  vertical-align: top;
+  flex: 1;
+  padding: 0 3em 0 0.5em;
+  border-left: 1px solid #ccc;
+  display: inline-flex;
+  flex-direction: column;
+}
+.FavoritesChooseCategoryListItem {
+  padding: 0.2em 0;
+  white-space: nowrap;
+}
+.FavoritesChooseCategoryColumn .spacer {
+  flex: 1;
 }
 .FavoritesChooseCategoryListItem.FavoritesChooseCategoryListItemNew {
   font-style: italic;
-  padding-left: 1em;
+  border: 1px solid #444;
+  border-radius: 3px;
+  padding: 0.25em;
+  background: #f0f0f0;
+  margin: 1.5em 0 0.75em;
+  font-size: 80%;
+  width: fit-content;
 }
 .FavoritesChooseCategoryListItem.selected {
-  background: #ccc;
+  font-weight: bold;
+  font-style: italic;
+  background: #ddf;
+  color: #004;
 }
 .FavoritesChooseCategoryButtonRow {
-  padding: 0.75em 0;
+  padding: 1em 0;
+  display: flex;
+  justify-content: space-around;
 }
 `;
 
@@ -818,6 +846,7 @@ let buildChooseCategoryControl = (parentElement, customControlsData) => {
 };
 
 let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
+  let newCategoryJustCreated = null;
   let onClickExistingCategory = e => {
     e.preventDefault();
     let target = e.currentTarget;
@@ -827,7 +856,12 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
   };
   let onClickNewCategory = e => {
     e.preventDefault();
-    debugger;
+    newCategoryJustCreated = e.currentTarget.FavoritesColumn;
+    localUpdate();
+    setTimeout(() => {
+      let elem = document.getElementById('FavoritesChooseCategoryNewCategory');
+      elem.focus();
+    }, 0);
   };
   let onClickDoit = e => {
     e.preventDefault();
@@ -842,27 +876,59 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
     e.preventDefault();
     hidePopup(customControlsData);
   };
+  let doneWithNewCategoryName = () => {
+    let elem = document.getElementById('FavoritesChooseCategoryNewCategory');
+    let name = elem.value.trim();
+    if (name.length > 0) {
+      Favorites.columns[newCategoryJustCreated].categories.push({ label: name, expanded: true, items: [] });
+      selCol = newCategoryJustCreated;
+      selCat = Favorites.columns[newCategoryJustCreated].categories.length - 1;
+    }
+    newCategoryJustCreated = null;
+    localUpdate();
+  };
+  let onNewBlur = e => {
+    e.preventDefault();
+    doneWithNewCategoryName();
+  };
+  let onKeyDown = e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      doneWithNewCategoryName();
+    }
+  }
+;
   let selCol = Favorites.lastChooseCategory.columnIndex;
   let selCat = Favorites.lastChooseCategory.categoryIndex;
   let localUpdate = () => {
     render(html`<div class=FavoritesChooseCategory>
       <div class=FavoritesChooseCategoryTitle>Choose a Favorites Category</div>
       <div class=FavoritesChooseCategoryChooser>
-        <label>Categories: (column# in brackets)</label>
         <div class=FavoritesChooseCategoryList>
           ${Favorites.columns.map((column, columnIndex) => html`
-            ${column.categories.map((category, categoryIndex) => html`
-              <div @click=${onClickExistingCategory} .FavoritesCategory=${categoryIndex} .FavoritesColumn=${columnIndex}
-                class="FavoritesChooseCategoryListItem ${columnIndex === selCol && categoryIndex === selCat ? 'selected' : ''}">
-                <span class=CategoryColumn>[${columnIndex+1}]</span>
-                <span class=CategoryName>${category.label}</span>
-              </div>
-            `)}
-            <div @click=${onClickNewCategory} .FavoritesColumn=${columnIndex}
-              class="FavoritesChooseCategoryListItem FavoritesChooseCategoryListItemNew">
-              <span class=CategoryColumn>[${columnIndex+1}]</span>
-              <span class=CategoryName>New Category</span>
-            </div>
+            <span class=FavoritesChooseCategoryColumn>
+              ${column.categories.map((category, categoryIndex) => html`
+                <div @click=${onClickExistingCategory} .FavoritesCategory=${categoryIndex} .FavoritesColumn=${columnIndex}
+                  class="FavoritesChooseCategoryListItem ${columnIndex === selCol && categoryIndex === selCat ? 'selected' : ''}">
+                  ${columnIndex === selCol && categoryIndex === selCat ? html`<span class=checkmark>&#x2714;</span>` : ''}
+                  <span class=CategoryName>${category.label}</span>
+                </div>
+              `)}
+              ${newCategoryJustCreated === columnIndex ? html`
+                <div @click=${onClickNewCategory} .FavoritesColumn=${columnIndex}
+                  class="FavoritesChooseCategoryListItem FavoritesChooseCategoryListItemInput">
+                  <input id=FavoritesChooseCategoryNewCategory class=CategoryName placeholder="Enter new category"
+                    @keydown=${onKeyDown} @blur=${onNewBlur}></input>
+                </div>
+                ` : ''}
+              <div class=spacer>&nbsp;</div>
+              ${newCategoryJustCreated != null ? '' : html`
+                <div @click=${onClickNewCategory} .FavoritesColumn=${columnIndex}
+                  class="FavoritesChooseCategoryListItem FavoritesChooseCategoryListItemNew">
+                  <span class=CategoryName>New ...</span>
+                </div>
+                `}
+            </span>
           `)}
         </div>
       </div>
