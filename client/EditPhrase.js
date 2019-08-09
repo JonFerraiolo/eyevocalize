@@ -2,6 +2,7 @@
 import { html, render } from './lib/lit-html/lit-html.js';
 import { buildSlideRightTitle } from './main.js';
 import { playPhrase } from './Phrases.js';
+import { resizeableTextarea } from './resizeableTextarea.js';
 
 let css = `
 .EditPhraseContent {
@@ -21,6 +22,10 @@ let css = `
 }
 .EditPhraseInputBlock textarea,.EditPhraseInputBlock input {
   width: 100%;
+}
+.EditPhraseInputBlock textarea {
+  overflow: hidden;
+  resize: none;
 }
 .EditPhraseInputBlock *:invalid {
   border-color: red;
@@ -213,6 +218,10 @@ export function EditPhrase(parentElement, params) {
       document.getElementById('EditPhraseStartAt').value = startAt;
       document.getElementById('EditPhraseEndAt').value = endAt;
     }
+    let textareas = parentElement.querySelectorAll('textarea');
+    textareas.forEach(ta => {
+      resizeableTextarea(ta);
+    });
   };
   localUpdate();
   validateData();
