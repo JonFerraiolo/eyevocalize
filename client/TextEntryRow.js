@@ -2,6 +2,7 @@
 import { speak } from './vocalize.js';
 import { stash } from './Stash.js';
 import { search, clear } from './main.js';
+import { resizeableTextarea } from './resizeableTextarea.js';
 import { html, render } from './lib/lit-html/lit-html.js';
 
 let css = `
@@ -20,6 +21,8 @@ let css = `
   font-size: 1em;
   border-radius: 3px;
   border: 1px solid #D9D9D9;
+  overflow: hidden;
+  resize: none;
 }
 .TextEntryRow button {
   height: 2.75emem;
@@ -60,6 +63,7 @@ export function updateTextEntryRow(parentElement, props) {
     ><button class=TextEntrySpeak @click=${search}>Search</button
     ><button class=TextEntryClear @click=${onClear}>Clear</button>
   </div>`, parentElement);
+  resizeableTextarea(document.getElementById('TextEntryRowTextArea'));
 }
 
 export function TextEntryRowSetFocus() {
