@@ -691,47 +691,92 @@ export function editFavorites(parentElement, props) {
   };
   let onClickMoveLeft = e => {
     e.preventDefault();
-    traverseColumnsCategories(localFavorites, category => {
-      for (let i=1, n=category.items.length; i<n; i++) {
-        let item = category.items[i];
-        if (item.selected && !category.items[i-1].selected) {
-          [ category.items[i-1], category.items[i] ] = [ category.items[i], category.items[i-1] ];  // swap
+    if (editWhat === 'items') {
+      traverseColumnsCategories(localFavorites, category => {
+        for (let i=1, n=category.items.length; i<n; i++) {
+          let item = category.items[i];
+          if (item.selected && !category.items[i-1].selected) {
+            [ category.items[i-1], category.items[i] ] = [ category.items[i], category.items[i-1] ];  // swap
+          }
         }
-      }
-    });
+      });
+    } else {
+      // should only be here if a single category is selected and
+      // and it is not the first in a column
+      let columnIndex, categoryIndex;
+      traverseColumnsCategories(localFavorites, (category, origObj, colIndex, catIndex) => {
+        if (category.selected) {
+          columnIndex = colIndex;
+          categoryIndex = catIndex;
+        }
+      });
+      let column = localFavorites.columns[columnIndex];
+      let i = categoryIndex;
+      [ column.categories[i-1], column.categories[i] ] = [ column.categories[i], column.categories[i-1] ];  // swap
+    }
     makeLocalChangesPermanent();
     lastClickItemIndex = null;
     editCategoryNameColumnIndex = editCategoryNameCategoryIndex = null;
   };
   let onClickMoveRight = e => {
     e.preventDefault();
-    traverseColumnsCategories(localFavorites, category => {
-      for (let n=category.items.length, i=n-2; i>=0; i--) {
-        let item = category.items[i];
-        if (item.selected && !category.items[i+1].selected) {
-          [ category.items[i+1], category.items[i] ] = [ category.items[i], category.items[i+1] ];  // swap
+    if (editWhat === 'items') {
+      traverseColumnsCategories(localFavorites, category => {
+        for (let n=category.items.length, i=n-2; i>=0; i--) {
+          let item = category.items[i];
+          if (item.selected && !category.items[i+1].selected) {
+            [ category.items[i+1], category.items[i] ] = [ category.items[i], category.items[i+1] ];  // swap
+          }
         }
-      }
-    });
+      });
+    } else {
+      // should only be here if a single category is selected and
+      // and it is not the last in a column
+      let columnIndex, categoryIndex;
+      traverseColumnsCategories(localFavorites, (category, origObj, colIndex, catIndex) => {
+        if (category.selected) {
+          columnIndex = colIndex;
+          categoryIndex = catIndex;
+        }
+      });
+      let column = localFavorites.columns[columnIndex];
+      let i = categoryIndex;
+      [ column.categories[i+1], column.categories[i] ] = [ column.categories[i], column.categories[i+1] ];  // swap
+    }
     makeLocalChangesPermanent();
     lastClickItemIndex = null;
     editCategoryNameColumnIndex = editCategoryNameCategoryIndex = null;
   };
   let onClickMoveToTop = e => {
     e.preventDefault();
-    traverseColumnsCategories(localFavorites, category => {
-      for (let n=category.items.length, toPosition=0, fromPosition=1; fromPosition<n; fromPosition++) {
-        let toItem = category.items[toPosition];
-        let fromItem = category .items[fromPosition];
-        if (fromItem.selected && !toItem.selected) {
-          category.items.splice(fromPosition, 1);
-          category.items.splice(toPosition, 0, fromItem);
+    if (editWhat === 'items') {
+      traverseColumnsCategories(localFavorites, category => {
+        for (let n=category.items.length, toPosition=0, fromPosition=1; fromPosition<n; fromPosition++) {
+          let toItem = category.items[toPosition];
+          let fromItem = category .items[fromPosition];
+          if (fromItem.selected && !toItem.selected) {
+            category.items.splice(fromPosition, 1);
+            category.items.splice(toPosition, 0, fromItem);
+          }
+          if (category.items[toPosition].selected) {
+            toPosition++;
+          }
         }
-        if (category.items[toPosition].selected) {
-          toPosition++;
+      });
+    } else {
+      // should only be here if a single category is selected and
+      // and it is not the first in a column
+      let columnIndex, categoryIndex;
+      traverseColumnsCategories(localFavorites, (category, origObj, colIndex, catIndex) => {
+        if (category.selected) {
+          columnIndex = colIndex;
+          categoryIndex = catIndex;
         }
-      }
-    });
+      });
+      let column = localFavorites.columns[columnIndex];
+      let deleted = column.categories.splice(categoryIndex, 1);
+      column.categories.splice(0, 0, deleted[0]);
+    }
     makeLocalChangesPermanent();
     lastClickItemIndex = null;
     editCategoryNameColumnIndex = editCategoryNameCategoryIndex = null;
@@ -739,19 +784,35 @@ export function editFavorites(parentElement, props) {
   };
   let onClickMoveToBottom = e => {
     e.preventDefault();
-    traverseColumnsCategories(localFavorites, category => {
-      for (let n=category.items.length, toPosition=n-1, fromPosition=n-2; fromPosition>=0; fromPosition--) {
-        let toItem = category.items[toPosition];
-        let fromItem = category.items[fromPosition];
-        if (fromItem.selected && !toItem.selected) {
-          category.items.splice(fromPosition, 1);
-          category.items.splice(toPosition, 0, fromItem);
+    if (editWhat === 'items') {
+      traverseColumnsCategories(localFavorites, category => {
+        for (let n=category.items.length, toPosition=n-1, fromPosition=n-2; fromPosition>=0; fromPosition--) {
+          let toItem = category.items[toPosition];
+          let fromItem = category.items[fromPosition];
+          if (fromItem.selected && !toItem.selected) {
+            category.items.splice(fromPosition, 1);
+            category.items.splice(toPosition, 0, fromItem);
+          }
+          if (category.items[toPosition].selected) {
+            toPosition--;
+          }
         }
-        if (category.items[toPosition].selected) {
-          toPosition--;
+      });
+    } else {
+      // should only be here if a single category is selected and
+      // and it is not the last  in a column
+      let columnIndex, categoryIndex;
+      traverseColumnsCategories(localFavorites, (category, origObj, colIndex, catIndex) => {
+        if (category.selected) {
+          columnIndex = colIndex;
+          categoryIndex = catIndex;
         }
-      }
-    });
+      });
+      let column = localFavorites.columns[columnIndex];
+      let endpos = column.categories.length - 1;
+      let deleted = column.categories.splice(categoryIndex, 1);
+      column.categories.splice(endpos, 0, deleted[0]);
+    }
     makeLocalChangesPermanent();
     lastClickItemIndex = null;
     editCategoryNameColumnIndex = editCategoryNameCategoryIndex = null;
@@ -866,22 +927,40 @@ export function editFavorites(parentElement, props) {
     let EditFavoritesSelectAllClass = !enableSelectAll ? 'EditFavoritesSelectDisabled' : '';
     let EditFavoritesDeselectAllClass = ((editWhat === 'items' && !enableRemoveSelected) ||
       (editWhat === 'categories' && !enableEditItem)) ? 'EditFavoritesSelectDisabled' : '';
-    // enableMoveLeft is true if enableRemoveSelected is true
-    // and at least one favorite can move left
-    let enableMoveLeft = enableRemoveSelected && localFavorites.columns.some(column => {
-      return column.categories.some(category => {
-        return category.items.some((item, index, arr) =>
-          item.selected && (index > 0 && !arr[index-1].selected));
+    let enableMoveLeft;
+    if (editWhat === 'items') {
+      // enableMoveLeft is true if enableRemoveSelected is true
+      // and at least one category can move left
+      enableMoveLeft = enableRemoveSelected && localFavorites.columns.some(column => {
+        return column.categories.some(category => {
+          return category.items.some((item, index, arr) =>
+            item.selected && (index > 0 && !arr[index-1].selected));
+        });
       });
-    });
-    // enableMoveRight is true if enableRemoveSelected is true
-    // and at least one favorite can move right
-    let enableMoveRight = enableRemoveSelected && localFavorites.columns.some(column => {
-      return column.categories.some(category => {
-        return category.items.some((item, index, arr) =>
-          item.selected && (index < arr.length-1 && !arr[index+1].selected));
+    } else {
+      // enableMoveLeft is true if at least one category can move up
+      enableMoveLeft = localFavorites.columns.some(column => {
+        return column.categories.some((category, index, arr) =>
+          category.selected && (index > 0 && !arr[index-1].selected));
       });
-    });
+    }
+    let enableMoveRight;
+    if (editWhat === 'items') {
+      // enableMoveRight is true if enableRemoveSelected is true
+      // and at least one favorite can move right
+      enableMoveRight = enableRemoveSelected && localFavorites.columns.some(column => {
+        return column.categories.some(category => {
+          return category.items.some((item, index, arr) =>
+            item.selected && (index < arr.length-1 && !arr[index+1].selected));
+        });
+      });
+    } else {
+      // enableMoveLeft is true if at least one category can move up
+      enableMoveRight = localFavorites.columns.some(column => {
+        return column.categories.some((category, index, arr) =>
+          category.selected && (index < arr.length-1 && !arr[index+1].selected));
+      });
+    }
     // FIXME css might be added multiple times
     render(html`
     <style>${css}</style>
