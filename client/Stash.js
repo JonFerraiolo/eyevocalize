@@ -90,7 +90,7 @@ export function updateStash(props) {
       });
     });
   }
-  let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Stash");
+  let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Noteboard");
   return html`
     <style>${css}</style>
     <div class=PhrasesSectionLabel>

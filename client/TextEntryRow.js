@@ -23,20 +23,7 @@ let css = `
   border: 1px solid #D9D9D9;
   overflow: hidden;
   resize: none;
-}
-.TextEntryRow button {
-  height: 2.75emem;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 3px;
-  border: black;
-  font-size: 0.9em;
-  margin: 0 2px;
-  padding: 0.8em 0.8em;
-  background: lightgreen;
-  color: black;
-  font-weight: bold;
-  text-align: center;
+  min-width: 8em;
 }
 .TextEntryRow button:hover, .TextEntryRow button:focus {
   cursor: pointer;
@@ -44,13 +31,120 @@ let css = `
 .TextEntryRow button:active {
   box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.1) inset;
 }
+.TextEntryIconBlocks {
+  display: inline-block;
+}
+.TextEntryIconBlock {
+  display: inline-block;
+  white-space: nowrap;
+}
+.TextEntryIcon {
+  display: inline-block;
+  width: 3em;
+  height: 3em;
+  background-size: 3em 3em;
+  background-repeat: no-repeat;
+  border: 1px solid black;
+  background-color: white;
+  padding: 0;
+  margin-left: -1px;;
+}
+.TextEntryClear {
+  background-image: url('./images/noun_clear_713056.svg');
+  width: 1.5em;
+  background-size: 3.5em 5em;
+  background-position: -1.1em -0.5em;
+  border: none;
+  margin-left: 0;
+  margin-right: 1em;
+}
+.TextEntrySpeak {
+  background-image: url('./images/noun_talk_1614342.svg');
+  background-position: 0px 0.2em;
+}
+.TextEntryStash {
+  background-image: url('./images/noun_sticky notes_2355407.svg');
+  background-size: 2.5em 2.5em;
+  background-position: 0.2em 0.5em;
+}
+.TextEntryAddFavorite {
+  background-image: url('./images/noun_Heart_682473.svg');
+  background-size: 1.75em 1.75em;
+  background-position: 50% 50%;
+}
+.TextEntrySearch {
+  background-image: url('./images/noun_Search_2784652.svg');
+  background-size: 2.5em 2.5em;
+  background-position: 0.2em 0.5em;
+  margin-right: 1em;
+}
+.TextEntryHalfOrFull {
+  border: none;
+  background-size: 1.75em 1.75em;
+  background-position: 50% 50%;
+}
+.TextEntryHalfOrFull.Half {
+  background-image: url('./images/halfpage.svg');
+}
+.TextEntryHalfOrFull.Full {
+  background-image: url('./images/fullpage.svg');
+}
+.TextEntrySettings {
+  width: 2em;
+  background-image: url('./images/Font_Awesome_5_solid_cog.svg');
+  background-size: 1.5em 1.5em;
+  background-position: 50% 50%;
+  border: none;
+}
+.TextEntryHelp {
+  width: 2em;
+  background-image: url('./images/helpicon.svg');
+  background-size: 1.25em 1.25em;
+  background-position: 50% 50%;
+  border: none;
+}
+.TextEntryUser {
+  width: 2em;
+  background-image: url('./images/user.svg');
+  background-size: 2em 2em;
+  background-position: 50% 50%;
+  border: none;
+  margin-right: 0.15em;
+}
 `;
 
 export function updateTextEntryRow(parentElement, props) {
   let text = props.initialText || '';
+  let HalfOrFull = 'Full';  // FIXME
   let onClear = e => {
+    e.preventDefault();
     document.getElementById('TextEntryRowTextArea').value = '';
     clear();
+    TextEntryRowSetFocus();
+  }
+  let onAddFavorite = e => {
+    e.preventDefault();
+    debugger;
+    TextEntryRowSetFocus();
+  }
+  let onHalfOrFull = e => {
+    e.preventDefault();
+    debugger;
+    TextEntryRowSetFocus();
+  }
+  let onSettings = e => {
+    e.preventDefault();
+    debugger;
+    TextEntryRowSetFocus();
+  }
+  let onHelp = e => {
+    e.preventDefault();
+    debugger;
+    TextEntryRowSetFocus();
+  }
+  let onUser = e => {
+    e.preventDefault();
+    debugger;
     TextEntryRowSetFocus();
   }
   render(html`
@@ -58,10 +152,31 @@ export function updateTextEntryRow(parentElement, props) {
   <div class=TextEntryRow>
     <label class=TextEntryLabel for=TextEntryRowTextArea>Compose:</label
     ><textarea value=text id=TextEntryRowTextArea></textarea
-    ><button class=TextEntrySpeak @click=${speak}>Speak</button
-    ><button class=TextEntrySpeak @click=${stash}>Stash</button
-    ><button class=TextEntrySpeak @click=${search}>Search</button
-    ><button class=TextEntryClear @click=${onClear}>Clear</button>
+    ><button class="TextEntryIcon TextEntryClear" @click=${onClear}
+      title='Clear the current composition in the text entry box'></button
+    ><span class=TextEntryIconBlocks
+      ><span class=TextEntryIconBlock
+        ><button class="TextEntryIcon TextEntrySpeak" @click=${speak}
+          title='Vocalize the words in the text entry box using speech synthesis'></button
+        ><button class="TextEntryIcon TextEntryStash" @click=${stash}
+          title='Save these words in the "Stash", the storage area for things you might need to say soon'></button
+        ><button class="TextEntryIcon TextEntryAddFavorite" @click=${onAddFavorite}
+          title='Save these words as a new favorite'></button
+        ><button class="TextEntryIcon TextEntrySearch" @click=${search}
+          title='Filter the stash, the history and your favorites using the search words typed into the text entry box'></button
+      ></span
+      ><span class=TextEntryIconBlock
+        ><button class="TextEntryIcon TextEntryHalfOrFull ${HalfOrFull}" @click=${onHalfOrFull}
+          title="${HalfOrFull==='Half' ? 'Expand the user interface vertical-vertically to take up the entire browser window' :
+          'Compress the user interface vertically to take up only part of the browser window'}"></button
+        ><button class="TextEntryIcon TextEntrySettings" @click=${onSettings}
+          title='View and change application settings'></button
+        ><button class="TextEntryIcon TextEntryHelp" @click=${onHelp}
+          title='Get help with the user interface for this application'></button
+        ><button class="TextEntryIcon TextEntryUser" @click=${onUser}
+          title='Show user screen, includes logout'></button
+      ></span
+    ></span>
   </div>`, parentElement);
   resizeableTextarea(document.getElementById('TextEntryRowTextArea'));
 }

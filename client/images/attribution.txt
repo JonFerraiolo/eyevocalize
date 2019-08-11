@@ -2,3 +2,15 @@
 <a title="Google [Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Question,_Web_Fundamentals.svg"><img width="32" alt="Question, Web Fundamentals" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Question%2C_Web_Fundamentals.svg/32px-Question%2C_Web_Fundamentals.svg.png"></a>
 <a title="Google Inc. [CC BY 4.0 (https://creativecommons.org/licenses/by/4.0)], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Ic_arrow_back_48px.svg"><img width="32" alt="Ic arrow back 48px" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Ic_arrow_back_48px.svg/32px-Ic_arrow_back_48px.svg.png"></a>
 <div>Icons made by <a href="https://www.flaticon.com/authors/hanan" title="Hanan">Hanan</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+talk by Gregor Cresnar from the Noun Project
+sticky notes by Azmi Anshori from the Noun Project
+sticky notes by OliM from the Noun Project
+Search by Nebhav from the Noun Project
+clear by Landan Lloyd from the Noun Project
+<a title="Font Awesome Free 5.2.0 by @fontawesome - https://fontawesome.com [CC BY 4.0 (https://creativecommons.org/licenses/by/4.0)], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Font_Awesome_5_solid_cog.svg"><img width="512" alt="Font Awesome 5 solid cog" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Font_Awesome_5_solid_cog.svg/512px-Font_Awesome_5_solid_cog.svg.png"></a>
+History by Rockicon from the Noun Project
+account by Lyhn from the Noun Project
+Hearts by y. onaldi from the Noun Project
+Heart by y. onaldi from the Noun Project
+Heart by Andrejs Kirma from the Noun Project
+<a title="Fabián Alexis [CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0)], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Antu_list-resource-add.svg"><img width="512" alt="Antu list-resource-add" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Antu_list-resource-add.svg/512px-Antu_list-resource-add.svg.png"></a>

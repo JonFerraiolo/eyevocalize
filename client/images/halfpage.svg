@@ -1,0 +1,26 @@
+<svg height='100px' width='100px'
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="1.1" viewBox="-2 -2 104 104" xml:space="preserve">
+
+<defs>
+  <style type="text/css">
+    .thin { stroke-width:2; stroke-dasharray:8 4; }
+    .thick { stroke-width:4; }
+    .fillstrokedark { fill:#555; stroke:#555; }
+    .filldark { fill:#555; stroke:none; }
+    .filllight { fill:#fff; stroke:none; }
+    .strokedark { fill:none; stroke:#333; }
+    .strokehalfdark { fill:none; stroke:#777; }
+  </style>
+</defs>
+
+<path d="M 0 10 h 100" class="thin strokedark"/>
+<path d="M 0 20 h 100" class="thin strokedark"/>
+<path d="M 0 30 h 100" class="thin strokedark"/>
+<path d="M 0 40 h 100" class="thin strokedark"/>
+<rect x="0" y="0" width="100" height="100" class="thick strokedark"/>
+<path d="M 0 50 h 100" class="thick strokedark"/>
+<rect x="0" y="50" width="100" height="50" class="thick fillstrokedark"/>
+<path d="M 50 89 L24 61 L 76 61 z" class="filllight"/>
+
+</svg>
