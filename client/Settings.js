@@ -73,3 +73,7 @@ export function getVoice() {
   voice = voice || voices[0];
   return voice;
 }
+
+export function mainAppSizeWhenSmall() {
+  return 0.5;
+}

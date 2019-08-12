@@ -25,9 +25,15 @@ let css = `
   flex: 1;
 }
 .StashContent, .HistoryContent {
-  flex: 1;
   overflow-x: hidden;
   overflow-y: auto;
+  min-height: 25%;
+}
+.StashContent {
+  flex: 0 0 content;
+}
+.HistoryContent {
+  flex: 1 1;
 }
 #FavoritesContainer {
   flex: 3;

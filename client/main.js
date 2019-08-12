@@ -1,6 +1,6 @@
 
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
-import { initializeSettings, editSettings } from './Settings.js';
+import { initializeSettings, editSettings, mainAppSizeWhenSmall } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
 import { initializeStash, stash, editStash } from './Stash.js';
 import { initializeHistory, addToHistory, editHistory } from './History.js';
@@ -28,7 +28,20 @@ export function clear() {
 	updateMain();
 }
 
-/**
+let appMinOrMax = 'Min'; // either 'Min' or 'Max', controls whether bottom of screen is blocked off for onscreen keyboard
+export function getAppMinOrMax() {
+	return appMinOrMax;
+}
+export function setAppMinOrMax(minOrMax) {
+	appMinOrMax = minOrMax;
+	let appmaincontentpercent = minOrMax === 'Min' ? (mainAppSizeWhenSmall()*100)+'%' : '100%';
+	let appinitiallyblankpercent = minOrMax === 'Min' ? ((1-mainAppSizeWhenSmall())*100)+'%' : '0%';
+	document.querySelector('.appmaincontent').style.height = appmaincontentpercent;
+	document.querySelector('.appinitiallyblank').style.height = appinitiallyblankpercent;
+	updateMain();
+}
+
+/*
  * Returns a block of lit-html nodes that can be used to render
  * the title row of a screen that slides in from the right.
  * @param {string} title Title that will appear at the top
@@ -85,27 +98,41 @@ export function thirdLevelScreenHide() {
   slideInScreenHide(document.querySelector('.secondlevelleft'));
 }
 
+let updateMainInProcess = false;
 export function updateMain(searchString) {
+	if (updateMainInProcess) return;
+	updateMainInProcess = true;
 	let TextEntryRowProps = { initialText: '' };
 	let PhrasesProps = { searchString };
 	render(html`
 		<style>${css}</style>
-    <div class=main>
-      <div class=mainleft>
-        <div class=mainleftcontent>
-          <div id=TextEntryRowContainer></div>
-          <div id=PhrasesContainer></div>
-        </div>
-      </div>
-      <div class=mainright>
-        <div class=secondlevelleft></div>
-        <div class=secondlevelright></div>
-      </div>
-    </div>
+		<div class=appfullheight>
+			<div class=appmaincontent>
+				<div class=main>
+		      <div class=mainleft>
+		        <div class=mainleftcontent>
+		          <div id=TextEntryRowContainer></div>
+		          <div id=PhrasesContainer></div>
+		        </div>
+		      </div>
+		      <div class=mainright>
+		        <div class=secondlevelleft></div>
+		        <div class=secondlevelright></div>
+		      </div>
+		    </div>
+			</div>
+			<div class=appinitiallyblank>
+			<p>This area is intentionally blank to provide room for an onscreen keyboard.</p>
+			<p>To use this area for the application's user interface, press the
+				<span class=icon></span> icon at the top-right of the application.</p> 
+			</div>
+		</div>
 	`, document.body);
+	setAppMinOrMax(appMinOrMax);
   updateTextEntryRow(document.getElementById('TextEntryRowContainer'), TextEntryRowProps);
   updatePhrases(document.getElementById('PhrasesContainer'), PhrasesProps);
 	TextEntryRowSetFocus();
+	updateMainInProcess = false;
 };
 
 export function main() {

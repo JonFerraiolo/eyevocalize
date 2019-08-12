@@ -1,7 +1,7 @@
 
 import { speak } from './vocalize.js';
 import { stash } from './Stash.js';
-import { search, clear } from './main.js';
+import { search, clear, getAppMinOrMax, setAppMinOrMax } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
 import { html, render } from './lib/lit-html/lit-html.js';
 
@@ -78,15 +78,15 @@ let css = `
   background-position: 0.2em 0.5em;
   margin-right: 1em;
 }
-.TextEntryHalfOrFull {
+.TextEntryMinOrMax {
   border: none;
   background-size: 1.75em 1.75em;
   background-position: 50% 50%;
 }
-.TextEntryHalfOrFull.Half {
+.TextEntryMinOrMax.Min {
   background-image: url('./images/halfpage.svg');
 }
-.TextEntryHalfOrFull.Full {
+.TextEntryMinOrMax.Max {
   background-image: url('./images/fullpage.svg');
 }
 .TextEntrySettings {
@@ -115,7 +115,17 @@ let css = `
 
 export function updateTextEntryRow(parentElement, props) {
   let text = props.initialText || '';
-  let HalfOrFull = 'Full';  // FIXME
+  let MinOrMax = getAppMinOrMax();
+  let onSpeak = e => {
+    e.preventDefault();
+    speak(document.getElementById('TextEntryRowTextArea').value);
+    TextEntryRowSetFocus();
+  }
+  let onStash = e => {
+    e.preventDefault();
+    stash(document.getElementById('TextEntryRowTextArea').value);
+    TextEntryRowSetFocus();
+  }
   let onClear = e => {
     e.preventDefault();
     document.getElementById('TextEntryRowTextArea').value = '';
@@ -127,9 +137,11 @@ export function updateTextEntryRow(parentElement, props) {
     debugger;
     TextEntryRowSetFocus();
   }
-  let onHalfOrFull = e => {
+  let onMinOrMax = e => {
     e.preventDefault();
-    debugger;
+    MinOrMax = MinOrMax === 'Min' ? 'Max' : 'Min';
+    setAppMinOrMax(MinOrMax);
+    localUpdate();
     TextEntryRowSetFocus();
   }
   let onSettings = e => {
@@ -147,38 +159,41 @@ export function updateTextEntryRow(parentElement, props) {
     debugger;
     TextEntryRowSetFocus();
   }
-  render(html`
-  <style>${css} </style>
-  <div class=TextEntryRow>
-    <label class=TextEntryLabel for=TextEntryRowTextArea>Compose:</label
-    ><textarea value=text id=TextEntryRowTextArea></textarea
-    ><button class="TextEntryIcon TextEntryClear" @click=${onClear}
-      title='Clear the current composition in the text entry box'></button
-    ><span class=TextEntryIconBlocks
-      ><span class=TextEntryIconBlock
-        ><button class="TextEntryIcon TextEntrySpeak" @click=${speak}
-          title='Vocalize the words in the text entry box using speech synthesis'></button
-        ><button class="TextEntryIcon TextEntryStash" @click=${stash}
-          title='Save these words in the "Stash", the storage area for things you might need to say soon'></button
-        ><button class="TextEntryIcon TextEntryAddFavorite" @click=${onAddFavorite}
-          title='Save these words as a new favorite'></button
-        ><button class="TextEntryIcon TextEntrySearch" @click=${search}
-          title='Filter the stash, the history and your favorites using the search words typed into the text entry box'></button
-      ></span
-      ><span class=TextEntryIconBlock
-        ><button class="TextEntryIcon TextEntryHalfOrFull ${HalfOrFull}" @click=${onHalfOrFull}
-          title="${HalfOrFull==='Half' ? 'Expand the user interface vertical-vertically to take up the entire browser window' :
-          'Compress the user interface vertically to take up only part of the browser window'}"></button
-        ><button class="TextEntryIcon TextEntrySettings" @click=${onSettings}
-          title='View and change application settings'></button
-        ><button class="TextEntryIcon TextEntryHelp" @click=${onHelp}
-          title='Get help with the user interface for this application'></button
-        ><button class="TextEntryIcon TextEntryUser" @click=${onUser}
-          title='Show user screen, includes logout'></button
-      ></span
-    ></span>
-  </div>`, parentElement);
-  resizeableTextarea(document.getElementById('TextEntryRowTextArea'));
+  let localUpdate = () => {
+    render(html`
+    <style>${css} </style>
+    <div class=TextEntryRow>
+      <label class=TextEntryLabel for=TextEntryRowTextArea>Compose:</label
+      ><textarea value=text id=TextEntryRowTextArea></textarea
+      ><button class="TextEntryIcon TextEntryClear" @click=${onClear}
+        title='Clear the current composition in the text entry box'></button
+      ><span class=TextEntryIconBlocks
+        ><span class=TextEntryIconBlock
+          ><button class="TextEntryIcon TextEntrySpeak" @click=${onSpeak}
+            title='Vocalize the words in the text entry box using speech synthesis'></button
+          ><button class="TextEntryIcon TextEntryStash" @click=${onStash}
+            title='Save these words in the "Stash", the storage area for things you might need to say soon'></button
+          ><button class="TextEntryIcon TextEntryAddFavorite" @click=${onAddFavorite}
+            title='Save these words as a new favorite'></button
+          ><button class="TextEntryIcon TextEntrySearch" @click=${search}
+            title='Filter the stash, the history and your favorites using the search words typed into the text entry box'></button
+        ></span
+        ><span class=TextEntryIconBlock
+          ><button class="TextEntryIcon TextEntryMinOrMax ${MinOrMax}" @click=${onMinOrMax}
+            title="${MinOrMax==='Min' ? 'Expand the user interface vertical-vertically to take up the entire browser window' :
+            'Compress the user interface vertically to take up only part of the browser window'}"></button
+          ><button class="TextEntryIcon TextEntrySettings" @click=${onSettings}
+            title='View and change application settings'></button
+          ><button class="TextEntryIcon TextEntryHelp" @click=${onHelp}
+            title='Get help with the user interface for this application'></button
+          ><button class="TextEntryIcon TextEntryUser" @click=${onUser}
+            title='Show user screen, includes logout'></button
+        ></span
+      ></span>
+    </div>`, parentElement);
+    resizeableTextarea(document.getElementById('TextEntryRowTextArea'));
+  };
+  localUpdate();
 }
 
 export function TextEntryRowSetFocus() {
