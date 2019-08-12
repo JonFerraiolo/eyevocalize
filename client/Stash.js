@@ -8,6 +8,16 @@ import { updateMain, buildSlideRightTitle,
 import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } from './Phrases.js';
 
 let css = `
+.StashTitleIcon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.4em;
+  background-image: url('./images/noun_sticky notes_2355407.svg');
+  background-size: 1.1em 1.5em;
+  background-position: 0% 0%;
+  background-repeat: no-repeat;
+}
 .editStash .skinnyScreenChild {
   display: flex;
   flex-direction: column;
@@ -77,10 +87,6 @@ export function updateStash(props) {
     e.preventDefault();
     onEditStash();
   };
-  let onClickHelp = e => {
-    e.preventDefault();
-    debugger;
-  };
   let filteredStash = JSON.parse(JSON.stringify(Stash));  // deep clone
   if (searchTokens.length > 0) {
     filteredStash.items = filteredStash.items.filter(phrase => {
@@ -90,11 +96,11 @@ export function updateStash(props) {
       });
     });
   }
-  let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Noteboard");
+  let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Noteboard", "StashTitleIcon");
   return html`
     <style>${css}</style>
     <div class=PhrasesSectionLabel>
-      ${StashTitle}${rightSideIcons({ onClickAdd, onClickEdit, onClickHelp })}
+      ${StashTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
     </div>
     ${filteredStash.expanded ?
       html`<div class=StashContent>

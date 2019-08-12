@@ -68,9 +68,9 @@ let css = `
   background-position: 0.2em 0.5em;
 }
 .TextEntryAddFavorite {
-  background-image: url('./images/noun_Heart_682473.svg');
+  background-image: url('./images/heart.svg');
   background-size: 1.75em 1.75em;
-  background-position: 50% 50%;
+  background-position: 50% 55%;
 }
 .TextEntrySearch {
   background-image: url('./images/noun_Search_2784652.svg');

@@ -98,12 +98,6 @@ let css = `
   height: 1em;
   vertical-align: top;
 }
-.rightsideicon.helpicon {
-  background-image: url(images/helpicon.svg);
-  width: 0.75em;
-  height: 0.75em;
-  vertical-align: 0%;
-}
 `;
 
 const expandArrowSpan = html`<span class=collapsearrow>&#x2304;</span>`;
@@ -120,11 +114,10 @@ export function deleteTemporaryProperties(phrase) {
 };
 
 export function rightSideIcons(params) {
-  let { onClickAdd, onClickEdit, onClickHelp } = params;
+  let { onClickAdd, onClickEdit } = params;
   let add = onClickAdd ? html`<a href="" @click=${onClickAdd} class="rightsideicon addicon"></a>` : '';
   let edit = onClickEdit ? html`<a href="" @click=${onClickEdit} class="rightsideicon editicon"></a>` : '';
-  let help = onClickHelp ? html`<a href="" @click=${onClickHelp} class="rightsideicon helpicon"></a>` : '';
-  return html`<span class=rightsideicons>${add}${edit}${help}</span>`;
+  return html`<span class=rightsideicons>${add}${edit}</span>`;
 };
 
 export function playPhrase(phrase) {
@@ -161,9 +154,10 @@ let toggleCollapseExpand = e => {
   updateMain();
 };
 
-export function buildTitleWithCollapseExpandArrows(obj, title) {
+export function buildTitleWithCollapseExpandArrows(obj, title, iconClass) {
   let arrow = obj.expanded ? collapseArrowSpan : expandArrowSpan;
-  return html`<a href="" @click=${toggleCollapseExpand} .objToToggle=${obj}>${title}${arrow}</a>`;
+  let icon = iconClass ? html`<span class="${iconClass}"></span>` : '';
+  return html`<a href="" @click=${toggleCollapseExpand} .objToToggle=${obj}>${icon}${title}${arrow}</a>`;
 };
 
 export function updatePhrases(parentElement, props) {

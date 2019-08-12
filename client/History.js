@@ -5,6 +5,16 @@ import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } fro
 let css = `
 .History {
 }
+.HistoryTitleIcon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.4em;
+  background-image: url('./images/noun_History_1563152.svg');
+  background-size: 1.1em 1.5em;
+  background-position: 0% 0%;
+  background-repeat: no-repeat;
+}
 `;
 
 let History;
@@ -35,10 +45,6 @@ export function updateHistory(props) {
     e.preventDefault();
     debugger;
   };
-  let onClickHelp = e => {
-    e.preventDefault();
-    debugger;
-  };
   let filteredHistory = History;
   if (searchTokens.length > 0) {
     filteredHistory = JSON.parse(JSON.stringify(History));  // deep clone
@@ -49,11 +55,11 @@ export function updateHistory(props) {
       });
     });
   }
-  let HistoryTitle = buildTitleWithCollapseExpandArrows(History, "History");
+  let HistoryTitle = buildTitleWithCollapseExpandArrows(History, "History", "HistoryTitleIcon");
   return html`
     <style>${css}</style>
     <div class=PhrasesSectionLabel>
-      ${HistoryTitle}${rightSideIcons({ onClickEdit, onClickHelp })}
+      ${HistoryTitle}${rightSideIcons({ onClickEdit })}
     </div>
     ${filteredHistory.expanded ?
       html`<div class=HistoryContent>

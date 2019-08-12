@@ -19,6 +19,16 @@ let css = `
 .Favorites.EditFavorites {
   padding-left: 0;
 }
+.FavoritesTitleIcon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.4em;
+  background-image: url('./images/heart.svg');
+  background-size: 1.1em 1.1em;
+  background-position: 0px 1px;
+  background-repeat: no-repeat;
+}
 .FavoritesCategoryLabel {
   font-size: 90%;
   color: #888;
@@ -408,10 +418,6 @@ export function updateFavorites(parentElement, props) {
     e.preventDefault();
     onEditFavorites();
   };
-  let onClickHelp = e => {
-    e.preventDefault();
-    debugger;
-  };
   let localUpdate = () => {
     let filteredFavorites = JSON.parse(JSON.stringify(Favorites));  // deep clone
     filteredFavorites.columns.forEach(column => {
@@ -438,7 +444,7 @@ export function updateFavorites(parentElement, props) {
     render(html`
     <style>${css}</style>
     <div class=Favorites>
-      <div class=PhrasesSectionLabel>Favorites${rightSideIcons({ onClickAdd, onClickEdit, onClickHelp })}</div>
+      <div class=PhrasesSectionLabel><span class=FavoritesTitleIcon></span>Favorites${rightSideIcons({ onClickAdd, onClickEdit })}</div>
       <div class=FavoritesColumns>
         ${filteredFavorites.columns.map(column => html`
           <div class=FavoritesColumn>
