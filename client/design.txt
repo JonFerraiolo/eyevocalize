@@ -1,41 +1,15 @@
-SavedText data structure:
-  { phrases, history }
-Application state
-  phrases ( hidden by clkk)
-  text (get/set)
-  activeTags [strings]
-  andVsOr
-  activeView
-    showPhrasesAndTags
-    addTagToPhrase(phrase)
-    setWeightOnPhrase(phrase)
-    download, upload
-    settings
-Data:
-  Ui allows
-    download of all
-    upload and merge
-    upload and replace
-  Internal data format:
-    [{[tags], weight, phrase, lastused, [usagetimestamps], created}]
-    Persisted both on server and localStorage, with a timestamp for last saved.
-    For performance, at initialization time, create a cache that is indexed by individual tags
-    For reliability, only allow changes through an API
-      https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures#Emulating_private_methods_with_closures
-      Exported API: phrases.{addTag(text,tag,weight),use(tx),removeTag(tx,tg),setWeight(tx)}
-UI:
+Settings
+
+Tabs
+  Voice
+  Appearance
   History
-    Groupings
-      Moments ago
-      Today
-      This week
-      Distant past
-  Edit Favorites
-    regular Favorites display, but short editing instruction message at top
-    also, add a new favorite button and add a new category, reorder categories
-    click a category or a button to edit
-    editing ui slides in from right
-    for category, edit label, plus ability to reorder the buttons
-    for buttons, edit label, choose text or audio, edit value, edit category
-    drag and drop available for rearranging
-     
+
+Voice - what we have now, approximately
+
+Appearance
+  Font size - 12-24 menu
+  Intentionally blank area - default = 50(%)
+
+History
+  Automatically delete history older than - 1 year, 1 month, 1 week, 1 day, 1 hour, never

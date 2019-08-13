@@ -3,7 +3,7 @@ import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntr
 import { initializeSettings, editSettings, mainAppSizeWhenSmall } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
 import { initializeStash, stash, editStash } from './Stash.js';
-import { initializeHistory, addToHistory, editHistory } from './History.js';
+import { initializeHistory, addToHistory, editHistory, playLastHistoryItem } from './History.js';
 import { initializeFavorites, editFavorites } from './Favorites.js';
 import { fromRight, fromLeft } from './animSlide.js';
 import { speak, playAudio } from './vocalize.js';
@@ -124,7 +124,7 @@ export function updateMain(searchString) {
 			<div class=appinitiallyblank>
 			<p>This area is intentionally blank to provide room for an onscreen keyboard.</p>
 			<p>To use this area for the application's user interface, press the
-				<span class=icon></span> icon at the top-right of the application.</p> 
+				<span class=icon></span> icon at the top-right of the application.</p>
 			</div>
 		</div>
 	`, document.body);
@@ -162,15 +162,10 @@ export function main() {
     } else if (e.key === 's' && !shift && (control || meta)) {
       e.preventDefault();
       search();
-    /* FIXME
 		} else if (e.key === '.' && !shift && (control || meta)) {
 			// Control+period speaks the most recent entry in the History
-			let text = History.length > 0 ? History[0].text : '';
-			if (text.length > 0) {
-				e.preventDefault();
-				speak(text);
-			}
-      */
+			e.preventDefault();
+			playLastHistoryItem();
     } else {
       // just pass through to default processing, which will add the character
     }

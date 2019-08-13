@@ -1,6 +1,6 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
-import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } from './Phrases.js';
+import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows, playPhrase } from './Phrases.js';
 
 let css = `
 .History {
@@ -37,6 +37,14 @@ export function addToHistory(obj) {
   obj = Object.assign({ timestamp: new Date() }, obj);
 	History.items.unshift(obj);
 	localStorage.setItem("History", JSON.stringify(History));
+};
+
+export function playLastHistoryItem() {
+  if (History.items.length > 0) {
+    let phrase = History.items[0];
+    playPhrase(phrase);
+    addToHistory(phrase);
+  }
 };
 
 export function updateHistory(props) {
