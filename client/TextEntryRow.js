@@ -1,6 +1,7 @@
 
 import { speak } from './vocalize.js';
 import { stash } from './Stash.js';
+import { slideInAddFavoriteScreen } from './Favorites.js';
 import { search, clear, getAppMinOrMax, setAppMinOrMax } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
 import { html, render } from './lib/lit-html/lit-html.js';
@@ -134,8 +135,7 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onAddFavorite = e => {
     e.preventDefault();
-    debugger;
-    TextEntryRowSetFocus();
+    slideInAddFavoriteScreen({ phrase: { type:'text', text:document.getElementById('TextEntryRowTextArea').value}});
   }
   let onMinOrMax = e => {
     e.preventDefault();

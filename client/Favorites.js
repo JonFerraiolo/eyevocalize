@@ -384,35 +384,42 @@ function traverseColumnsCategoriesItems(aFavorites, func) {
 
 function onFavoritesChange(newFavorites) {
   // FIXME localStorage.setItem("Favorites", JSON.stringify(Favorites));
-}
+};
+
+export function slideInAddFavoriteScreen(props) {
+  props = props || {};
+  let { phrase } = props;
+  let customControlsData = {};
+  let params = {
+    renderFunc: EditPhrase,
+    renderFuncParams: {
+      title: 'Add New Favorite',
+      doItButtonLabel: 'Add Favorite',
+      doItCallback: function(phrase) {
+        let { columnIndex, categoryIndex } = customControlsData;
+        // add phrase to Favorites, go back to parent screen
+        addToFavorites(phrase, columnIndex, categoryIndex);
+        localUpdate();
+        secondLevelScreenHide();
+      },
+      cancelCallback: function() {
+        // do nothing, go back to parent screen
+        secondLevelScreenHide();
+      },
+      textLabelRequired: true,
+      customControlsFunc: buildChooseCategoryControl,
+      phrase,
+      customControlsData,
+    },
+  };
+  secondLevelScreenShow(params);
+};
 
 export function updateFavorites(parentElement, props) {
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
-    let customControlsData = {};
-    let params = {
-      renderFunc: EditPhrase,
-      renderFuncParams: {
-        title: 'Add New Favorite',
-        doItButtonLabel: 'Add Favorite',
-        doItCallback: function(phrase) {
-          let { columnIndex, categoryIndex } = customControlsData;
-          // add phrase to Favorites, go back to parent screen
-          addToFavorites(phrase, columnIndex, categoryIndex);
-          localUpdate();
-          secondLevelScreenHide();
-        },
-        cancelCallback: function() {
-          // do nothing, go back to parent screen
-          secondLevelScreenHide();
-        },
-        textLabelRequired: true,
-        customControlsFunc: buildChooseCategoryControl,
-        customControlsData,
-      },
-    };
-    secondLevelScreenShow(params);
+    slideInAddFavoriteScreen();
   };
   let onClickEdit = e => {
     e.preventDefault();
