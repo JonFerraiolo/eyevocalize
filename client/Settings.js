@@ -62,7 +62,7 @@ let css = `
 let currentVersion;
 let voices;
 let voice;
-let voiceName;
+let voiceName = null;
 let voiceIndex = 0;
 let defaultVolume = 1;
 let volume = defaultVolume;
@@ -80,10 +80,27 @@ export function initializeSettings(props) {
   window.speechSynthesis.onvoiceschanged = function(e) {
     voices = speechSynthesis.getVoices();
   };
+  let initialSettings = { voiceName, volume, rate, pitch, sampleText };
+  let Settings;
+  let SettingsString = localStorage.getItem("Settings");
+  try {
+    Settings = (typeof SettingsString === 'string') ? JSON.parse(SettingsString) : initialSettings;
+  } catch(e) {
+    Settings = initialSettings;
+  }
+  if (typeof Settings.version != 'number'|| Settings.version < currentVersion) {
+    Settings = initialSettings;
+  }
+  voiceName = Settings.voiceName;
+  volume = Settings.volume;
+  rate = Settings.rate;
+  pitch = Settings.pitch;
+  sampleText = Settings.sampleText;
 };
 
 let updateLocalStorage = () => {
-
+  let Settings = { version: currentVersion, voiceName, volume, rate, pitch, sampleText };
+  localStorage.setItem("Settings", JSON.stringify(Settings));
 };
 
 export function slideInAddSettingsScreen(props) {
@@ -160,7 +177,7 @@ export function editSettings(parentElement, params) {
     } else if (section === 'History') {
 
     } else if (section === 'Voice') {
-      voiceIndex = 0;
+      voiceName = null;
       volume = defaultVolume;
       rate = defaultRate;
       pitch = defaultPitch;
@@ -177,6 +194,8 @@ export function editSettings(parentElement, params) {
   }`;
   let title = 'Settings';
   let localUpdate = () => {
+    voiceIndex = voices.findIndex(v => v.name === voiceName );
+    if (voiceIndex === -1) voiceIndex = 0;
     voice = voices[voiceIndex];
     voiceName = voice.name;
     let SettingsData;

@@ -42,7 +42,6 @@ export function initializeStash(props) {
   if (typeof Stash.version != 'number'|| Stash.version < currentVersion) {
     Stash = initialStash;
   }
-  return Stash;
 }
 
 // Add phrase to Stash without speaking
