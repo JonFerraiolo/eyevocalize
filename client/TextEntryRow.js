@@ -4,6 +4,7 @@ import { stash } from './Stash.js';
 import { slideInAddFavoriteScreen } from './Favorites.js';
 import { search, clear, getAppMinOrMax, setAppMinOrMax } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
+import { slideInAddSettingsScreen } from './Settings.js';
 import { html, render } from './lib/lit-html/lit-html.js';
 
 let css = `
@@ -146,8 +147,7 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onSettings = e => {
     e.preventDefault();
-    debugger;
-    TextEntryRowSetFocus();
+    slideInAddSettingsScreen();
   }
   let onHelp = e => {
     e.preventDefault();
@@ -164,7 +164,7 @@ export function updateTextEntryRow(parentElement, props) {
     <style>${css} </style>
     <div class=TextEntryRow>
       <label class=TextEntryLabel for=TextEntryRowTextArea>Compose:</label
-      ><textarea value=text id=TextEntryRowTextArea></textarea
+      ><textarea id=TextEntryRowTextArea>${text}</textarea
       ><button class="TextEntryIcon TextEntryClear" @click=${onClear}
         title='Clear the current composition in the text entry box'></button
       ><span class=TextEntryIconBlocks

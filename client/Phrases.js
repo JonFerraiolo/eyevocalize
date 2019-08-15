@@ -71,9 +71,6 @@ let css = `
 .skinnyScreenChild .PhraseRow {
   padding: 0 1.5em;
 }
-.StashAndHistory .PhrasesSectionLabel {
-  border-right: none;
-}
 .HistoryContent button, .StashContent button {
   text-align: left;
   white-space: nowrap;

@@ -11,13 +11,6 @@ import { html, render } from './lib/lit-html/lit-html.js';
 
 let css = `@import 'app.css';`;
 
-let showSettings = () => {
-	// Don't show Settings for the time being.
-	// Will make into a popup
-	const props = Object.assign({}, Settings);
-	render(editSettings(props), document.getElementById('root'));
-}
-
 export function search(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	updateMain(text);
@@ -123,8 +116,8 @@ export function updateMain(searchString) {
 			</div>
 			<div class=appinitiallyblank>
 			<p>This area is intentionally blank to provide room for an onscreen keyboard.</p>
-			<p>To use this area for the application's user interface, press the
-				<span class=icon></span> icon at the top-right of the application.</p>
+			<p>To use this area instead for the application's user interface, press the
+				<span class=icon></span> toggle icon at the top-right of the application.</p>
 			</div>
 		</div>
 	`, document.body);
