@@ -76,11 +76,36 @@ function onStashChange() {
   localStorage.setItem("Stash", JSON.stringify(Stash));
 }
 
+
+function slideInAddEntryToStashScreen(props) {
+  props = props || {};
+  let { phrase } = props;
+  let params = {
+    renderFunc: EditPhrase,
+    renderFuncParams: {
+      title: 'Add Entry to Noteboard',
+      doItButtonLabel: 'Add Entry',
+      doItCallback: function(phrase) {
+        // add phrase to Stash, go back to parent screen
+        addToStash(phrase);
+        updateMain();
+        secondLevelScreenHide();
+      },
+      cancelCallback: function() {
+        // do nothing, go back to parent screen
+        secondLevelScreenHide();
+      },
+      phrase,
+    },
+  };
+  secondLevelScreenShow(params);
+};
+
 export function updateStash(props) {
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
-    debugger;
+    slideInAddEntryToStashScreen();
   };
   let onClickEdit = e => {
     e.preventDefault();

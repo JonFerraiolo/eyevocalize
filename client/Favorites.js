@@ -399,7 +399,7 @@ export function slideInAddFavoriteScreen(props) {
         let { columnIndex, categoryIndex } = customControlsData;
         // add phrase to Favorites, go back to parent screen
         addToFavorites(phrase, columnIndex, categoryIndex);
-        localUpdate();
+        updateMain();
         secondLevelScreenHide();
       },
       cancelCallback: function() {
