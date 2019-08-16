@@ -1,6 +1,6 @@
 
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
-import { initializeSettings, editSettings, mainAppSizeWhenSmall } from './Settings.js';
+import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
 import { initializeStash, stash, editStash } from './Stash.js';
 import { initializeHistory, addToHistory, editHistory, playLastHistoryItem } from './History.js';
@@ -8,6 +8,7 @@ import { initializeFavorites, editFavorites } from './Favorites.js';
 import { fromRight, fromLeft } from './animSlide.js';
 import { speak, playAudio } from './vocalize.js';
 import { html, render } from './lib/lit-html/lit-html.js';
+import { styleMap } from './lib/lit-html/directives/style-map.js';
 
 let css = `@import 'app.css';`;
 
@@ -27,8 +28,8 @@ export function getAppMinOrMax() {
 }
 export function setAppMinOrMax(minOrMax) {
 	appMinOrMax = minOrMax;
-	let appmaincontentpercent = minOrMax === 'Min' ? (mainAppSizeWhenSmall()*100)+'%' : '100%';
-	let appinitiallyblankpercent = minOrMax === 'Min' ? ((1-mainAppSizeWhenSmall())*100)+'%' : '0%';
+	let appmaincontentpercent = minOrMax === 'Min' ? mainAppPercentWhenSmall()+'%' : '100%';
+	let appinitiallyblankpercent = minOrMax === 'Min' ? (100-mainAppPercentWhenSmall())+'%' : '0%';
 	document.querySelector('.appmaincontent').style.height = appmaincontentpercent;
 	document.querySelector('.appinitiallyblank').style.height = appinitiallyblankpercent;
 	updateMain();
@@ -95,11 +96,12 @@ let updateMainInProcess = false;
 export function updateMain(searchString) {
 	if (updateMainInProcess) return;
 	updateMainInProcess = true;
+	let appFontSize = getAppFontSize();
 	let TextEntryRowProps = { initialText: '' };
 	let PhrasesProps = { searchString };
 	render(html`
 		<style>${css}</style>
-		<div class=appfullheight>
+		<div class=appfullheight style=${styleMap({fontSize: appFontSize})}>
 			<div class=appmaincontent>
 				<div class=main>
 		      <div class=mainleft>

@@ -32,11 +32,17 @@ let css = `
   text-align: left;
   vertical-align: middle;
 }
+.SettingsData .gridlayout > label {
+  white-space: nowrap;
+}
 .SettingsData .chooseVoiceRow {
   margin-bottom: 0.25em;
 }
 .SettingsData input[type="range"] {
   width: 300px;
+}
+#SettingsMinScreenPercent {
+  width: 200px;
 }
 .SettingsData .testsamplerow {
   grid-column-start: 1;
@@ -72,6 +78,15 @@ let defaultPitch = 1;
 let pitch = defaultPitch;
 let defaultSampleText = 'What do you think of the new voice settings?';
 let sampleText = defaultSampleText;
+let appFontSizes = [];
+for (let i=14; i<=24; i++) {
+  appFontSizes.push({ label: i+'', value: i+'px' });
+}
+let defaultFontSize = '16px';
+let appFontSize = defaultFontSize;
+let appFontSizeIndex;
+let defaultMinScreenPercent = 50;
+let minScreenPercent = defaultMinScreenPercent;
 
 export function initializeSettings(props) {
   currentVersion = props.currentVersion;
@@ -80,7 +95,7 @@ export function initializeSettings(props) {
   window.speechSynthesis.onvoiceschanged = function(e) {
     voices = speechSynthesis.getVoices();
   };
-  let initialSettings = { voiceName, volume, rate, pitch, sampleText };
+  let initialSettings = { voiceName, volume, rate, pitch, sampleText, appFontSize, minScreenPercent };
   let Settings;
   let SettingsString = localStorage.getItem("Settings");
   try {
@@ -96,10 +111,13 @@ export function initializeSettings(props) {
   rate = Settings.rate;
   pitch = Settings.pitch;
   sampleText = Settings.sampleText;
+  appFontSize = Settings.appFontSize;
+  minScreenPercent = Settings.minScreenPercent;
 };
 
 let updateLocalStorage = () => {
-  let Settings = { version: currentVersion, voiceName, volume, rate, pitch, sampleText };
+  let Settings = { version: currentVersion, voiceName, volume, rate, pitch, sampleText,
+    appFontSize, minScreenPercent };
   localStorage.setItem("Settings", JSON.stringify(Settings));
 };
 
@@ -170,10 +188,22 @@ export function editSettings(parentElement, params) {
     let text = document.getElementById('SettingsVoiceSampleText').value;
     speak(text);
   };
+  let onChangeFontSize = e => {
+    e.preventDefault();
+    appFontSizeIndex = e.srcElement.selectedIndex;
+    appFontSize = appFontSizes[appFontSizeIndex].value;
+    updateLocalStorage();
+  };
+  let onChangeMinScreenPercent = e => {
+    e.preventDefault();
+    minScreenPercent = parseFloat(e.srcElement.value);
+    updateLocalStorage();
+  };
   let onClickRestoreDefaults = e => {
     e.preventDefault();
     if (section === 'Appearance') {
-
+      appFontSize = defaultFontSize;
+      minScreenPercent = defaultMinScreenPercent;
     } else if (section === 'History') {
 
     } else if (section === 'Voice') {
@@ -192,20 +222,40 @@ export function editSettings(parentElement, params) {
       html`<option value=${voice.name}>${voice.name}</option>}`
     )
   }`;
+  let appFontSizeOptionElements = html`${
+    appFontSizes.map(
+      o =>
+      html`<option value=${o.value}>${o.label}</option>}`
+    )
+  }`;
   let title = 'Settings';
   let localUpdate = () => {
     voiceIndex = voices.findIndex(v => v.name === voiceName );
     if (voiceIndex === -1) voiceIndex = 0;
     voice = voices[voiceIndex];
     voiceName = voice.name;
+    appFontSizeIndex = appFontSizes.findIndex(o => o.value === appFontSize);
+    if (appFontSizeIndex === -1) {
+      appFontSizeIndex = appFontSizes.findIndex(o => o.value === defaultFontSize);
+    }
+    appFontSize = appFontSizes[appFontSizeIndex].value;
     let SettingsData;
     if (section === 'Appearance') {
-      SettingsData = html``;
+      SettingsData = html`
+        <div class="gridlayout SettingsAppearance">
+          <label for="SettingsFontSize" class=chooseFontSizeRow>Application text size</label>
+          <select id="SettingsFontSize" .selectedIndex=${appFontSizeIndex} @change=${onChangeFontSize} class=chooseFontSizeRow>
+            ${appFontSizeOptionElements}
+          </select>
+          <label for="SettingsMinScreenPercent">Minimum screen percent</label>
+          <input type="range" min="25" max="75" step="1" id="SettingsMinScreenPercent" .value=${minScreenPercent} @change=${onChangeMinScreenPercent}></input>
+        </div>
+      `;
     } else if (section === 'History') {
       SettingsData = html``;
     } else {
       SettingsData = html`
-        <div class="gridlayout">
+        <div class="gridlayout SettingsVoice">
           <label for="SettingsVoice" class=chooseVoiceRow>Voice</label>
           <select id="SettingsVoice" .selectedIndex=${voiceIndex} @change=${onChangeVoice} class=chooseVoiceRow>
             ${voiceOptionElements}
@@ -249,6 +299,8 @@ export function editSettings(parentElement, params) {
     // lit-html mysteriously does not update the value of the select element
     if (section === 'Voice') {
       document.getElementById('SettingsVoice').selectedIndex = voiceIndex;
+    } else if (section === 'Appearance') {
+      document.getElementById('SettingsFontSize').selectedIndex = appFontSizeIndex;
     }
   };
   localUpdate();
@@ -259,6 +311,10 @@ export function getVoice() {
   return voice;
 }
 
-export function mainAppSizeWhenSmall() {
-  return 0.5;
+export function mainAppPercentWhenSmall() {
+  return minScreenPercent;
+}
+
+export function getAppFontSize() {
+  return appFontSize;
 }
