@@ -78,11 +78,14 @@ html {
 .slideFromRightAnim {
   animation-name: slideFromRight; animation-duration: 1s; animation-timing-function: linear; animation-fill-mode: forwards;
 }
-@keyframes slideFromRight { from { margin-left: 0; } to { margin-left: -100%; } }
+.endFromRightAnim {
+  margin-left: -100%;
+}
+@keyframes slideFromRight { from { transform: translate(0,0); } to { transform: translate(-100%,0); } }
 .undoSlideFromRightAnim {
   animation-name: undoSlideFromRight; animation-duration: 1s; animation-timing-function: linear; animation-fill-mode: forwards;
 }
-@keyframes undoSlideFromRight { from { margin-left: -100%; } to { margin-left: 0; } }
+@keyframes undoSlideFromRight { from { transform: translate(-100%,0); } to { transform: translate(0,0); } }
 .nospeechsupport {
   font-size: 2em;
 }

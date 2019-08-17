@@ -55,41 +55,44 @@ export function buildSlideRightTitle(title, returnFunc) {
   </div>`;
 }
 
-function slideInScreenShow(leftContentDiv, rightContentDiv, params) {
+function slideInScreenShow(leftContentDiv, rightContentDiv, rightRenderDiv,  params) {
   let { renderFunc, renderFuncParams } = params;
-  renderFunc(rightContentDiv, renderFuncParams);
+  renderFunc(rightRenderDiv, renderFuncParams);
   let animParams = {
-    leftContentDiv,
-    animClassName: 'slideFromRightAnim'
+		leftContentDiv,
+		rightContentDiv,
+    animClassName: 'slideFromRightAnim',
+		endAnimClassName: 'endFromRightAnim',
   };
   fromRight(animParams);
 }
 
-function slideInScreenHide(leftContentDiv) {
+function slideInScreenHide(leftContentDiv, rightContentDiv) {
   let animParams = {
-    leftContentDiv,
-    origAnimClassName: 'slideFromRightAnim',
+		leftContentDiv,
+		rightContentDiv,
+    origAnimClassName: 'endFromRightAnim',
     undoAnimClassName: 'undoSlideFromRightAnim'
   };
   fromLeft(animParams);
 }
 
 export function secondLevelScreenShow(params) {
-  slideInScreenShow(document.querySelector('.mainleft'),
+  slideInScreenShow(document.querySelector('.mainleft'), document.querySelector('.mainright'),
     document.querySelector('.secondlevelleft'), params);
 }
 
 export function secondLevelScreenHide() {
-  slideInScreenHide(document.querySelector('.mainleft'));
+  slideInScreenHide(document.querySelector('.mainleft'), document.querySelector('.mainright'));
 }
 
 export function thirdLevelScreenShow(params) {
-  slideInScreenShow(document.querySelector('.secondlevelleft'),
+  slideInScreenShow(document.querySelector('.secondlevelleft'), document.querySelector('.secondlevelright'),
     document.querySelector('.secondlevelright'), params);
 }
 
 export function thirdLevelScreenHide() {
-  slideInScreenHide(document.querySelector('.secondlevelleft'));
+  slideInScreenHide(document.querySelector('.secondlevelleft'), document.querySelector('.secondlevelright'));
 }
 
 let updateMainInProcess = false;
