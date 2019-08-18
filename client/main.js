@@ -32,7 +32,7 @@ export function setAppMinOrMax(minOrMax) {
 	let appinitiallyblankpercent = minOrMax === 'Min' ? (100-mainAppPercentWhenSmall())+'%' : '0%';
 	document.querySelector('.appmaincontent').style.height = appmaincontentpercent;
 	document.querySelector('.appinitiallyblank').style.height = appinitiallyblankpercent;
-	document.querySelector('.appinitiallyblank').style.display = minOrMax === 'Min' ? 'block' : 'none';
+	document.querySelector('.appinitiallyblank').style.display = minOrMax === 'Min' ? 'flex' : 'none';
 	updateMain();
 }
 
