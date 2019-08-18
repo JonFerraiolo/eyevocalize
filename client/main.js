@@ -32,6 +32,7 @@ export function setAppMinOrMax(minOrMax) {
 	let appinitiallyblankpercent = minOrMax === 'Min' ? (100-mainAppPercentWhenSmall())+'%' : '0%';
 	document.querySelector('.appmaincontent').style.height = appmaincontentpercent;
 	document.querySelector('.appinitiallyblank').style.height = appinitiallyblankpercent;
+	document.querySelector('.appinitiallyblank').style.display = minOrMax === 'Min' ? 'block' : 'none';
 	updateMain();
 }
 
@@ -102,6 +103,10 @@ export function updateMain(searchString) {
 	let appFontSize = getAppFontSize();
 	let TextEntryRowProps = { initialText: '' };
 	let PhrasesProps = { searchString };
+	let onMinOrMax = e => {
+		e.preventDefault();
+		setAppMinOrMax('Max');
+	};
 	render(html`
 		<style>${css}</style>
 		<div class=appfullheight style=${styleMap({fontSize: appFontSize})}>
@@ -122,7 +127,7 @@ export function updateMain(searchString) {
 			<div class=appinitiallyblank>
 			<p>This area is intentionally blank to provide room for an onscreen keyboard.</p>
 			<p>To use this area instead for the application's user interface, press the
-				<span class=icon></span> toggle icon at the top-right of the application.</p>
+				<span @click=${onMinOrMax} class=icon></span> toggle icon at the top-right of the application.</p>
 			</div>
 		</div>
 	`, document.body);

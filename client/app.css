@@ -44,6 +44,7 @@ html {
    level 3 content goes into secondlevelright. */
 .main {
   white-space: nowrap;
+  overflow: hidden;
   width: 100%;
   height: 100%;
   margin: 0;
