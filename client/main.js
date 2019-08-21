@@ -12,6 +12,8 @@ import { styleMap } from './lib/lit-html/directives/style-map.js';
 
 let css = `@import 'app.css';`;
 
+let mainShowing = true;
+
 export function isChrome() {
 	return !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 };
@@ -83,12 +85,15 @@ function slideInScreenHide(leftContentDiv, rightContentDiv) {
 }
 
 export function secondLevelScreenShow(params) {
+	mainShowing = false;
   slideInScreenShow(document.querySelector('.mainleft'), document.querySelector('.mainright'),
     document.querySelector('.secondlevelleft'), params);
 }
 
 export function secondLevelScreenHide() {
   slideInScreenHide(document.querySelector('.mainleft'), document.querySelector('.mainright'));
+	mainShowing = true;
+	updateMain();
 }
 
 export function thirdLevelScreenShow(params) {
@@ -138,7 +143,7 @@ export function updateMain(searchString) {
 	setAppMinOrMax(appMinOrMax);
   updateTextEntryRow(document.getElementById('TextEntryRowContainer'), TextEntryRowProps);
   updatePhrases(document.getElementById('PhrasesContainer'), PhrasesProps);
-	TextEntryRowSetFocus();
+	if (mainShowing) TextEntryRowSetFocus();
 	updateMainInProcess = false;
 };
 

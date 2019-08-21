@@ -83,7 +83,7 @@ let defaultSampleText = 'What do you think of the new voice settings?';
 let sampleText = defaultSampleText;
 let defaultFontSize = 16;
 let appFontSize = defaultFontSize;
-let defaultMinScreenPercent = 50;
+let defaultMinScreenPercent = 50, minScreenPercentMin = 30, minScreenPercentMax = 100;
 let minScreenPercent = defaultMinScreenPercent;
 
 let volumeCombo = new combobox();
@@ -203,12 +203,14 @@ export function editSettings(parentElement, params) {
     appFontSize = parseFloat(newValue);
     if (appFontSize === NaN) appFontSize = defaultFontSize;
     localUpdate();
+    updateMain();
     updateLocalStorage();
   };
   let onChangeMinScreenPercent = newValue => {
-    minScreenPercent = parseFloat(newValue);
-    if (minScreenPercent === NaN) minScreenPercent = defaultMinScreenPercent;
-    localUpdate();
+    let v = parseFloat(newValue);
+    if (v === NaN || v < minScreenPercentMin || v > minScreenPercentMax) return;
+    minScreenPercent = v;
+    updateMain();
     updateLocalStorage();
   };
   let onClickRestoreDefaults = e => {
@@ -319,7 +321,7 @@ export function editSettings(parentElement, params) {
         value: appFontSize, onChange: onChangeFontSize,
       });
       minScreenPercentCombo.update(document.querySelector('.SettingsMinScreenPercentCombo'), {
-        inputType: 'number', min: 30, max: 100, step: 10, digits: 0, showPlusMinus: true,
+        inputType: 'number', min: minScreenPercentMin, max: minScreenPercentMax, step: 10, digits: 0, showPlusMinus: true,
         value: minScreenPercent, onChange: onChangeMinScreenPercent,
       });
 
