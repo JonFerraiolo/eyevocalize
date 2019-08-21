@@ -203,8 +203,8 @@ export function editStash(parentElement, props) {
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
-        title: 'Add New Entry To Stash',
-        doItButtonLabel: 'Add to Stash',
+        title: 'Add New Entry To Noteboard',
+        doItButtonLabel: 'Add to Noteboard',
         doItCallback: function(phrase) {
           // add phrase to Stash, go back to parent screen
           addToStash(phrase);
@@ -230,7 +230,7 @@ export function editStash(parentElement, props) {
       renderFunc: EditPhrase,
       renderFuncParams: {
         phrase,
-        title: 'Edit Entry From Stash',
+        title: 'Edit Entry From Noteboard',
         doItButtonLabel: 'Update Entry',
         doItCallback: function(phrase) {
           // add phrase to Stash, go back to parent screen
@@ -350,7 +350,7 @@ export function editStash(parentElement, props) {
     <style>${css}</style>
     <div class="Stash editStash skinnyScreenParent">
       <div class=skinnyScreenChild>
-        ${buildSlideRightTitle("Manage Stash", onEditStashReturn)}
+        ${buildSlideRightTitle("Manage Noteboard", onEditStashReturn)}
         <div class=ScreenInstructions>
           Click items in the list below to select and deselect.
         </div>

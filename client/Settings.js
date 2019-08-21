@@ -2,6 +2,7 @@
 import { html, render } from './lib/lit-html/lit-html.js';
 import { buildSlideRightTitle, secondLevelScreenShow, secondLevelScreenHide, updateMain } from './main.js';
 import { speak } from './vocalize.js';
+import { combobox } from './combobox.js';
 
 let css = `
 .skinnyScreenChild .SettingsContent {
@@ -29,8 +30,9 @@ let css = `
   line-height: 1.5em;
 }
 .SettingsData .gridlayout > * {
-  text-align: left;
-  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: start;
 }
 .SettingsData .gridlayout > label {
   white-space: nowrap;
@@ -87,6 +89,10 @@ let appFontSize = defaultFontSize;
 let appFontSizeIndex;
 let defaultMinScreenPercent = 50;
 let minScreenPercent = defaultMinScreenPercent;
+
+let volumeCombo = new combobox();
+let rateCombo = new combobox();
+let pitchCombo = new combobox();
 
 export function initializeSettings(props) {
   currentVersion = props.currentVersion;
@@ -157,25 +163,28 @@ export function editSettings(parentElement, params) {
   };
   let onChangeVoice = e => {
     e.preventDefault();
-    voiceIndex = e.srcElement.selectedIndex;
+    voiceIndex = e.target.selectedIndex;
     if (voiceIndex === -1) voiceIndex = 0;
     voice = voices[voiceIndex];
     voiceName = voice.name;
     updateLocalStorage();
   };
-  let onChangeVolume = e => {
-    e.preventDefault();
-    volume = parseFloat(e.srcElement.value);
+  let onChangeVolume = newValue => {
+    volume = parseFloat(newValue);
+    if (volume === NaN) volume = defaultVolume;
+    localUpdate();
     updateLocalStorage();
   };
-  let onChangeRate = e => {
-    e.preventDefault();
-    rate = parseFloat(e.srcElement.value);
+  let onChangeRate = newValue => {
+    rate = parseFloat(newValue);
+    if (rate === NaN) rate = defaultRate;
+    localUpdate();
     updateLocalStorage();
   };
-  let onChangePitch = e => {
-    e.preventDefault();
-    pitch = parseFloat(e.srcElement.value);
+  let onChangePitch = newValue => {
+    pitch = parseFloat(newValue);
+    if (pitch === NaN) pitch = defaultPitch;
+    localUpdate();
     updateLocalStorage();
   };
   let onInputSampleText = e => {
@@ -190,13 +199,13 @@ export function editSettings(parentElement, params) {
   };
   let onChangeFontSize = e => {
     e.preventDefault();
-    appFontSizeIndex = e.srcElement.selectedIndex;
+    appFontSizeIndex = e.target.selectedIndex;
     appFontSize = appFontSizes[appFontSizeIndex].value;
     updateLocalStorage();
   };
   let onChangeMinScreenPercent = e => {
     e.preventDefault();
-    minScreenPercent = parseFloat(e.srcElement.value);
+    minScreenPercent = parseFloat(e.target.value);
     updateLocalStorage();
   };
   let onClickRestoreDefaults = e => {
@@ -260,12 +269,12 @@ export function editSettings(parentElement, params) {
           <select id="SettingsVoice" .selectedIndex=${voiceIndex} @change=${onChangeVoice} class=chooseVoiceRow>
             ${voiceOptionElements}
           </select>
-          <label for="SettingsVolume">Volume</label>
-          <input type="range" min="0" max="1" step="0.1" id="SettingsVolume" .value=${volume} @change=${onChangeVolume}></input>
+          <label>Volume</label>
+          <span class=SettingsVolumeCombo></span>
           <label for="SettingsRate">Rate</label>
-          <input type="range" min="0.1" max="10" step="0.1" id="SettingsRate" .value=${rate} @change=${onChangeRate}></input>
+          <span class=SettingsRateCombo></span>
           <label for="SettingsPitch">Pitch</label>
-          <input type="range" min="0" max="2" step="0.1" id="SettingsPitch" .value=${pitch} @change=${onChangePitch}></input>
+          <span class=SettingsPitchCombo></span>
           <span class=testsamplerow>
             <textarea id=SettingsVoiceSampleText @input=${onInputSampleText} .value=${sampleText} placeholder='Enter sample text, then press "Test" to try out settings'></textarea>
             <button @click=${onTest}>Test</button>
@@ -299,6 +308,18 @@ export function editSettings(parentElement, params) {
     // lit-html mysteriously does not update the value of the select element
     if (section === 'Voice') {
       document.getElementById('SettingsVoice').selectedIndex = voiceIndex;
+      volumeCombo.update(document.querySelector('.SettingsVolumeCombo'), {
+        inputType: 'number', min: 0, max: 1, step: 0.1, digits: 1, showPlusMinus: true,
+        value: volume, onChange: onChangeVolume,
+      });
+      rateCombo.update(document.querySelector('.SettingsRateCombo'), {
+        inputType: 'number', min: 0.2, max: 1, step: 0.1, digits: 1, showPlusMinus: true,
+        value: rate, onChange: onChangeRate,
+      });
+      pitchCombo.update(document.querySelector('.SettingsPitchCombo'), {
+        inputType: 'number', min: 0.5, max: 1.5, step: 0.1, digits: 1, showPlusMinus: true,
+        value: pitch, onChange: onChangePitch,
+      });
     } else if (section === 'Appearance') {
       document.getElementById('SettingsFontSize').selectedIndex = appFontSizeIndex;
     }
