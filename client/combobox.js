@@ -57,7 +57,7 @@ export class combobox {
     let numericWithStep = (options.length === 0 &&
       typeof min == 'number' && typeof max == 'number' &&
       typeof step == 'number' && typeof digits == 'number' &&
-      max > min && step > 0 && digits > 0 && digits < 10);
+      max > min && step > 0 && digits >= 0 && digits < 10);
     if (numericWithStep) {
       for (let i = min; i <= max; i += step) {
         let v = i.toFixed(digits);

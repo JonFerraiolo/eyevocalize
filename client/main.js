@@ -12,6 +12,10 @@ import { styleMap } from './lib/lit-html/directives/style-map.js';
 
 let css = `@import 'app.css';`;
 
+export function isChrome() {
+	return !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+};
+
 export function search(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	updateMain(text);
@@ -109,7 +113,7 @@ export function updateMain(searchString) {
 	};
 	render(html`
 		<style>${css}</style>
-		<div class=appfullheight style=${styleMap({fontSize: appFontSize})}>
+		<div class=appfullheight style=${styleMap({fontSize: appFontSize+'px'})}>
 			<div class=appmaincontent>
 				<div class=main>
 		      <div class=mainleft>

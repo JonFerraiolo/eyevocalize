@@ -2,25 +2,24 @@
 import { playYoutubeVideo } from './youtube.js' ;
 import { addToHistory } from './History.js' ;
 import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
-import { getVoice } from './Settings.js';
-import { updateMain } from './main.js';
+import { getVoice, getVolume, getRate, getPitch } from './Settings.js';
+import { updateMain, isChrome } from './main.js';
 
 // Add text to the voice synthesis queue
 export function speak(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	if (text.length > 0) {
 		let voice = getVoice();
+		let volume = getVolume();
+		let rate = getRate();
+		let pitch = getPitch();
+		if (isChrome()) pitch = 1;  // chrome freezes voice synthesis if you speak with pitch! =1
 		if (voice) {
 			var msg = new SpeechSynthesisUtterance();
 			msg.text = text;
-			/*
-			msg.volume = parseFloat(volumeInput.value);
-			msg.rate = parseFloat(rateInput.value);
-			msg.pitch = parseFloat(pitchInput.value);
-			*/
-			msg.volume = 1;
-			msg.rate = 0.5;
-			msg.pitch = 1;
+			msg.volume = volume;
+			msg.rate = rate;
+			msg.pitch = pitch;
 			msg.voice = voice;
 			window.speechSynthesis.speak(msg);
 			TextEntryRowSetText('');

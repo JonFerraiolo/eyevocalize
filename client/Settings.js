@@ -1,6 +1,6 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
-import { buildSlideRightTitle, secondLevelScreenShow, secondLevelScreenHide, updateMain } from './main.js';
+import { buildSlideRightTitle, secondLevelScreenShow, secondLevelScreenHide, updateMain, isChrome } from './main.js';
 import { speak } from './vocalize.js';
 import { combobox } from './combobox.js';
 
@@ -68,6 +68,7 @@ let css = `
 `;
 
 let currentVersion;
+let section = 'Voice';
 let voices;
 let voice;
 let voiceName = null;
@@ -80,19 +81,16 @@ let defaultPitch = 1;
 let pitch = defaultPitch;
 let defaultSampleText = 'What do you think of the new voice settings?';
 let sampleText = defaultSampleText;
-let appFontSizes = [];
-for (let i=14; i<=24; i++) {
-  appFontSizes.push({ label: i+'', value: i+'px' });
-}
-let defaultFontSize = '16px';
+let defaultFontSize = 16;
 let appFontSize = defaultFontSize;
-let appFontSizeIndex;
 let defaultMinScreenPercent = 50;
 let minScreenPercent = defaultMinScreenPercent;
 
 let volumeCombo = new combobox();
 let rateCombo = new combobox();
 let pitchCombo = new combobox();
+let appFontSizeCombo = new combobox();
+let minScreenPercentCombo = new combobox();
 
 export function initializeSettings(props) {
   currentVersion = props.currentVersion;
@@ -112,6 +110,7 @@ export function initializeSettings(props) {
   if (typeof Settings.version != 'number'|| Settings.version < currentVersion) {
     Settings = initialSettings;
   }
+  section = Settings.section || 'Voice';
   voiceName = Settings.voiceName;
   volume = Settings.volume;
   rate = Settings.rate;
@@ -122,7 +121,8 @@ export function initializeSettings(props) {
 };
 
 let updateLocalStorage = () => {
-  let Settings = { version: currentVersion, voiceName, volume, rate, pitch, sampleText,
+  let Settings = { version: currentVersion, section,
+    voiceName, volume, rate, pitch, sampleText,
     appFontSize, minScreenPercent };
   localStorage.setItem("Settings", JSON.stringify(Settings));
 };
@@ -144,7 +144,7 @@ function onSettingsReturn() {
 }
 
 export function editSettings(parentElement, params) {
-  let section = 'Voice';
+  if (isChrome()) pitch = 1;  // chrome freezes voice synthesis if you speak with pitch! =1
   let buildSectionRadioButton = (id, value, label) => {
     let cls = 'TabControlRadioButton' + (section===value ? ' TabControlRadioButtonChecked' : '');
     return html`
@@ -160,6 +160,7 @@ export function editSettings(parentElement, params) {
     e.preventDefault();
     section = e.currentTarget.SectionName;
     localUpdate();
+    updateLocalStorage();
   };
   let onChangeVoice = e => {
     e.preventDefault();
@@ -167,6 +168,7 @@ export function editSettings(parentElement, params) {
     if (voiceIndex === -1) voiceIndex = 0;
     voice = voices[voiceIndex];
     voiceName = voice.name;
+    localUpdate();
     updateLocalStorage();
   };
   let onChangeVolume = newValue => {
@@ -197,15 +199,16 @@ export function editSettings(parentElement, params) {
     let text = document.getElementById('SettingsVoiceSampleText').value;
     speak(text);
   };
-  let onChangeFontSize = e => {
-    e.preventDefault();
-    appFontSizeIndex = e.target.selectedIndex;
-    appFontSize = appFontSizes[appFontSizeIndex].value;
+  let onChangeFontSize = newValue => {
+    appFontSize = parseFloat(newValue);
+    if (appFontSize === NaN) appFontSize = defaultFontSize;
+    localUpdate();
     updateLocalStorage();
   };
-  let onChangeMinScreenPercent = e => {
-    e.preventDefault();
-    minScreenPercent = parseFloat(e.target.value);
+  let onChangeMinScreenPercent = newValue => {
+    minScreenPercent = parseFloat(newValue);
+    if (minScreenPercent === NaN) minScreenPercent = defaultMinScreenPercent;
+    localUpdate();
     updateLocalStorage();
   };
   let onClickRestoreDefaults = e => {
@@ -231,33 +234,20 @@ export function editSettings(parentElement, params) {
       html`<option value=${voice.name}>${voice.name}</option>}`
     )
   }`;
-  let appFontSizeOptionElements = html`${
-    appFontSizes.map(
-      o =>
-      html`<option value=${o.value}>${o.label}</option>}`
-    )
-  }`;
   let title = 'Settings';
   let localUpdate = () => {
     voiceIndex = voices.findIndex(v => v.name === voiceName );
     if (voiceIndex === -1) voiceIndex = 0;
     voice = voices[voiceIndex];
     voiceName = voice.name;
-    appFontSizeIndex = appFontSizes.findIndex(o => o.value === appFontSize);
-    if (appFontSizeIndex === -1) {
-      appFontSizeIndex = appFontSizes.findIndex(o => o.value === defaultFontSize);
-    }
-    appFontSize = appFontSizes[appFontSizeIndex].value;
     let SettingsData;
     if (section === 'Appearance') {
       SettingsData = html`
         <div class="gridlayout SettingsAppearance">
           <label for="SettingsFontSize" class=chooseFontSizeRow>Application text size</label>
-          <select id="SettingsFontSize" .selectedIndex=${appFontSizeIndex} @change=${onChangeFontSize} class=chooseFontSizeRow>
-            ${appFontSizeOptionElements}
-          </select>
+          <span class=SettingsAppFontSizeCombo></span>
           <label for="SettingsMinScreenPercent">Minimum screen percent</label>
-          <input type="range" min="25" max="75" step="1" id="SettingsMinScreenPercent" .value=${minScreenPercent} @change=${onChangeMinScreenPercent}></input>
+          <span class=SettingsMinScreenPercentCombo></span>
         </div>
       `;
     } else if (section === 'History') {
@@ -273,8 +263,9 @@ export function editSettings(parentElement, params) {
           <span class=SettingsVolumeCombo></span>
           <label for="SettingsRate">Rate</label>
           <span class=SettingsRateCombo></span>
-          <label for="SettingsPitch">Pitch</label>
-          <span class=SettingsPitchCombo></span>
+          ${!isChrome() ? html`
+            <label for="SettingsPitch">Pitch</label>
+            <span class=SettingsPitchCombo></span>` : '' }
           <span class=testsamplerow>
             <textarea id=SettingsVoiceSampleText @input=${onInputSampleText} .value=${sampleText} placeholder='Enter sample text, then press "Test" to try out settings'></textarea>
             <button @click=${onTest}>Test</button>
@@ -316,12 +307,22 @@ export function editSettings(parentElement, params) {
         inputType: 'number', min: 0.2, max: 1, step: 0.1, digits: 1, showPlusMinus: true,
         value: rate, onChange: onChangeRate,
       });
-      pitchCombo.update(document.querySelector('.SettingsPitchCombo'), {
-        inputType: 'number', min: 0.5, max: 1.5, step: 0.1, digits: 1, showPlusMinus: true,
-        value: pitch, onChange: onChangePitch,
-      });
+      if (!isChrome()) {
+        pitchCombo.update(document.querySelector('.SettingsPitchCombo'), {
+          inputType: 'number', min: 0.5, max: 1.5, step: 0.1, digits: 1, showPlusMinus: true,
+          value: pitch, onChange: onChangePitch,
+        });
+      }
     } else if (section === 'Appearance') {
-      document.getElementById('SettingsFontSize').selectedIndex = appFontSizeIndex;
+      appFontSizeCombo.update(document.querySelector('.SettingsAppFontSizeCombo'), {
+        inputType: 'number', min: 14, max: 24, step: 1, digits: 0, showPlusMinus: true,
+        value: appFontSize, onChange: onChangeFontSize,
+      });
+      minScreenPercentCombo.update(document.querySelector('.SettingsMinScreenPercentCombo'), {
+        inputType: 'number', min: 30, max: 100, step: 10, digits: 0, showPlusMinus: true,
+        value: minScreenPercent, onChange: onChangeMinScreenPercent,
+      });
+
     }
   };
   localUpdate();
@@ -330,6 +331,18 @@ export function editSettings(parentElement, params) {
 export function getVoice() {
   voice = voice || voices[0];
   return voice;
+}
+
+export function getVolume() {
+  return volume;
+}
+
+export function getRate() {
+  return rate;
+}
+
+export function getPitch() {
+  return pitch;
 }
 
 export function mainAppPercentWhenSmall() {
