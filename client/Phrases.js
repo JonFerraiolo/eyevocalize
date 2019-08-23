@@ -14,15 +14,33 @@ let css = `
   flex-direction: row;
 }
 .StashAndHistory, #FavoritesContainer {
-  overflow: auto;
   min-height: 0px;
   height: 100%;
   display: inline-block;
+}
+#FavoritesContainer {
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .StashAndHistory {
   display: inline-flex;
   flex-direction: column;
   flex: 1;
+  overflow: hidden;
+}
+#StashContainer, #HistoryContainer {
+  min-height: 25%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+#StashContainer {
+  flex: 0 0 auto;
+  height: auto;
+  max-height: 75%;
+}
+#HistoryContainer {
+  flex: 1 1;
 }
 .StashContent, .HistoryContent {
   overflow-x: hidden;
@@ -30,7 +48,7 @@ let css = `
   min-height: 25%;
 }
 .StashContent {
-  flex: 0 0 content;
+  flex: 1 1;
 }
 .HistoryContent {
   flex: 1 1;
@@ -175,10 +193,12 @@ export function updatePhrases(parentElement, props) {
   <style>${css}</style>
   <div class=Phrases>
     <div class=StashAndHistory>
-      ${updateStash(StashProps)}
-      ${updateHistory(HistoryProps)}
+      <div id=StashContainer></div>
+      <div id=HistoryContainer></div>
     </div>
     <div id=FavoritesContainer></div>
   </div>`, parentElement);
+  updateStash(document.getElementById('StashContainer'), StashProps);
+  updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
   updateFavorites(document.getElementById('FavoritesContainer'), FavoritesProps);
 }

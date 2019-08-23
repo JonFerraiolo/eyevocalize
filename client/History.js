@@ -5,6 +5,12 @@ import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows, play
 let css = `
 .History {
 }
+.HistoryGroup {
+  font-size: 75%;
+  font-style: italic;
+  color: #888;
+  text-align: center;
+}
 .HistoryTitleIcon {
   display: inline-block;
   width: 1em;
@@ -18,6 +24,15 @@ let css = `
 `;
 
 let History;
+let interval = null;
+let timeGroups = [
+  { delta: 1000*60*10, label: 'moments ago' },
+  { delta: 1000*60*60, label: 'within an hour' },
+  { delta: 1000*60*60*24, label: 'within 24 hours' },
+  { delta: 1000*60*60*24*7, label: 'within a week' },
+  { delta: 1000*60*60*24*365, label: 'within a year' },
+  { delta: Number.MAX_SAFE_INTEGER, label: 'over a year' },
+];
 
 export function initializeHistory(props) {
   let { currentVersion } = props;
@@ -34,7 +49,7 @@ export function initializeHistory(props) {
 }
 
 export function addToHistory(obj) {
-  obj = Object.assign({ timestamp: new Date() }, obj);
+  obj = Object.assign({ timestamp: Date.now() }, obj);
 	History.items.unshift(obj);
 	localStorage.setItem("History", JSON.stringify(History));
 };
@@ -47,7 +62,7 @@ export function playLastHistoryItem() {
   }
 };
 
-export function updateHistory(props) {
+export function updateHistory(parentElement, props) {
   let { searchTokens } = props;
   let onClickEdit = e => {
     e.preventDefault();
@@ -64,24 +79,71 @@ export function updateHistory(props) {
     });
   }
   let HistoryTitle = buildTitleWithCollapseExpandArrows(History, "History", "HistoryTitleIcon");
-  return html`
-    <style>${css}</style>
-    <div class=PhrasesSectionLabel>
-      ${HistoryTitle}${rightSideIcons({ onClickEdit })}
-    </div>
-    ${filteredHistory.expanded ?
-      html`<div class=HistoryContent>
-        ${filteredHistory.items.map(phrase =>
-          html`
-            <div class=PhraseRow>
-              <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
-            </div>
-          `
-        )}
-      </div>` : ''}
-    `;
+  let localUpdate = () => {
+    let now = Date.now();
+    let historyElements = [];
+    let nextGroup = 0;
+    for(let i=0, n=filteredHistory.items.length; i<n; i++) {
+      let phrase = filteredHistory.items[i];
+      if (nextGroup < timeGroups.length) {
+        /*
+        if (i<15) {
+          console.log('i='+i+', nextGroup:'+nextGroup+', datetime='+(new Date(phrase.timestamp)));
+          console.log('phrase.timestamp='+phrase.timestamp);
+          console.log('now - timeGroups[nextGroup].delta='+(now - timeGroups[nextGroup].delta));
+          console.log('phrase.timestamp-(now - timeGroups[nextGroup].delta)='+(phrase.timestamp-(now - timeGroups[nextGroup].delta)));
+        }
+        */
+        if (nextGroup === 0 || phrase.timestamp < now - timeGroups[nextGroup-1].delta) {
+          do {
+            nextGroup++;
+          } while(nextGroup < timeGroups.length && phrase.timestamp < now - timeGroups[nextGroup-1].delta);
+          if (nextGroup < timeGroups.length) {
+            historyElements.push(html`<div class=HistoryGroup>${timeGroups[nextGroup-1].label}</div>`);
+          }
+        }
+      }
+      historyElements.push(html`
+        <div class=PhraseRow>
+          <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
+        </div>
+      `);
+    }
+    render(html`
+      <style>${css}</style>
+      <div class=PhrasesSectionLabel>
+        ${HistoryTitle}${rightSideIcons({ onClickEdit })}
+      </div>
+      ${filteredHistory.expanded ?
+        html`<div class=HistoryContent>
+          ${historyElements}
+        </div>` : ''}
+      `, parentElement);
+  };
+  localUpdate();
+
+  let updateInterval = () => {
+    if (document.hidden === false) {
+      if (interval === null) {
+        localUpdate();
+        interval = setInterval(e => {
+          localUpdate();
+        }, 60*1000);
+      }
+    } else {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    }
+  };
+  document.addEventListener('visibilitychange', e => {
+    updateInterval();
+  }, false);
+  updateInterval();
+
 }
 
 export function editHistory(parentElement, props) {
 
-}
+};

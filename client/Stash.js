@@ -66,7 +66,7 @@ export function stash(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	if (text.length > 0) {
 		TextEntryRowSetText('');
-		let phrase = { type: 'text', text, timestamp: new Date() };
+		let phrase = { type: 'text', text, timestamp: Date.now() };
     addToStash(phrase);
     updateMain();
 	}
@@ -101,7 +101,7 @@ function slideInAddEntryToStashScreen(props) {
   secondLevelScreenShow(params);
 };
 
-export function updateStash(props) {
+export function updateStash(parentElement, props) {
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
@@ -121,22 +121,25 @@ export function updateStash(props) {
     });
   }
   let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Noteboard", "StashTitleIcon");
-  return html`
-    <style>${css}</style>
-    <div class=PhrasesSectionLabel>
-      ${StashTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
-    </div>
-    ${filteredStash.expanded ?
-      html`<div class=StashContent>
-        ${filteredStash.items.map(phrase =>
-          html`
-            <div class=PhraseRow>
-              <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
-            </div>
-          `
-        )}
-      </div>` : ''}
-    `;
+  let localUpdate = () => {
+    render(html`
+      <style>${css}</style>
+      <div class=PhrasesSectionLabel>
+        ${StashTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
+      </div>
+      ${filteredStash.expanded ?
+        html`<div class=StashContent>
+          ${filteredStash.items.map(phrase =>
+            html`
+              <div class=PhraseRow>
+                <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
+              </div>
+            `
+          )}
+        </div>` : ''}
+      `, parentElement);
+  };
+  localUpdate();
 }
 
 function onEditStash() {

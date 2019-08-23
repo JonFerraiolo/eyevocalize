@@ -148,7 +148,7 @@ export function updateMain(searchString) {
 };
 
 export function main() {
-  let currentVersion = 2;
+  let currentVersion = 3;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
   initializeStash(initializationProps);
@@ -182,4 +182,5 @@ export function main() {
       // just pass through to default processing, which will add the character
     }
 	}, false);
+
 };

@@ -117,7 +117,7 @@ export function EditPhrase(parentElement, params) {
     cancelCallback();
   };
   let makePhrase = () => {
-    let timestamp = new Date();
+    let timestamp = Date.now();
     let phrase = type === 'audio' ? { type, label, url, timestamp } :
       (type === 'youtube' ? { type, label, videoId, startAt, endAt, timestamp } :
       { type, text, label, timestamp });
