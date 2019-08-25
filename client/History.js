@@ -1,6 +1,7 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
 import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows, playPhrase } from './Phrases.js';
+import { getAutoDeleteHistory } from './Settings.js';
 
 let css = `
 .History {
@@ -33,6 +34,13 @@ let timeGroups = [
   { delta: 1000*60*60*24*365, label: 'within a year' },
   { delta: Number.MAX_SAFE_INTEGER, label: 'over a year' },
 ];
+let autoDeleteOffset = {
+  hour: 1000*60*60,
+  day: 1000*60*60*24,
+  week: 1000*60*60*24*7,
+  month: 1000*60*60*24*30,
+  year: 1000*60*60*24*365,
+};
 
 export function initializeHistory(props) {
   let { currentVersion } = props;
@@ -68,32 +76,41 @@ export function updateHistory(parentElement, props) {
     e.preventDefault();
     debugger;
   };
-  let filteredHistory = History;
-  if (searchTokens.length > 0) {
-    filteredHistory = JSON.parse(JSON.stringify(History));  // deep clone
-    filteredHistory.items = filteredHistory.items.filter(phrase => {
-      return searchTokens.some(token => {
-        return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
-                (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
-      });
-    });
-  }
   let HistoryTitle = buildTitleWithCollapseExpandArrows(History, "History", "HistoryTitleIcon");
   let localUpdate = () => {
     let now = Date.now();
+    let autoDeleteHistory = getAutoDeleteHistory();
+    let offset = autoDeleteOffset[autoDeleteHistory];
+    if (typeof offset == 'number') {
+      let deleteDateTime = now - offset;
+      let firstItemToDelete = -1;
+      for (let i=0, n=History.items.length; i<n; i++) {
+        let item = History.items[i];
+        if (item.timestamp < deleteDateTime) {
+          firstItemToDelete = i;
+          break;
+        }
+      }
+      if (firstItemToDelete != -1) {
+        // delete history items that have aged out
+        History.items.splice(firstItemToDelete);
+      }
+    }
+    let filteredHistory = History;
+    if (searchTokens.length > 0) {
+      filteredHistory = JSON.parse(JSON.stringify(History));  // deep clone
+      filteredHistory.items = filteredHistory.items.filter(phrase => {
+        return searchTokens.some(token => {
+          return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
+                  (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
+        });
+      });
+    }
     let historyElements = [];
     let nextGroup = 0;
     for(let i=0, n=filteredHistory.items.length; i<n; i++) {
       let phrase = filteredHistory.items[i];
       if (nextGroup < timeGroups.length) {
-        /*
-        if (i<15) {
-          console.log('i='+i+', nextGroup:'+nextGroup+', datetime='+(new Date(phrase.timestamp)));
-          console.log('phrase.timestamp='+phrase.timestamp);
-          console.log('now - timeGroups[nextGroup].delta='+(now - timeGroups[nextGroup].delta));
-          console.log('phrase.timestamp-(now - timeGroups[nextGroup].delta)='+(phrase.timestamp-(now - timeGroups[nextGroup].delta)));
-        }
-        */
         if (nextGroup === 0 || phrase.timestamp < now - timeGroups[nextGroup-1].delta) {
           do {
             nextGroup++;

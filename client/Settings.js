@@ -85,6 +85,17 @@ let defaultFontSize = 16;
 let appFontSize = defaultFontSize;
 let defaultMinScreenPercent = 50, minScreenPercentMin = 30, minScreenPercentMax = 100;
 let minScreenPercent = defaultMinScreenPercent;
+let defaultAutoDeleteHistory = 'never';
+let autoDeleteHistory = defaultAutoDeleteHistory;
+let autoDeleteHistoryOptions = [
+  { value: 'hour',  label: 'an hour' },
+  { value: 'day',  label: 'a day' },
+  { value: 'week',  label: 'a week' },
+  { value: 'month',  label: 'thirty days' },
+  { value: 'year',  label: 'a year' },
+  { value: 'never',  label: 'never' },
+];
+let autoDeleteHistoryIndex = autoDeleteHistoryOptions.length -  1;
 
 let volumeCombo = new combobox();
 let rateCombo = new combobox();
@@ -118,12 +129,13 @@ export function initializeSettings(props) {
   sampleText = Settings.sampleText;
   appFontSize = Settings.appFontSize;
   minScreenPercent = Settings.minScreenPercent;
+  autoDeleteHistory = Settings.autoDeleteHistory;
 };
 
 let updateLocalStorage = () => {
   let Settings = { version: currentVersion, section,
     voiceName, volume, rate, pitch, sampleText,
-    appFontSize, minScreenPercent };
+    appFontSize, minScreenPercent, autoDeleteHistory };
   localStorage.setItem("Settings", JSON.stringify(Settings));
 };
 
@@ -213,13 +225,22 @@ export function editSettings(parentElement, params) {
     updateMain();
     updateLocalStorage();
   };
+  let onChangeAutoDeleteHistory = e => {
+    e.preventDefault();
+    autoDeleteHistoryIndex = e.target.selectedIndex;
+    if (autoDeleteHistoryIndex === -1) autoDeleteHistoryIndex = autoDeleteHistoryOptions.length - 1;
+    autoDeleteHistory = autoDeleteHistoryOptions[autoDeleteHistoryIndex].value;
+    localUpdate();
+    updateMain();
+    updateLocalStorage();
+  };
   let onClickRestoreDefaults = e => {
     e.preventDefault();
     if (section === 'Appearance') {
       appFontSize = defaultFontSize;
       minScreenPercent = defaultMinScreenPercent;
     } else if (section === 'History') {
-
+      autoDeleteHistory = defaultAutoDeleteHistory;
     } else if (section === 'Voice') {
       voiceName = null;
       volume = defaultVolume;
@@ -236,12 +257,21 @@ export function editSettings(parentElement, params) {
       html`<option value=${voice.name}>${voice.name}</option>}`
     )
   }`;
+  let autoDeleteHistoryOptionElements = html`${
+    autoDeleteHistoryOptions.map(
+      o =>
+      html`<option value=${o.value}>${o.label}</option>}`
+    )
+  }`;
   let title = 'Settings';
   let localUpdate = () => {
     voiceIndex = voices.findIndex(v => v.name === voiceName );
     if (voiceIndex === -1) voiceIndex = 0;
     voice = voices[voiceIndex];
     voiceName = voice.name;
+    autoDeleteHistoryIndex = autoDeleteHistoryOptions.findIndex(o => o.value === autoDeleteHistory);
+    if (autoDeleteHistoryIndex === -1) autoDeleteHistoryIndex = autoDeleteHistoryOptions.length - 1;
+    autoDeleteHistory = autoDeleteHistoryOptions[autoDeleteHistoryIndex].value;
     let SettingsData;
     if (section === 'Appearance') {
       SettingsData = html`
@@ -253,7 +283,14 @@ export function editSettings(parentElement, params) {
         </div>
       `;
     } else if (section === 'History') {
-      SettingsData = html``;
+      SettingsData = html`
+        <div class="gridlayout SettingsHistory">
+          <label for="SettingsAutoDeleteHistory" class=chooseFontSizeRow>Auto delete history older than</label>
+          <select id="SettingsAutoDeleteHistory" .selectedIndex=${autoDeleteHistoryIndex} @change=${onChangeAutoDeleteHistory} class=chooseVoiceRow>
+            ${autoDeleteHistoryOptionElements}
+          </select>
+        </div>
+      `;
     } else {
       SettingsData = html`
         <div class="gridlayout SettingsVoice">
@@ -324,7 +361,8 @@ export function editSettings(parentElement, params) {
         inputType: 'number', min: minScreenPercentMin, max: minScreenPercentMax, step: 10, digits: 0, showPlusMinus: true,
         value: minScreenPercent, onChange: onChangeMinScreenPercent,
       });
-
+    } else if (section === 'History') {
+      document.getElementById('SettingsAutoDeleteHistory').selectedIndex = autoDeleteHistoryIndex;
     }
   };
   localUpdate();
@@ -353,4 +391,8 @@ export function mainAppPercentWhenSmall() {
 
 export function getAppFontSize() {
   return appFontSize;
+}
+
+export function getAutoDeleteHistory() {
+  return autoDeleteHistory;
 }

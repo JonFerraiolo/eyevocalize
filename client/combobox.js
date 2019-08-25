@@ -16,6 +16,7 @@ let css = `
   position: absolute;
   top: 0px;
   z-index: 1;
+  height: max-content; /* does not yet support fit-content */
   height: fit-content;
   line-height: 1.2em;
   overflow: auto;
@@ -39,6 +40,15 @@ let css = `
   font-size: 150%;
   font-weight: bold;
 }
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 `;
 
 export class combobox {
@@ -74,6 +84,7 @@ export class combobox {
       e.preventDefault();
       value = options[e.target.selectedIndex].value;
       showMenu = false;
+      localUpdate(); // necessary on Firefox
       onChange(value);
     };
     let onBlurSelect = e => {
@@ -96,6 +107,7 @@ export class combobox {
           v += step;
           if (v > max) v = max;
           value = v.toFixed(digits);
+          localUpdate(); // necessary on Firefox
           onChange(value);
         }
       }
@@ -109,6 +121,8 @@ export class combobox {
           v -= step;
           if (v < min) v = min;
           value = v.toFixed(digits);
+          localUpdate(); // necessary on Firefox
+
           onChange(value);
         }
       }
