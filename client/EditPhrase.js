@@ -144,7 +144,7 @@ export function EditPhrase(parentElement, params) {
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseURl>URL for the audio clip:</label>
-          <textarea id=EditPhraseURl @input=${onInput} pattern=${patternUrl} .editPhraseField=${'url'} .value=${url}></textarea>
+          <textarea id=EditPhraseURl @input=${onInput} pattern=${patternUrl} .editPhraseField=${'url'}></textarea>
         </div>
       `;
     } else if (type === 'youtube') {
@@ -170,7 +170,7 @@ export function EditPhrase(parentElement, params) {
       phraseData = html`
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseText>Text to be spoken:</label>
-          <textarea id=EditPhraseText @input=${onInput} .editPhraseField=${'text'} .value=${text}></textarea>
+          <textarea id=EditPhraseText @input=${onInput} .editPhraseField=${'text'}></textarea>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>${textLabelRequired ? 'Label:' : 'Optional label:'}</label>
@@ -202,6 +202,13 @@ export function EditPhrase(parentElement, params) {
         </div>
       </div>
     </div>`, parentElement);
+    // for some mysterious reason, lit-html doesn't always update
+    // the value of textarea elements even if you provide a .value property
+    if (type === 'audio') {
+      document.getElementById('EditPhraseURl').value = url;
+    } else if (type === 'text') {
+      document.getElementById('EditPhraseText').value = text;
+    }
     if (customControlsFunc) {
       customControlsFunc(document.querySelector('.EditPhraseCustomControls'), customControlsData);
     }

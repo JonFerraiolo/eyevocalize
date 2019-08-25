@@ -27,12 +27,12 @@ let css = `
 let History;
 let interval = null;
 let timeGroups = [
-  { delta: 1000*60*10, label: 'moments ago' },
-  { delta: 1000*60*60, label: 'within an hour' },
-  { delta: 1000*60*60*24, label: 'within 24 hours' },
-  { delta: 1000*60*60*24*7, label: 'within a week' },
-  { delta: 1000*60*60*24*365, label: 'within a year' },
-  { delta: Number.MAX_SAFE_INTEGER, label: 'over a year' },
+  { delta: 1000*60*15, label: '1-15 minutes ago' },
+  { delta: 1000*60*60, label: '15-60 minutes ago' },
+  { delta: 1000*60*60*24, label: '1-24 hours ago' },
+  { delta: 1000*60*60*24*7, label: '1-7 days ago' },
+  { delta: 1000*60*60*24*365, label: 'within past year' },
+  { delta: Number.MAX_SAFE_INTEGER, label: 'over a year old' },
 ];
 let autoDeleteOffset = {
   hour: 1000*60*60,
