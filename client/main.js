@@ -118,7 +118,7 @@ export function updateMain(searchString) {
 	};
 	render(html`
 		<style>${css}</style>
-		<div class=appfullheight style=${styleMap({fontSize: appFontSize+'px'})}>
+		<div class=appfullheight style=${styleMap({fontSize: appFontSize+'%'})}>
 			<div class=appmaincontent>
 				<div class=main>
 		      <div class=mainleft>
@@ -148,7 +148,7 @@ export function updateMain(searchString) {
 };
 
 export function main() {
-  let currentVersion = 3;
+  let currentVersion = 4;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
   initializeStash(initializationProps);

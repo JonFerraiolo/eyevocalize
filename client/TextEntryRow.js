@@ -19,7 +19,7 @@ let css = `
   font-size: 90%;
 }
 .TextEntryRow textarea {
-  height: 2.75emem;
+  height: 2.75em;
   font-family: Arial, sans-serif;
   flex: 1;
   padding: 0.25em;

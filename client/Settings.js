@@ -65,6 +65,9 @@ let css = `
 .SettingsRestoreDefaultsRow * {
   vertical-align: middle;
 }
+#SettingsVoiceSampleText {
+  font-size: 115%;
+}
 `;
 
 let currentVersion;
@@ -81,7 +84,7 @@ let defaultPitch = 1;
 let pitch = defaultPitch;
 let defaultSampleText = 'What do you think of the new voice settings?';
 let sampleText = defaultSampleText;
-let defaultFontSize = 16;
+let defaultFontSize = 100;
 let appFontSize = defaultFontSize;
 let defaultMinScreenPercent = 50, minScreenPercentMin = 30, minScreenPercentMax = 100;
 let minScreenPercent = defaultMinScreenPercent;
@@ -249,6 +252,7 @@ export function editSettings(parentElement, params) {
       sampleText = defaultSampleText;
     }
     localUpdate();
+    updateMain();
     updateLocalStorage();
   };
   let voiceOptionElements = html`${
@@ -276,7 +280,7 @@ export function editSettings(parentElement, params) {
     if (section === 'Appearance') {
       SettingsData = html`
         <div class="gridlayout SettingsAppearance">
-          <label for="SettingsFontSize" class=chooseFontSizeRow>Application text size</label>
+          <label for="SettingsFontSize" class=chooseFontSizeRow>App text size (% of normal)</label>
           <span class=SettingsAppFontSizeCombo></span>
           <label for="SettingsMinScreenPercent">Minimum screen percent</label>
           <span class=SettingsMinScreenPercentCombo></span>
@@ -340,26 +344,26 @@ export function editSettings(parentElement, params) {
       document.getElementById('SettingsVoice').selectedIndex = voiceIndex;
       volumeCombo.update(document.querySelector('.SettingsVolumeCombo'), {
         inputType: 'number', min: 0, max: 1, step: 0.1, digits: 1, showPlusMinus: true,
-        value: volume, onChange: onChangeVolume,
+        value: volume, onChange: onChangeVolume, inputWidthEms: 5
       });
       rateCombo.update(document.querySelector('.SettingsRateCombo'), {
         inputType: 'number', min: 0.2, max: 1, step: 0.1, digits: 1, showPlusMinus: true,
-        value: rate, onChange: onChangeRate,
+        value: rate, onChange: onChangeRate, inputWidthEms: 5
       });
       if (!isChrome()) {
         pitchCombo.update(document.querySelector('.SettingsPitchCombo'), {
           inputType: 'number', min: 0.5, max: 1.5, step: 0.1, digits: 1, showPlusMinus: true,
-          value: pitch, onChange: onChangePitch,
+          value: pitch, onChange: onChangePitch, inputWidthEms: 5
         });
       }
     } else if (section === 'Appearance') {
       appFontSizeCombo.update(document.querySelector('.SettingsAppFontSizeCombo'), {
-        inputType: 'number', min: 14, max: 24, step: 1, digits: 0, showPlusMinus: true,
-        value: appFontSize, onChange: onChangeFontSize,
+        inputType: 'number', min: 80, max: 120, step: 5, digits: 0, showPlusMinus: true,
+        value: appFontSize, onChange: onChangeFontSize, inputWidthEms: 5
       });
       minScreenPercentCombo.update(document.querySelector('.SettingsMinScreenPercentCombo'), {
         inputType: 'number', min: minScreenPercentMin, max: minScreenPercentMax, step: 10, digits: 0, showPlusMinus: true,
-        value: minScreenPercent, onChange: onChangeMinScreenPercent,
+        value: minScreenPercent, onChange: onChangeMinScreenPercent, inputWidthEms: 5
       });
     } else if (section === 'History') {
       document.getElementById('SettingsAutoDeleteHistory').selectedIndex = autoDeleteHistoryIndex;
