@@ -57,7 +57,6 @@ let css = `
 }
 .FavoriteContainer {
   display: inline-block;
-  font-size: 0.95rem;
 }
 .Favorites .FavoriteContainer button {
   display: inline-block;
@@ -161,7 +160,7 @@ let css = `
 .Favorites .EditWhatCategories .FavoriteContainer button {
   border: 1px solid #888;
   color: #888;
-  font-size: 0.35rem;
+  font-size: 0.35em;
 }
 .Favorites .EditWhatCategories .FavoritesColumn {
   display: inline-flex;
@@ -191,10 +190,10 @@ let css = `
   padding: 0.5em 0;
 }
 .EditFavoritesChild .ButtonRow button {
-  padding: 0px 15px;
+  padding: 0em 1.1em;
 }
 .EditFavoritesChild .ButtonRow button .arrowButton {
-  margin: -3px 0;
+  margin: -0.2em 0;
 }
 .FavoritesChooseCategory {
   background: white;

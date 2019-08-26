@@ -122,7 +122,6 @@ export class combobox {
           if (v < min) v = min;
           value = v.toFixed(digits);
           localUpdate(); // necessary on Firefox
-
           onChange(value);
         }
       }
@@ -143,7 +142,8 @@ export class combobox {
           ><select @change=${onChangeSelect} .size=${options.length} style=${selectStyle} @blur=${onBlurSelect}>${optionElements}</select
           ><input id=${inputId} type=${inputType} .value=${value} @input=${onInput} style=${styleMap({width:inputWidthEms+'em'})}></input
           >${comboboxDownArrow}${showPlusMinus ? html`${comboboxPlusIcon}${comboboxMinusIcon}` : '' }</span>
-      `, parentElement)
+      `, parentElement);
+      parentElement.querySelector('select').value = value;
     };
     localUpdate();
   }

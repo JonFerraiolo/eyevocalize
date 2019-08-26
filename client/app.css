@@ -12,6 +12,9 @@ html, body, .appfullheight {
 html {
   font-family: Helvetica, Arial, sans-serif;
 }
+button,input,textarea,select {
+  font-size: 85%;
+}
 .appmaincontent, .appinitiallyblank {
   height: 50%; /* will get overridden by code which will set height on element.style */
 }

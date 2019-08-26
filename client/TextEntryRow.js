@@ -13,7 +13,10 @@ let css = `
   display: flex;
   align-items: center;
   flex: 0;
-  font-size: 0.9rem;
+  font-size: 0.9em;
+}
+.TextEntryRow .TextEntryLabel {
+  font-size: 90%;
 }
 .TextEntryRow textarea {
   height: 2.75emem;
