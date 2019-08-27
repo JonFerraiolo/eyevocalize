@@ -150,7 +150,7 @@ button,input,textarea,select {
 .skinnyScreenChild .ButtonRow button, .EditFavoritesChild .ButtonRow button {
   display: inline-block;
   zoom: 1;
-  padding: 2px 15px;
+  padding: 0.1em 0.75em;
   margin: 0;
   cursor: pointer;
   border: 1px solid #bbb;

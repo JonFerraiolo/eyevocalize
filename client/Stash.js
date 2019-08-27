@@ -6,6 +6,7 @@ import { EditPhrase } from './EditPhrase.js';
 import { updateMain, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } from './Phrases.js';
+import { slideInAddFavoriteScreen } from './Favorites.js';
 
 let css = `
 .StashTitleIcon {
@@ -25,6 +26,15 @@ let css = `
 .editStashPhraseRows {
   flex: 1;
   overflow: auto;
+}
+.editStashNewFavorite {
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  vertical-align: middle;
+  background-image: url('./images/heart.svg');
+  background-size: 1.75em 1.75em;
+  background-position: 50% 40%;
 }
 `;
 
@@ -260,6 +270,12 @@ export function editStash(parentElement, props) {
     localUpdate();
     lastClickItemIndex = null;
   };
+  let onClickAddToFavorites = e => {
+    e.preventDefault();
+    let index = localStash.items.findIndex(phrase => phrase.selected);
+    let phrase = Stash.items[index];
+    slideInAddFavoriteScreen({ slideInLevel: 'third', phrase });
+  };
   let onClickMoveUp = e => {
     e.preventDefault();
     for (let i=1, n=localStash.items.length; i<n; i++) {
@@ -344,6 +360,7 @@ export function editStash(parentElement, props) {
       }
       return accumulator;
     }, 0) === 1;
+    let enableAddToFavorites = enableEditItem;
     let enableRemoveSelected = localStash.items.some(item => item.selected);
     let enableMoveUp = localStash.items.some((item, index, arr) =>
       item.selected && (index > 0 && !arr[index-1].selected));
@@ -361,9 +378,9 @@ export function editStash(parentElement, props) {
           ${localStash.items.map((phrase, index) => {
             return html`
               <div class=PhraseRow>
-              <button @click=${onItemClick} .phraseObject=${phrase} .phraseIndex=${index} class=${phrase.cls}>
-                ${phrase.checkmark}
-                ${phrase.label || phrase.text}</button>
+                <button @click=${onItemClick} .phraseObject=${phrase} .phraseIndex=${index} class=${phrase.cls}>
+                  ${phrase.checkmark}
+                  ${phrase.label || phrase.text}</button>
               </div>
             `;
           })}
@@ -379,6 +396,9 @@ export function editStash(parentElement, props) {
           title="Edit the selected item">Edit</button>
           <button @click=${onClickRemoveSelected} ?disabled=${!enableRemoveSelected}
             title="Delete selected items">Delete</button>
+          <button @click=${onClickAddToFavorites} ?disabled=${!enableAddToFavorites}
+            title="Make selected item into a favorite">
+            <span class=editStashNewFavorite></span></button>
           <button @click=${onClickMoveUp} ?disabled=${!enableMoveUp}
             title="Move selected items up one position">
             <span class=arrowButton>&#x1f851;</span></button>

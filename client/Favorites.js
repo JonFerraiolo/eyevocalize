@@ -324,8 +324,8 @@ export function initializeFavorites(props) {
           { type: 'text', label: 'tighter', text: 'Please make it tighter. '},
           { type: 'text', label: 'looser', text: 'Please make it looser. '},
           { type: 'text', label: 'r-elbow', text: 'Please adjust my right elbow. It is uncomfortable.'},
-          { type: 'text', label: 'strap', text: 'Can you please adjust the position of the computer?'},
-          { type: 'text', label: 'laptop', text: 'Can you please adjust the head strap?'},
+          { type: 'text', label: 'laptop', text: 'Can you please adjust the position of the computer?'},
+          { type: 'text', label: 'strap', text: 'Can you please adjust the head strap?'},
           { type: 'text', label: 'mask', text: 'Can you please adjust the mask?'},
           { type: 'text', label: 'eyes', text: 'The eye gaze bar cannot see one of my eyes. '},
           { type: 'text', label: 'crooked', text: 'It is crooked. Please straighten.'},
@@ -398,7 +398,7 @@ function onFavoritesChange(newFavorites) {
 
 export function slideInAddFavoriteScreen(props) {
   props = props || {};
-  let { phrase } = props;
+  let { phrase, slideInLevel } = props;
   let customControlsData = {};
   let params = {
     renderFunc: EditPhrase,
@@ -410,7 +410,11 @@ export function slideInAddFavoriteScreen(props) {
         // add phrase to Favorites, go back to parent screen
         addToFavorites(phrase, columnIndex, categoryIndex);
         updateMain();
-        secondLevelScreenHide();
+        if (slideInLevel === 'third') {
+          thirdLevelScreenHide();
+        } else {
+          secondLevelScreenHide();
+        }
       },
       cancelCallback: function() {
         // do nothing, go back to parent screen
@@ -422,7 +426,11 @@ export function slideInAddFavoriteScreen(props) {
       customControlsData,
     },
   };
-  secondLevelScreenShow(params);
+  if (slideInLevel === 'third') {
+    thirdLevelScreenShow(params);
+  } else {
+    secondLevelScreenShow(params);
+  }
 };
 
 export function updateFavorites(parentElement, props) {

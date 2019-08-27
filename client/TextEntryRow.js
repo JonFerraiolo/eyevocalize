@@ -139,7 +139,8 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onAddFavorite = e => {
     e.preventDefault();
-    slideInAddFavoriteScreen({ phrase: { type:'text', text:document.getElementById('TextEntryRowTextArea').value}});
+    slideInAddFavoriteScreen({ slideInLevel: 'second',
+      phrase: { type:'text', text:document.getElementById('TextEntryRowTextArea').value}});
   }
   let onMinOrMax = e => {
     e.preventDefault();
