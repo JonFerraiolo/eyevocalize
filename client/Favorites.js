@@ -136,7 +136,8 @@ let css = `
   padding: 0.25em 0.5em 0;
 }
 .EditFavorites .ScreenInstructions {
-  font-size: 90%;
+  font-size: 85%;
+  font-style: italic;
   text-align: center;
   padding: 0 0 0.5em;
 }
@@ -1005,8 +1006,8 @@ export function editFavorites(parentElement, props) {
         </div>
         <div class="EditFavoritesData ${editWhat === 'items' ? 'EditWhatItems' : 'EditWhatCategories' }">
           <div class=ScreenInstructions>
-            ${editWhat === 'items' ? 'Click individual favorites below to select.' :
-              'Click individual categories to select.'}
+            ${editWhat === 'items' ? '(Click individual favorites below to select.)' :
+              '(Click individual categories to select.)'}
           </div>
           <div class=FavoritesColumns>
             ${localFavorites.columns.map((column, colIndex) => html`

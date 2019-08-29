@@ -127,6 +127,7 @@ button,input,textarea,select {
 .skinnyScreenChild .ScreenInstructions {
   padding: 0.5em 1.75em 1em;
   font-size: 90%;
+  font-style: italic;
 }
 .skinnyScreenChild .SelectLinksRow {
   padding: 0.5em 1.5em 0;

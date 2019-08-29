@@ -3,7 +3,7 @@ import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntr
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
 import { initializeStash, stash, editStash } from './Stash.js';
-import { initializeHistory, addToHistory, editHistory, playLastHistoryItem } from './History.js';
+import { initializeHistory, playLastHistoryItem } from './History.js';
 import { initializeFavorites, editFavorites } from './Favorites.js';
 import { fromRight, fromLeft } from './animSlide.js';
 import { speak, playAudio } from './vocalize.js';

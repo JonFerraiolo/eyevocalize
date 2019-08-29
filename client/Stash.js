@@ -23,6 +23,10 @@ let css = `
   display: flex;
   flex-direction: column;
 }
+.editStash .ScreenInstructions {
+  text-align: center;
+  font-size: 90%;
+}
 .editStashPhraseRows {
   flex: 1;
   overflow: auto;
@@ -372,7 +376,7 @@ export function editStash(parentElement, props) {
       <div class=skinnyScreenChild>
         ${buildSlideRightTitle("Manage Noteboard", onEditStashReturn)}
         <div class=ScreenInstructions>
-          Click items in the list below to select and deselect.
+          (Click to select, control-click to toggle, shift-click for range)
         </div>
         <div class=editStashPhraseRows>
           ${localStash.items.map((phrase, index) => {

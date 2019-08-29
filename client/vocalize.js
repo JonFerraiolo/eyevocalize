@@ -23,7 +23,7 @@ export function speak(text) {
 			msg.voice = voice;
 			window.speechSynthesis.speak(msg);
 			TextEntryRowSetText('');
-			addToHistory({ type: 'text', text });
+			addToHistory({ type: 'text', text, timestamp: Date.now() });
       updateMain();
 		}
 	}
@@ -36,7 +36,7 @@ export function playAudio(phrase) {
 		var audio = new Audio(url);
 		audio.play();
 		TextEntryRowSetText('');
-		addToHistory(Object.assign({}, phrase));
+		addToHistory(Object.assign({}, phrase, { timestamp: Date.now() }));
     updateMain();
 	}
 };

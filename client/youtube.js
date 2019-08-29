@@ -85,7 +85,7 @@ export function playYoutubeVideo(phrase) {
     };
     invokeYoutubePlayAPI(youtubeParams);
 		TextEntryRowSetText('');
-		addToHistory(Object.assign({}, phrase));
+    addToHistory(Object.assign({}, phrase, { timestamp: Date.now() }));
 	}
 }
 
