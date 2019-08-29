@@ -26,7 +26,7 @@ let css = `
 .EditPhraseInputBlock textarea {
   overflow: hidden;
   resize: none;
-  font-size: 105%;
+  font-size: 95%;
 }
 .EditPhraseInputBlock input {
   font-size: 95%;
