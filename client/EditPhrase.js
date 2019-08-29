@@ -26,6 +26,10 @@ let css = `
 .EditPhraseInputBlock textarea {
   overflow: hidden;
   resize: none;
+  font-size: 105%;
+}
+.EditPhraseInputBlock input {
+  font-size: 95%;
 }
 .EditPhraseInputBlock *:invalid {
   border-color: red;
@@ -140,7 +144,7 @@ export function EditPhrase(parentElement, params) {
       phraseData = html`
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>Label:</label>
-          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'} .value=${label}></input>
+          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseURl>URL for the audio clip:</label>
@@ -151,19 +155,19 @@ export function EditPhrase(parentElement, params) {
       phraseData = html`
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>Label:</label>
-          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'} .value=${label}></input>
+          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseVideoId>YouTube videoId for this clip:</label>
-          <input id=EditPhraseVideoId @input=${onInput} pattern=${patternVideoId} .editPhraseField=${'videoId'} .value=${videoId}></input>
+          <input id=EditPhraseVideoId @input=${onInput} pattern=${patternVideoId} .editPhraseField=${'videoId'}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseStartAt>Start at: (seconds, default=0)</label>
-          <input id=EditPhraseStartAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'startAt'} .value=${startAt}></input>
+          <input id=EditPhraseStartAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'startAt'}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseEndAt>End at: (seconds, default=end of clip)</label>
-          <input id=EditPhraseEndAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'endAt'} .value=${endAt}></input>
+          <input id=EditPhraseEndAt @input=${onInput} pattern=${patternSeconds} .editPhraseField=${'endAt'}></input>
         </div>
       `;
     } else {
@@ -174,7 +178,7 @@ export function EditPhrase(parentElement, params) {
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>${textLabelRequired ? 'Label:' : 'Optional label:'}</label>
-          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'} .value=${label}></input>
+          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
         </div>
       `;
     }
@@ -203,11 +207,18 @@ export function EditPhrase(parentElement, params) {
       </div>
     </div>`, parentElement);
     // for some mysterious reason, lit-html doesn't always update
-    // the value of textarea elements even if you provide a .value property
+    // the value of textarea  and input elements even if you provide a .value property
     if (type === 'audio') {
+      document.getElementById('EditPhraseLabel').value = label;
       document.getElementById('EditPhraseURl').value = url;
+    } else if (type === 'youtube') {
+      document.getElementById('EditPhraseLabel').value = label;
+      document.getElementById('EditPhraseVideoId').value = videoId;
+      document.getElementById('EditPhraseStartAt').value = startAt;
+      document.getElementById('EditPhraseEndAt').value = endAt;
     } else if (type === 'text') {
       document.getElementById('EditPhraseText').value = text;
+      document.getElementById('EditPhraseLabel').value = label;
     }
     if (customControlsFunc) {
       customControlsFunc(document.querySelector('.EditPhraseCustomControls'), customControlsData);

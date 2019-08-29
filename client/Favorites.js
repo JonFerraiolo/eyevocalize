@@ -419,7 +419,11 @@ export function slideInAddFavoriteScreen(props) {
       },
       cancelCallback: function() {
         // do nothing, go back to parent screen
-        secondLevelScreenHide();
+        if (slideInLevel === 'third') {
+          thirdLevelScreenHide();
+        } else {
+          secondLevelScreenHide();
+        }
       },
       textLabelRequired: true,
       customControlsFunc: buildChooseCategoryControl,
