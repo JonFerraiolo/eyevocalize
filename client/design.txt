@@ -1,15 +1,10 @@
-Settings
 
-Tabs
-  Voice
-  Appearance
-  History
+if not a session, take to login screen or sign up screen, depending on cookie
 
-Voice - what we have now, approximately
+Login
+  email
+  password
 
-Appearance
-  Font size - 12-24 menu
-  Intentionally blank area - default = 50(%)
+  forgot password
 
-History
-  Automatically delete history older than - 1 year, 1 month, 1 week, 1 day, 1 hour, never
+look on other computer
