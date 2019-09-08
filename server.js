@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
-const appserver = process.env.APPSERVER || 'localhost';
-const port = process.env.PORT || 3000;
+const appserver = process.env.EVC_APPSERVER || 'localhost';
+const port = process.env.EVC_PORT || 3000;
 const rootDir = process.cwd();
 
 app.use(express.static('client'));
