@@ -2,6 +2,10 @@
 import { main } from './main.js';
 import { html, render } from './lib/lit-html/lit-html.js';
 
+if (window.location.hostname === 'eyevocalize.com' && window.location.protocol === 'http:') {
+	window.location = 'https://eyevocalize.com';
+}
+
 if ('speechSynthesis' in window) {
 	main();
 
