@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "eyevocalize",
   "version": "0.0.1",
   "description": "eyevocalize application",
@@ -9,16 +10,22 @@
     "clean": "rm -rf node_modules npm-debug.log",
     "start": "cd server && node server.js",
     "postinstall": "cd server && npm install",
+=======
+  "name": "tts",
+  "version": "1.0.0",
+  "description": "Text to speech Web app",
+  "main": "server.js",
+  "scripts": {
+>>>>>>> parent of ed93522... update package.json for all modules I think we need, but none of the new are working yet.
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/JonFerraiolo/eyevocalize"
-  },
-  "bugs": {
-    "url": "https://github.com/JonFerraiolo/eyevocalize/issues"
-  },
+  "author": "",
+  "license": "MIT",
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "express": "^4.17.1",
+>>>>>>> parent of ed93522... update package.json for all modules I think we need, but none of the new are working yet.
     "lit-html": "^1.1.1"
   }
 }
