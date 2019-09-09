@@ -1,31 +1,27 @@
 {
-<<<<<<< HEAD
   "name": "eyevocalize",
   "version": "0.0.1",
   "description": "eyevocalize application",
   "author": "Jon Ferraiolo",
-  "main": "server/server.js",
+  "main": "server.js",
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf node_modules npm-debug.log",
-    "start": "cd server && node server.js",
-    "postinstall": "cd server && npm install",
-=======
-  "name": "tts",
-  "version": "1.0.0",
-  "description": "Text to speech Web app",
-  "main": "server.js",
-  "scripts": {
->>>>>>> parent of ed93522... update package.json for all modules I think we need, but none of the new are working yet.
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "MIT",
   "dependencies": {
-<<<<<<< HEAD
-=======
+    "body-parser": "^1.19.0",
+    "csurf": "^1.10.0",
+    "debug": "^4.1.1",
     "express": "^4.17.1",
->>>>>>> parent of ed93522... update package.json for all modules I think we need, but none of the new are working yet.
-    "lit-html": "^1.1.1"
+    "express-mysql-session": "^2.1.0",
+    "express-session": "^1.16.2",
+    "lit-html": "^1.1.1",
+    "morgan": "^1.9.1",
+    "mysql": "^2.17.1",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "socket.io": "^2.2.0"
   }
 }
