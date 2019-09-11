@@ -22,6 +22,50 @@ try {
   process.exit(1);
 }
 
+// set up global.logger
+const { createLogger, format, transports } = require('winston');
+const { combine, timestamp, printf } = format;
+const myFormat1 = printf(({ level, message, timestamp }) => {
+  return `${timestamp} ${level}: ${message}`;
+});
+const myFormat2 = combine(
+    timestamp(),
+    myFormat1
+  );
+let logdir = global.config.LOGDIR;
+if (typeof logdir === 'string' && logdir.length > 0) {
+  function ensureDirSync (dirpath) {
+    try {
+      fs.mkdirSync(dirpath, { recursive: true })
+    } catch (err) {
+      if (err.code !== 'EEXIST') throw err
+    }
+  }
+  if (logdir[0] != '/') {
+    logdir = path.normalize(rootDir + '/' + logdir);
+  }
+  try {
+    ensureDirSync(logdir);
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+  const logfile = logdir + '/' + (new Date()).toISOString();
+  global.logger = createLogger({
+    format: myFormat2,
+    transports: [
+      new transports.File({ filename: logfile })
+    ]
+  });
+} else {
+  global.logger = createLogger({
+    format: myFormat2,
+    transports: [
+      new transports.Console()
+    ]
+  });
+}
+const logger = global.logger;
 const port = global.config.PORT;
 
 dbconnection.connect();
@@ -29,7 +73,7 @@ const app = express();
 app.use(express.static('client'));
 app.get('/', (req, res) => res.sendFile(rootDir+'/client/app.html'));
 
-app.listen(port, () => console.log(`App listening on port ${port}!`));
+app.listen(port, () => logger.info(`App listening on port ${port}!`));
 
 /*
 const envvars = require('./server/envvars');
