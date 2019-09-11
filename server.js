@@ -1,9 +1,31 @@
 const express = require('express');
-const app = express();
-const appserver = process.env.EVC_APPSERVER || 'localhost';
-const port = process.env.EVC_PORT || 3000;
-const rootDir = process.cwd();
+const path = require('path');
+const fs = require('fs');
+const dbconnection = require('./server/dbconnection');
 
+// read site-specific configuration options and put into global.config
+const rootDir = process.cwd();
+let configFile = process.env.EVC_CONFIG;
+if (!configFile) {
+  console.error('no config file specified');
+  process.exit(1);
+}
+if (configFile[0] != '/') {
+  configFile = path.normalize(rootDir + '/' + configFile);
+}
+try {
+  const configString = fs.readFileSync(configFile, 'utf8');
+  global.config = JSON.parse(configString);
+} catch(e) {
+  console.error('config file read/parse error');
+  console.dir(e);
+  process.exit(1);
+}
+
+const port = global.config.PORT;
+
+dbconnection.connect();
+const app = express();
 app.use(express.static('client'));
 app.get('/', (req, res) => res.sendFile(rootDir+'/client/app.html'));
 
@@ -18,8 +40,8 @@ const dbconnection = require('./server/dbconnection');
 const sessionMgmt = require('./server/sessionMgmt');
 const sessionRoutes = require('./server/sessionRoutes');
 const dataRoutes = require('./server/dataRoutes');
-const hostname = process.env.EVC_HOSTNAME || 'localhost';
-const port = process.env.EVC_PORT || 3000;
+const hostname = global.config.HOSTNAME || 'localhost';
+const port = global.config.PORT || 3000;
 const rootDir = process.cwd();
 const connection = dbconnection.getConnection();
 const app = express();
