@@ -31,11 +31,9 @@ exports.connect = function() {
     PRIMARY KEY (id),
     INDEX(email(100),emailValidateToken)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
-    /*
   const adminInsert = `insert into ${accountTable}
     (firstName, lastName, email, password, agreement, isAdmin, created, emailValidateToken, emailValidateTokenDateTime, emailValidated, modified)
     VALUES('Jon', 'Ferraiolo', 'JONEMAIL', 'JONPASSWORD', 1, 1, now(), 'x', now(), now(), now());`;
-    */
 
   connection = mysql.createConnection({
     host: global.config.DB_HOST,
@@ -87,7 +85,7 @@ exports.connect = function() {
     });
   });
 
-  let dropAndMakeTables  = (() => {
+  let dropAndMakeTables = (() => {
     connection.query(dropAccount, function (error, results, fields) {
       if (error) {
         logger.error("drop account table error");
@@ -101,7 +99,7 @@ exports.connect = function() {
     });
   });
 
-  let makeTables  = (() => {
+  let makeTables = (() => {
     connection.query(createAccount, function (error, results, fields) {
       if (error) {
         logger.error("create account table error");
@@ -110,9 +108,24 @@ exports.connect = function() {
       } else {
         logger.info("create account table success");
         logger.info(JSON.stringify(results));
+        addAdmin();
       }
     });
   });
+
+  let addAdmin = (() => {
+    connection.query(adminInsert, function (error, results, fields) {
+      if (error) {
+        logger.error("insert admin account table error");
+        logger.error(JSON.stringify(error));
+        process.exit(1);
+      } else {
+        logger.info("insert admin account table success");
+        logger.info(JSON.stringify(results));
+      }
+    });
+  });
+
 };
 
 exports.getConnection = function() {
