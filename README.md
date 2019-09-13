@@ -5,4 +5,4 @@ Provides UI for quick access to saved phrases.
 
 Runs in browser!!
 
-You betcha.  
+You betcha!!  
