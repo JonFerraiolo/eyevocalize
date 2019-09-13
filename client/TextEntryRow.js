@@ -17,6 +17,7 @@ let css = `
 }
 .TextEntryRow .TextEntryLabel {
   font-size: 90%;
+  font-weight: bold;
 }
 .TextEntryRow textarea {
   height: 2.75em;
