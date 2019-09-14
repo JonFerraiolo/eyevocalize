@@ -15,11 +15,8 @@ exports.connect = function() {
   const dropAccount = `DROP TABLE  IF EXISTS ${accountTable};`;
   const createAccount = `CREATE TABLE ${accountTable} (
     id int(11) unsigned NOT NULL AUTO_INCREMENT,
-    firstName varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-    lastName varchar(100) COLLATE utf8_unicode_ci NOT NULL,
     email varchar(100) COLLATE utf8_unicode_ci UNIQUE NOT NULL,
     password varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-    agreement TINYINT unsigned DEFAULT 0,
     isAdmin TINYINT unsigned DEFAULT 0,
     created datetime NOT NULL,
     emailValidateToken varchar(20) NOT NULL,
@@ -32,8 +29,8 @@ exports.connect = function() {
     INDEX(email(100),emailValidateToken)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
   const adminInsert = `insert into ${accountTable}
-    (firstName, lastName, email, password, agreement, isAdmin, created, emailValidateToken, emailValidateTokenDateTime, emailValidated, modified)
-    VALUES('Jon', 'Ferraiolo', 'JONEMAIL', 'JONPASSWORD', 1, 1, now(), 'x', now(), now(), now());`;
+    (email, password, isAdmin, created, emailValidateToken, emailValidateTokenDateTime, emailValidated, modified)
+    VALUES('JONEMAIL', 'JONPASSWORD', 1, now(), 'x', now(), now(), now());`;
 
   connection = mysql.createConnection({
     host: global.config.DB_HOST,

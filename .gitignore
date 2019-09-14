@@ -62,3 +62,6 @@ typings/
 
 # Other Project-specific exclusions
 old/
+
+# nohup file
+nohup.out

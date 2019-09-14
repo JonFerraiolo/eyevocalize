@@ -1,7 +1,11 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const dbconnection = require('./server/dbconnection');
+const sessionRoutes = require('./server/sessionRoutes');
+
+global.SITENAME = 'EyeVocalize';
 
 // read site-specific configuration options and put into global.config
 const rootDir = process.cwd();
@@ -71,7 +75,10 @@ const port = global.config.PORT;
 dbconnection.connect();
 const app = express();
 app.use(express.static('client'));
+app.use(bodyParser.urlencoded({ extended: true })); // for uploading files
+app.use(bodyParser.json());
 app.get('/', (req, res) => res.sendFile(rootDir+'/client/app.html'));
+app.post('/api/signup', sessionRoutes.signup)
 
 app.listen(port, () => logger.info(`App listening on port ${port}!`));
 

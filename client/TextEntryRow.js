@@ -17,7 +17,7 @@ let css = `
 }
 .TextEntryRow .TextEntryLabel {
   font-size: 90%;
-  font-weight: bold;
+  font-weight: normal;
 }
 .TextEntryRow textarea {
   height: 2.75em;
@@ -161,7 +161,13 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onUser = e => {
     e.preventDefault();
-    debugger;
+    fetch('/api/signup', {
+      method: 'POST',
+      body: JSON.stringify({email:'111',password:'222'}),
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(res => console.log('res='+res));
     TextEntryRowSetFocus();
   }
   let localUpdate = () => {
