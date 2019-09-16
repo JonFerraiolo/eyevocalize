@@ -5,6 +5,10 @@
   "author": "Jon Ferraiolo",
   "main": "server.js",
   "license": "MIT",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/JonFerraiolo/eyevocalize.git"
+  },
   "scripts": {
     "clean": "rm -rf node_modules npm-debug.log",
     "start": "node server.js",
