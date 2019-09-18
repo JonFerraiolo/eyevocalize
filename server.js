@@ -72,7 +72,7 @@ if (typeof logdir === 'string' && logdir.length > 0) {
 const logger = global.logger;
 const port = global.config.PORT;
 
-dbconnection.connect();
+dbconnection.initialize();
 const app = express();
 app.use(express.static('client'));
 app.use(bodyParser.urlencoded({ extended: true })); // for uploading files

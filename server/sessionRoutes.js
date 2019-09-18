@@ -38,63 +38,59 @@ const TOKEN_NOT_FOUND = 'TOKEN_NOT_FOUND'
 const TOKEN_EXPIRED = 'TOKEN_EXPIRED'
 const UNSPECIFIED_SYSTEM_ERROR = 'UNSPECIFIED_SYSTEM_ERROR'
 
-let logger;
-let connection;
-let accountTable;
-const initModuleGlobals = function() {
-  logger = global.logger;
-  connection = dbconnection.getConnection();
-  accountTable = global.accountTable;
-};
-
 exports.signup = function(req, res, next) {
-  initModuleGlobals();
-  logger.info("signup req", req.body);
-  let now = new Date();
-  let account = {
-     email: req.body.email,
-     password: req.body.password,
-     emailValidateToken: null,
-     emailValidateTokenDateTime: now,
-     created: now,
-     modified: now
-   }
-   const token = makeToken(account)
-   account.emailValidateToken = token
-   connection.query(`SELECT email FROM ${accountTable} WHERE email = ?`, [account.email], function (error, results, fields) {
-     if (error) {
-       logSendSE(res, error, "signup select account database failure for email '" + account.email + "'");
-     } else {
-       if (results.length >= 1) {
-         logSendCE(res, 401, USER_ALREADY_EXISTS, "signup account already exists: '" + account.email + "'");
-       } else {
-         connection.query(`INSERT INTO ${accountTable} SET ?`, account, function (error, results, fields) {
-           if (error) {
-             logSendSE(res, error, "Insert new account insert database failure for email '" + account.email + "'");
-           } else {
-             account.id = results.insertId;
-             sendAccountVerificationEmailToUser(account, function(error, result) {
-               if (error) {
-                 logger.error("Insert new account email send failure for email '" + account.email + "', error= ", error);
-                 connection.query(`DELETE FROM ${accountTable} WHERE email = ?`, [account.email], function (error, results, fields) {
-                   if (error) {
-                     logger.error('DELETE failed after sendMail failure. error='+error)
-                   }
-                   res.send(500, { msg, error: UNSPECIFIED_SYSTEM_ERROR })
-                 });
-               } else {
-                 getUserObject(account.email, {account}).then(userObject => {
-                   logSendOK(res, userObject, "Insert new account success for email '" + account.email + "'");
-                 }).catch(error => {
-                   logSendSE(res, error, 'getUserObjectError');
-                 });
-               }
-             });
-           }
-         });
-       }
+  dbconnection.dbReady().then(connection => {
+    const logger = global.logger;
+    const accountTable = global.accountTable;
+    logger.info("signup req", req.body);
+    let now = new Date();
+    let account = {
+       email: req.body.email,
+       password: req.body.password,
+       emailValidateToken: null,
+       emailValidateTokenDateTime: now,
+       created: now,
+       modified: now
      }
-   });
+     const token = makeToken(account)
+     account.emailValidateToken = token
+     connection.query(`SELECT email FROM ${accountTable} WHERE email = ?`, [account.email], function (error, results, fields) {
+       if (error) {
+         logSendSE(res, error, "signup select account database failure for email '" + account.email + "'");
+       } else {
+         if (results.length >= 1) {
+           logSendCE(res, 401, USER_ALREADY_EXISTS, "signup account already exists: '" + account.email + "'");
+         } else {
+           connection.query(`INSERT INTO ${accountTable} SET ?`, account, function (error, results, fields) {
+             if (error) {
+               logSendSE(res, error, "Insert new account insert database failure for email '" + account.email + "'");
+             } else {
+               account.id = results.insertId;
+               sendAccountVerificationEmailToUser(account, function(error, result) {
+                 if (error) {
+                   logger.error("Insert new account email send failure for email '" + account.email + "', error= ", error);
+                   connection.query(`DELETE FROM ${accountTable} WHERE email = ?`, [account.email], function (error, results, fields) {
+                     if (error) {
+                       logger.error('DELETE failed after sendMail failure. error='+error)
+                     }
+                     res.send(500, { msg, error: UNSPECIFIED_SYSTEM_ERROR })
+                   });
+                 } else {
+                   getUserObject(account.email, {account}).then(userObject => {
+                     logSendOK(res, userObject, "Insert new account success for email '" + account.email + "'");
+                   }).catch(error => {
+                     logSendSE(res, error, 'getUserObjectError');
+                   });
+                 }
+               });
+             }
+           });
+         }
+       }
+     });
+  }, () => {
+    logSendSE(res, null, "signup: no database connection");
+  });
 }
 /*
 exports.login = function(req, res, next) {

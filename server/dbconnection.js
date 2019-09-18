@@ -1,16 +1,145 @@
 
-const mysql = require('mysql');
+let mysql = require('mysql');
 
-let connection;
+/*
+FIXME Include explanation about how mysql on hosting provider
+goes away after five minutes, so we need to verify the connection
+before, each operation.
+Also, how db initialization works
+*/
 
-exports.connect = function() {
+let connection = null;
+let dbInitialized = false;
+
+const dbReady = function() {
   const logger = global.logger;
-  const DB_FORCE_CREATION = global.config.DB_FORCE_CREATION;
+  return new Promise((outerResolve, outerReject) =>  {
+    let connectionPromise = getConnection();
+    let initializePromise = new Promise((resolve, reject) => {
+      let initializeCounter = 0;
+      let check = (() => {
+        if (dbInitialized) {
+          resolve();
+        } else {
+          if (initializeCounter >= 5) {
+            reject();
+          } else {
+            initializeCounter++;
+            setTimeout(() => {
+              check();
+            }, 3000);
+          }
+        }
+      });
+      check();
+    });
+    return Promise.all([connectionPromise, initializePromise]).then(function(values) {
+      outerResolve(connection);
+    }, () => {
+      outerReject();
+    });
+  });
+};
+exports.dbReady = dbReady;
+
+const getConnection = function() {
+  const logger = global.logger;
+  logger.info("enter getConnection");
+  return new Promise((resolve, reject) => {
+    if (connection) {
+      logger.info("getConnection Immediate return, we have an active connection");
+      resolve(connection);
+    } else {
+      logger.info("getConnection no active connection. Calling reconnect");
+      reconnect().then(() => {
+        logger.info("getConnection reconnect has returned a new connection");
+        resolve(connection);
+      }, () => {
+        logger.error("getConnection reconnect failed");
+        reject();
+      });
+    }
+  });
+};
+
+//FIXME no reason to kill application if we cannot connect to database
+let reconnectCounter;
+function reconnect() {
+  const logger = global.logger;
+  logger.info("enter reconnect");
+  reconnectCounter = 0;
+  return new Promise((outerResolve, outerReject) => {
+    function inner() {
+      logger.info("enter reconnect/inner");
+      return new Promise((innerResolve, innerReject) => {
+        logger.info("before createConnection");
+        try {
+          connection = mysql.createConnection({
+            host: global.config.DB_HOST,
+            user: global.config.DB_USER,
+            password: global.config.DB_PASSWORD,
+            database: global.config.DB_DATABASE,
+            debug: global.config.DB_DEBUG === 'true' ? true : false,
+          });
+        } catch(e) {
+          logger.error('mysql createConnection error');
+          logger.error('error: '+e.toString());
+        }
+        logger.info("after createConnection. connection="+connection);
+
+        connection.on('error', function(err) {
+          logger.error('mysql error: '+err.code);
+          logger.error(JSON.stringify(err));
+          // if(err.code === 'PROTOCOL_CONNECTION_LOST') {
+          connection = null;
+        });
+
+        logger.info("before connect");
+        connection.connect(function(error){
+          if (!error) {
+            logger.info("Database connected");
+            innerResolve(connection);
+          } else {
+            logger.error("Database connection error");
+            logger.error(JSON.stringify(error));
+            connection = null;
+            logger.info("checking reconnectCounter. reconnectCounter="+reconnectCounter);
+            if (reconnectCounter >= 5) {
+              innerReject(true) ; // too many retries, give up
+            } else {
+              reconnectCounter++;
+              innerReject(false); // don't finish the outer promise yet, we will try again
+              setTimeout(() => {
+                inner().then(() => {
+                  outerResolve(connection);
+                }, finishOuter => {
+                  if (finishOuter) {
+                    outerReject();
+                  }
+                });
+              }, 3000);
+            }
+          }
+        });
+      });
+    }
+    inner().then(() => {
+      outerResolve(connection);
+    }, finishOuter => {
+      if (finishOuter) {
+        outerReject();
+      }
+    });
+  });
+}
+
+exports.initialize = function() {
+  const logger = global.logger;
+  logger.info("dbconnection.initialize entered");
 
   // sql commands to check if database is empty
   // and to create tables if necessary.
-  const DB_TABLE_PREFIX = global.config.DB_TABLE_PREFIX;
-  const accountTable = global.accountTable = DB_TABLE_PREFIX + 'account';
+  const accountTable = global.accountTable = global.config.DB_TABLE_PREFIX + 'account';
   const showTables = `show tables;`;
   const dropAccount = `DROP TABLE  IF EXISTS ${accountTable};`;
   const createAccount = `CREATE TABLE ${accountTable} (
@@ -32,62 +161,46 @@ exports.connect = function() {
     (email, password, isAdmin, created, emailValidateToken, emailValidateTokenDateTime, emailValidated, modified)
     VALUES('JONEMAIL', 'JONPASSWORD', 1, now(), 'x', now(), now(), now());`;
 
-  connection = mysql.createConnection({
-    host: global.config.DB_HOST,
-    user: global.config.DB_USER,
-    password: global.config.DB_PASSWORD,
-    database: global.config.DB_DATABASE,
-    debug: global.config.DB_DEBUG === 'true' ? true : false,
+  getConnection().then(connection => {
+    logger.info("dbconnection.initialize we have a connection");
+    checkForTables();
+  }, () => {
+    logger.error("dbconnection.initialize failed to get a connection");
   });
 
-  //FIXME what to do if connection is dropped?
-  // err.code = 'PROTOCOL_CONNECTION_LOST'.
-  // reconnecting a connection is done by establishing a new connection.
-  connection.on('error', function(err) {
-    logger.error('mysql error: '+err.code);
-    logger.error(JSON.stringify(err));
-  });
-
-  connection.connect(function(error){
-    if (!error) {
-        logger.info("Database connected");
-        dbinit();
-    } else {
-        logger.error("Database connection error");
-        logger.error(JSON.stringify(error));
-        process.exit(1);
-    }
-  });
-
-  let dbinit = (() => {
+  let checkForTables = (() => {
+    logger.info("checkForTables entered");
     connection.query(showTables, function (error, results, fields) {
       if (error) {
         logger.error("show tables error");
         logger.error(JSON.stringify(error));
-        process.exit(1);
       } else {
         logger.info("show tables success");
-        logger.info(JSON.stringify(results));
-        let s;
+        let s = null;
         try {
           s = JSON.stringify(results);
+          logger.info('results='+s);
         } catch(e) {
           logger.error("show tables results stringify error");
-          process.exit(1);
-        }
-        if (s.indexOf(accountTable)  === -1 || DB_FORCE_CREATION) {
-          dropAndMakeTables();
+        } finally {
+          if (s != null) {
+            if (s.indexOf(accountTable) === -1 || global.config.DB_FORCE_CREATION) {
+              dropAndMakeTables();
+            } else {
+              dbInitialized = true;
+            }
+          }
         }
       }
     });
   });
 
   let dropAndMakeTables = (() => {
+    logger.info("dropAndMakeTables entered");
     connection.query(dropAccount, function (error, results, fields) {
       if (error) {
         logger.error("drop account table error");
         logger.error(JSON.stringify(error));
-        process.exit(1);
       } else {
         logger.info("drop account table success");
         logger.info(JSON.stringify(results));
@@ -97,34 +210,30 @@ exports.connect = function() {
   });
 
   let makeTables = (() => {
+    logger.info("makeTables entered");
     connection.query(createAccount, function (error, results, fields) {
       if (error) {
         logger.error("create account table error");
         logger.error(JSON.stringify(error));
-        process.exit(1);
       } else {
         logger.info("create account table success");
         logger.info(JSON.stringify(results));
+        dbInitialized = true; //FIXME probably don't need addAdmin
         addAdmin();
       }
     });
   });
 
   let addAdmin = (() => {
+    logger.info("addAdmin entered");
     connection.query(adminInsert, function (error, results, fields) {
       if (error) {
         logger.error("insert admin account table error");
         logger.error(JSON.stringify(error));
-        process.exit(1);
       } else {
         logger.info("insert admin account table success");
         logger.info(JSON.stringify(results));
       }
     });
   });
-
-};
-
-exports.getConnection = function() {
-  return connection;
 };
