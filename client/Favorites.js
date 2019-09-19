@@ -293,6 +293,8 @@ export function initializeFavorites(props) {
             { type: 'youtube', label: 'mad', videoId: 'tUY05_ZwFzg', startAt: 0, endAt: 999 },
             { type: 'youtube', label: 'failure', videoId: 'V2f-MZ2HRHQ', startAt: 2, endAt: 999 },
             { type: 'youtube', label: 'betcha', videoId: 'fv9XtSiqEDA', startAt: 0, endAt: 999 },
+            { type: 'youtube', label: 'fraud', videoId: 'AC9z7LIQX_A', startAt: 0, endAt: 999 },
+            { type: 'youtube', label: 'bro', videoId: 'QkkLUP-gm4Q', startAt: 114, endAt: 119 },
             { type: 'text', label: 'hello', text: "You had me at hello"},
             { type: 'text', label: 'girl', text: "I'm just a girl, standing in front of a boy, asking him to love her"},
         	]},

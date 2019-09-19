@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const dbconnection = require('./server/dbconnection');
+//const sessionMgmt = require('./server/sessionMgmt');
 const sessionRoutes = require('./server/sessionRoutes');
 
 global.SITENAME = 'EyeVocalize';
@@ -74,6 +75,8 @@ const port = global.config.PORT;
 
 dbconnection.initialize();
 const app = express();
+//const authMiddleware = sessionMgmt.auth;
+//sessionMgmt.init(app); // calls app.use with session middleware
 app.use(express.static('client'));
 app.use(bodyParser.urlencoded({ extended: true })); // for uploading files
 app.use(bodyParser.json());

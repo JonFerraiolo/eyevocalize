@@ -8,7 +8,7 @@ before, each operation.
 Also, how db initialization works
 */
 
-let connection = null;
+let pool  = null;
 let dbInitialized = false;
 
 const dbReady = function() {
@@ -34,7 +34,7 @@ const dbReady = function() {
       check();
     });
     return Promise.all([connectionPromise, initializePromise]).then(function(values) {
-      outerResolve(connection);
+      outerResolve(pool );
     }, () => {
       outerReject();
     });
@@ -46,14 +46,14 @@ const getConnection = function() {
   const logger = global.logger;
   logger.info("enter getConnection");
   return new Promise((resolve, reject) => {
-    if (connection) {
+    if (pool ) {
       logger.info("getConnection Immediate return, we have an active connection");
-      resolve(connection);
+      resolve(pool);
     } else {
       logger.info("getConnection no active connection. Calling reconnect");
       reconnect().then(() => {
         logger.info("getConnection reconnect has returned a new connection");
-        resolve(connection);
+        resolve(pool);
       }, () => {
         logger.error("getConnection reconnect failed");
         reject();
@@ -63,6 +63,7 @@ const getConnection = function() {
 };
 
 //FIXME no reason to kill application if we cannot connect to database
+//FIXME add pooled connections?
 let reconnectCounter;
 function reconnect() {
   const logger = global.logger;
@@ -72,9 +73,10 @@ function reconnect() {
     function inner() {
       logger.info("enter reconnect/inner");
       return new Promise((innerResolve, innerReject) => {
-        logger.info("before createConnection");
+        logger.info("before createPool ");
         try {
-          connection = mysql.createConnection({
+          pool  = mysql.createPool({
+            connectionLimit : 2,
             host: global.config.DB_HOST,
             user: global.config.DB_USER,
             password: global.config.DB_PASSWORD,
@@ -82,11 +84,26 @@ function reconnect() {
             debug: global.config.DB_DEBUG === 'true' ? true : false,
           });
         } catch(e) {
-          logger.error('mysql createConnection error');
+          logger.error('mysql createPool  error');
           logger.error('error: '+e.toString());
+          innerReject(true);
         }
-        logger.info("after createConnection. connection="+connection);
+        logger.info("after createPool . pool="+pool);
+        pool.on('acquire', function (connection) {
+          logger.info('Connection %d acquired', connection.threadId);
+        });
+        pool.on('connection', function (connection) {
+          logger.info('Connection %d connected', connection.threadId);
+        });
+        pool.on('enqueue', function () {
+          logger.info('Waiting for connection');
+        });
+        pool.on('release', function (connection) {
+          logger.info('Connection %d released', connection.threadId);
+        });
+        innerResolve(pool);
 
+/*
         connection.on('error', function(err) {
           logger.error('mysql error: '+err.code);
           logger.error(JSON.stringify(err));
@@ -121,10 +138,11 @@ function reconnect() {
             }
           }
         });
+*/
       });
     }
     inner().then(() => {
-      outerResolve(connection);
+      outerResolve(pool);
     }, finishOuter => {
       if (finishOuter) {
         outerReject();
@@ -161,7 +179,7 @@ exports.initialize = function() {
     (email, password, isAdmin, created, emailValidateToken, emailValidateTokenDateTime, emailValidated, modified)
     VALUES('JONEMAIL', 'JONPASSWORD', 1, now(), 'x', now(), now(), now());`;
 
-  getConnection().then(connection => {
+  getConnection().then(pool  => {
     logger.info("dbconnection.initialize we have a connection");
     checkForTables();
   }, () => {
@@ -170,7 +188,7 @@ exports.initialize = function() {
 
   let checkForTables = (() => {
     logger.info("checkForTables entered");
-    connection.query(showTables, function (error, results, fields) {
+    pool.query(showTables, function (error, results, fields) {
       if (error) {
         logger.error("show tables error");
         logger.error(JSON.stringify(error));
@@ -197,7 +215,7 @@ exports.initialize = function() {
 
   let dropAndMakeTables = (() => {
     logger.info("dropAndMakeTables entered");
-    connection.query(dropAccount, function (error, results, fields) {
+    pool.query(dropAccount, function (error, results, fields) {
       if (error) {
         logger.error("drop account table error");
         logger.error(JSON.stringify(error));
@@ -211,7 +229,7 @@ exports.initialize = function() {
 
   let makeTables = (() => {
     logger.info("makeTables entered");
-    connection.query(createAccount, function (error, results, fields) {
+    pool.query(createAccount, function (error, results, fields) {
       if (error) {
         logger.error("create account table error");
         logger.error(JSON.stringify(error));
@@ -226,7 +244,7 @@ exports.initialize = function() {
 
   let addAdmin = (() => {
     logger.info("addAdmin entered");
-    connection.query(adminInsert, function (error, results, fields) {
+    pool.query(adminInsert, function (error, results, fields) {
       if (error) {
         logger.error("insert admin account table error");
         logger.error(JSON.stringify(error));
