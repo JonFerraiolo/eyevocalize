@@ -14,6 +14,8 @@ const getBaseName = require('./getBaseName')
  *        If the calling routine has no info on hand, pass in undefined, null or {}
  * @return {Promise} payload is userObject
  */
+
+ /* FIXME Promises look all screwed up */
 module.exports = function(email, alreadyHave) {
   logger.info('getUserObject entered. Email='+email+', alreadyHave='+JSON. stringify(alreadyHave));
   const connection = dbconnection.getConnection();
@@ -104,6 +106,8 @@ module.exports = function(email, alreadyHave) {
           });
         }
       });
+    }, error => {
+      masterReject(error);
     }).catch(error => {
       masterReject(error);
     });

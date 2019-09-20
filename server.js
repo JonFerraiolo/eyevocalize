@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const dbconnection = require('./server/dbconnection');
-//const sessionMgmt = require('./server/sessionMgmt');
+const sessionMgmt = require('./server/sessionMgmt');
 const sessionRoutes = require('./server/sessionRoutes');
 
 global.SITENAME = 'EyeVocalize';
@@ -73,17 +73,28 @@ if (typeof logdir === 'string' && logdir.length > 0) {
 const logger = global.logger;
 const port = global.config.PORT;
 
-dbconnection.initialize();
+dbconnection.initialize(); // kick off the connection to the db and any needed db inits
 const app = express();
-//const authMiddleware = sessionMgmt.auth;
-//sessionMgmt.init(app); // calls app.use with session middleware
-app.use(express.static('client'));
-app.use(bodyParser.urlencoded({ extended: true })); // for uploading files
-app.use(bodyParser.json());
-app.get('/', (req, res) => res.sendFile(rootDir+'/client/app.html'));
-app.post('/api/signup', sessionRoutes.signup)
+const authMiddleware = sessionMgmt.auth;
+// this call results in app.use with session middleware, which needs to be first in line
+sessionMgmt.init(app).then(() => {
 
-app.listen(port, () => logger.info(`App listening on port ${port}!`));
+  app.use(express.static('client'));
+  app.use(bodyParser.urlencoded({ extended: true })); // for uploading files
+  app.use(bodyParser.json());
+  app.get('/', (req, res) => res.sendFile(rootDir+'/client/app.html'));
+  app.post('/api/signup', sessionRoutes.signup)
+
+  app.listen(port, () => logger.info(`App listening on port ${port}!`));
+
+}, () => {
+  logger.error('serverjs sessionMgmt.init promise reject.');
+  process.exit(1);
+}).catch(e => {
+  logger.error('serverjs sessionMgmt.init promise error');
+  logger.error('e='+JSON.stringify(e));
+  process.exit(1);
+});
 
 /*
 const envvars = require('./server/envvars');

@@ -3,25 +3,43 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const dbconnection = require('./dbconnection');
 
-const SESSION_SECRET = global.config.SESSION_SECRET;
-
 module.exports = {
   init: function(app) {
+    const logger = global.logger;
 
-    dbconnection.dbReady().then(connection => {
-      const options = {};
-      const sessionStore = new MySQLStore(options, connection);
-
-      app.use(session({
-          cookie: { secure: false , maxAge:5*60*1000  }, // FIXME secure:true once https
-          proxy: true,
-          secret: SESSION_SECRET,
-          store: sessionStore,
-          resave: true,
-          rolling: true,
-          saveUninitialized: false
-      }));
-    })
+    return new Promise((resolve, reject) => {
+      dbconnection.dbReady().then(connectionPool => {
+        let options = {
+          checkExpirationInterval: 60*60*1000,// How frequently expired sessions will be cleared; milliseconds.
+          expiration: 24*60*60*1000,// The maximum age of a valid session; milliseconds.
+          useConnectionPooling: true,// Whether or not to use connection pooling.
+          keepAlive: true,// Whether or not to send keep-alive pings on the database connectionPool.
+          keepAliveInterval: 60*60*1000,// How frequently keep-alive pings will be sent; milliseconds
+        };
+        try {
+          let sessionStore = new MySQLStore(options, connectionPool);
+          app.use(session({
+              cookie: { secure: false , maxAge:24*60*60*1000 }, // FIXME secure:true once https
+              proxy: true,
+              secret: global.config.SESSION_SECRET,
+              store: sessionStore,
+              resave: false,
+              saveUninitialized: false
+          }));
+          resolve();
+        } catch(e) {
+          logger.error('setting store error');
+          reject();
+        }
+      }, err => {
+        logger.error('sessionMgmt.init dbReady failed');
+        reject();
+      }).catch(e => {
+        logger.error('sessionMgmt.init promise error');
+        logger.error('e='+JSON.stringify(e));
+        reject();
+      });
+    });
   },
 
   // Authentication and Authorization Middleware

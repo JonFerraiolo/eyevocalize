@@ -38,11 +38,14 @@ const TOKEN_NOT_FOUND = 'TOKEN_NOT_FOUND'
 const TOKEN_EXPIRED = 'TOKEN_EXPIRED'
 const UNSPECIFIED_SYSTEM_ERROR = 'UNSPECIFIED_SYSTEM_ERROR'
 
+//FIXME don't put credentials into log files
 exports.signup = function(req, res, next) {
-  dbconnection.dbReady().then(connection => {
+  logger.info('signup req.session='+req.session);
+  dbconnection.dbReady().then(connectionPool => {
     const logger = global.logger;
     const accountTable = global.accountTable;
-    logger.info("signup req", req.body);
+    logger.info('signup req.body='+req.body);
+    try { logger.info(JSON.stringify(req.body)); } catch(e) { logger.error('stringify error'); }
     let now = new Date();
     let account = {
        email: req.body.email,
@@ -54,14 +57,14 @@ exports.signup = function(req, res, next) {
      }
      const token = makeToken(account)
      account.emailValidateToken = token
-     connection.query(`SELECT email FROM ${accountTable} WHERE email = ?`, [account.email], function (error, results, fields) {
+     connectionPool.query(`SELECT email FROM ${accountTable} WHERE email = ?`, [account.email], function (error, results, fields) {
        if (error) {
          logSendSE(res, error, "signup select account database failure for email '" + account.email + "'");
        } else {
          if (results.length >= 1) {
            logSendCE(res, 401, USER_ALREADY_EXISTS, "signup account already exists: '" + account.email + "'");
          } else {
-           connection.query(`INSERT INTO ${accountTable} SET ?`, account, function (error, results, fields) {
+           connectionPool.query(`INSERT INTO ${accountTable} SET ?`, account, function (error, results, fields) {
              if (error) {
                logSendSE(res, error, "Insert new account insert database failure for email '" + account.email + "'");
              } else {
@@ -69,7 +72,7 @@ exports.signup = function(req, res, next) {
                sendAccountVerificationEmailToUser(account, function(error, result) {
                  if (error) {
                    logger.error("Insert new account email send failure for email '" + account.email + "', error= ", error);
-                   connection.query(`DELETE FROM ${accountTable} WHERE email = ?`, [account.email], function (error, results, fields) {
+                   connectionPool.query(`DELETE FROM ${accountTable} WHERE email = ?`, [account.email], function (error, results, fields) {
                      if (error) {
                        logger.error('DELETE failed after sendMail failure. error='+error)
                      }
@@ -90,78 +93,97 @@ exports.signup = function(req, res, next) {
      });
   }, () => {
     logSendSE(res, null, "signup: no database connection");
+  }).catch(e => {
+    logSendSE(res, e, "signup: promise error");
   });
 }
-/*
+
 exports.login = function(req, res, next) {
-  logger.info('login req.body='+req.body);
-  logger.dir(req.body);
-  logger.info('req.session.id='+req.session.id);
-  const email = req.body.email;
-  const password = req.body.password;
-  logger.info('email='+email);
-  connection.query('SELECT * FROM ${accountTable} WHERE email = ?', [email], function (error, results, fields) {
-    if (error) {
-      logSendSE(res, error, "Select account failure for email '" + email + "'");
-    } else {
-      let msg = "Select account success for email '" + email + "'";
-      logger.info(msg + ", results= ", results);
-      if (results.length < 1) {
-        logSendCE(res, 401, EMAIL_NOT_REGISTERED, "No account for '" + email + "'");
+  dbconnection.dbReady().then(connectionPool => {
+    const logger = global.logger;
+    const accountTable = global.accountTable;
+    logger.info('login req.body='+req.body);
+    try { logger.info(JSON.stringify(req.body)); } catch(e) { logger.error('stringify error'); }
+    const email = req.body.email;
+    const password = req.body.password;
+    logger.info('email='+email);
+    connectionPool.query('SELECT * FROM ${accountTable} WHERE email = ?', [email], function (error, results, fields) {
+      if (error) {
+        logSendSE(res, error, "Select account failure for email '" + email + "'");
       } else {
-        let account = results[0]
-        if (!account.emailValidated) {
-          logSendCE(res, 401, EMAIL_NOT_VERIFIED, "Account for '" + email + "' has not been verified yet via email");
+        let msg = "Select account success for email '" + email + "'";
+        logger.info(msg + ", results= ", results);
+        if (results.length < 1) {
+          logSendCE(res, 401, EMAIL_NOT_REGISTERED, "No account for '" + email + "'");
         } else {
-          if (account.password === password) {
-            logger.info('Before calling session login.  User='+account);
-            logger.dir(account);
-            logger.info('req.session.id='+req.session.id);
-            req.session.user = account;
-            logger.info('login after regenerate req.session.id='+req.session.id);
-            getUserObject(account.email, { account }).then(userObject => {
-              logSendOK(res, userObject, "Login success for email '" + email + "'");
-            }).catch(error => {
-              logSendSE(res, error, 'login getUserObject');
-            });
+          let account = results[0]
+          if (!account.emailValidated) {
+            logSendCE(res, 401, EMAIL_NOT_VERIFIED, "Account for '" + email + "' has not been verified yet via email");
           } else {
-            logSendCE(res, 401, INCORRECT_PASSWORD, "Login failure for email '" + email + "'");
+            if (account.password === password) {
+              logger.info('Before calling session login.  User='+account);
+              logger.info(account);
+              logger.info('req.session.id='+req.session.id);
+              req.session.user = account;
+              logger.info('login after regenerate req.session.id='+req.session.id);
+              getUserObject(account.email, { account }).then(userObject => {
+                logSendOK(res, userObject, "Login success for email '" + email + "'");
+              }).catch(error => {
+                logSendSE(res, error, 'login getUserObject');
+              });
+            } else {
+              logSendCE(res, 401, INCORRECT_PASSWORD, "Login failure for email '" + email + "'");
+            }
           }
         }
       }
-    }
+    });
+  }, () => {
+    logSendSE(res, null, "login: no database connection");
+  }).catch(e => {
+    logSendSE(res, e, "login: promise error");
   });
 }
 
 exports.logout = function(req, res, next) {
   logger.info('logout req.body='+req.body);
-  logger.dir(req.body);
+  logger.info(req.body);
   logger.info('req.session.id='+req.session.id);
-  req.session.user = null;
+  if (req.session) {
+    req.session.user = null;
+  }
   logSendOK(res, null, "Logout success");
 }
 
 exports.loginexists = function(req, res, next) {
-  logger.info('loginexists req.body='+req.body);
-  logger.dir(req.body);
-  const email = req.body.email;
-  logger.info('email='+email);
-  connection.query('SELECT email FROM ${accountTable} WHERE email = ?', [email], function (error, results, fields) {
-    if (error) {
-      logSendSE(res, error, "loginexists failure for email '" + email + "'");
-    } else {
-      let exists = (results.length > 0)
-      logSendOK(res, { email, exists }, "loginexists success for email '" + email + "'");
-    }
+  dbconnection.dbReady().then(connectionPool => {
+    const logger = global.logger;
+    const accountTable = global.accountTable;
+    logger.info('loginexists req.body=');
+    try { logger.info(JSON.stringify(req.body)); } catch(e) { logger.error('stringify error'); }
+    const email = req.body.email;
+    logger.info('email='+email);
+    connectionPool.query('SELECT email FROM ${accountTable} WHERE email = ?', [email], function (error, results, fields) {
+      if (error) {
+        logSendSE(res, error, "loginexists failure for email '" + email + "'");
+      } else {
+        let exists = (results.length > 0)
+        logSendOK(res, { email, exists }, "loginexists success for email '" + email + "'");
+      }
+    });
+  }, () => {
+    logSendSE(res, null, "loginexists: no database connection");
+  }).catch(e => {
+    logSendSE(res, e, "loginexists: promise error");
   });
 }
-
+/*
 exports.resendVerificationEmail = function(req, res, next) {
   logger.info('resendVerificationEmail req.body='+req.body);
-  logger.dir(req.body);
+  logger.info(req.body);
   const email = req.body.email;
   logger.info('email='+email);
-  connection.query('SELECT * FROM ${accountTable} WHERE email = ?', [email], function (error, results, fields) {
+  connectionPool.query('SELECT * FROM ${accountTable} WHERE email = ?', [email], function (error, results, fields) {
     if (error) {
       logSendSE(res, error, "resendVerificationEmail database failure for email '" + email + "'");
     } else {
@@ -175,7 +197,7 @@ exports.resendVerificationEmail = function(req, res, next) {
         } else {
           const token = makeToken(account)
           let now = new Date();
-          connection.query('UPDATE ${accountTable} SET emailValidateToken = ?, emailValidateTokenDateTime = ?, modified = ? WHERE email = ?', [token, now, now, email], function (error, results, fields) {
+          connectionPool.query('UPDATE ${accountTable} SET emailValidateToken = ?, emailValidateTokenDateTime = ?, modified = ? WHERE email = ?', [token, now, now, email], function (error, results, fields) {
             if (error) {
               logSendSE(res, error, "resendVerificationEmail update database failure for email '" + account.email + "'");
             } else {
@@ -208,10 +230,10 @@ exports.resendVerificationEmail = function(req, res, next) {
 
 exports.sendResetPasswordEmail = function(req, res, next) {
   logger.info('sendResetPasswordEmail req.body='+req.body);
-  logger.dir(req.body);
+  logger.info(req.body);
   const email = req.body.email;
   logger.info('email='+email);
-  connection.query('SELECT * FROM ${accountTable} WHERE email = ?', [email], function (error, results, fields) {
+  connectionPool.query('SELECT * FROM ${accountTable} WHERE email = ?', [email], function (error, results, fields) {
     if (error) {
       logSendSE(res, error, "sendResetPasswordEmail database failure for email '" + email + "'");
     } else {
@@ -222,7 +244,7 @@ exports.sendResetPasswordEmail = function(req, res, next) {
         const account = results[0]
         const token = makeToken(account)
         let now = new Date();
-        connection.query('UPDATE ${accountTable} SET resetPasswordToken = ?, resetPasswordTokenDateTime = ?, modified = ? WHERE email = ?', [token, now, now, email], function (error, results, fields) {
+        connectionPool.query('UPDATE ${accountTable} SET resetPasswordToken = ?, resetPasswordTokenDateTime = ?, modified = ? WHERE email = ?', [token, now, now, email], function (error, results, fields) {
           if (error) {
             logSendSE(res, error, "sendResetPasswordEmail update database failure for email '" + account.email + "'");
           } else {
@@ -253,10 +275,10 @@ exports.sendResetPasswordEmail = function(req, res, next) {
 
 exports.verifyAccount = function(req, res, next) {
   logger.info('verifyAccount req.params='+req.params);
-  logger.dir(req.params);
+  logger.info(req.params);
   let token = req.params.token
   res.type('html')
-  connection.query('SELECT email, emailValidateTokenDateTime FROM ${accountTable} WHERE emailValidateToken = ?', [token], function (error, results, fields) {
+  connectionPool.query('SELECT email, emailValidateTokenDateTime FROM ${accountTable} WHERE emailValidateToken = ?', [token], function (error, results, fields) {
     if (error || results.length !== 1) {
       let msg = "verifyAccount failure for token '" + token + "'";
       logger.info(msg + ", error= ", error, 'results=', JSON.stringify(results));
@@ -286,7 +308,7 @@ exports.verifyAccount = function(req, res, next) {
         res.send(html)
       } else {
         logger.info('now='+now+', email='+email)
-        connection.query('UPDATE ${accountTable} SET emailValidated = ?, modified = ? WHERE email = ?', [now, now, email], function (error, results, fields) {
+        connectionPool.query('UPDATE ${accountTable} SET emailValidated = ?, modified = ? WHERE email = ?', [now, now, email], function (error, results, fields) {
           logger.info('error='+error+", results= ", JSON.stringify(results));
           if (error) {
             let msg = "verifyAccount update emailValidated database failure for email '" + account.email + "'";
@@ -313,10 +335,10 @@ logger.info('html='+html) ;
 
 exports.gotoResetPasswordPage = function(req, res, next) {
   logger.info('gotoResetPasswordPage req.params='+req.params);
-  logger.dir(req.params);
+  logger.info(req.params);
   let token = req.params.token
   res.type('html')
-  connection.query('SELECT email, resetPasswordTokenDateTime FROM ${accountTable} WHERE resetPasswordToken = ?', [token], function (error, results, fields) {
+  connectionPool.query('SELECT email, resetPasswordTokenDateTime FROM ${accountTable} WHERE resetPasswordToken = ?', [token], function (error, results, fields) {
     if (error || results.length !== 1) {
       let msg = "gotoResetPasswordPage failure for token '" + token + "'";
       logger.info(msg + ", error= ", error, 'results=', JSON.stringify(results));
@@ -354,11 +376,11 @@ exports.gotoResetPasswordPage = function(req, res, next) {
 
 exports.resetPassword = function(req, res, next) {
   logger.info('resetpassword req.body='+req.body);
-  logger.dir(req.body);
+  logger.info(req.body);
   const password = req.body.password;
   const token = req.body.token;
   logger.info('req.session.id='+req.session.id);
-  connection.query('SELECT email, resetPasswordTokenDateTime FROM ${accountTable} WHERE resetPasswordToken = ?', [token], function (error, results, fields) {
+  connectionPool.query('SELECT email, resetPasswordTokenDateTime FROM ${accountTable} WHERE resetPasswordToken = ?', [token], function (error, results, fields) {
     if (error || results.length !== 1) {
       logSendCE(res, 400, TOKEN_NOT_FOUND, "resetPassword select failure for token '" + token + "'");
     } else {
@@ -374,7 +396,7 @@ exports.resetPassword = function(req, res, next) {
         logSendCE(res, 400, TOKEN_EXPIRED, "resetPassword expired token for email '" + email + "'");
       } else {
         logger.info('now='+now+', email='+email)
-        connection.query('UPDATE ${accountTable} SET password = ?, resetPasswordToken = NULL, resetPasswordTokenDateTime = NULL, modified = ? WHERE email = ?', [password, now, email], function (error, results, fields) {
+        connectionPool.query('UPDATE ${accountTable} SET password = ?, resetPasswordToken = NULL, resetPasswordTokenDateTime = NULL, modified = ? WHERE email = ?', [password, now, email], function (error, results, fields) {
           logger.info('error='+error+", results= ", JSON.stringify(results));
           if (error) {
             logSendSE(res, error, "resetPassword update resetPasswordToken database failure for email '" + account.email + "'");

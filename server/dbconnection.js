@@ -2,10 +2,7 @@
 let mysql = require('mysql');
 
 /*
-FIXME Include explanation about how mysql on hosting provider
-goes away after five minutes, so we need to verify the connection
-before, each operation.
-Also, how db initialization works
+FIXME Include explanation about how db initialization works
 */
 
 let pool  = null;
@@ -76,7 +73,7 @@ function reconnect() {
         logger.info("before createPool ");
         try {
           pool  = mysql.createPool({
-            connectionLimit : 2,
+            connectionLimit : 5,
             host: global.config.DB_HOST,
             user: global.config.DB_USER,
             password: global.config.DB_PASSWORD,
@@ -103,7 +100,7 @@ function reconnect() {
         });
         innerResolve(pool);
 
-/*
+/*FIXME get rid of this code
         connection.on('error', function(err) {
           logger.error('mysql error: '+err.code);
           logger.error(JSON.stringify(err));
