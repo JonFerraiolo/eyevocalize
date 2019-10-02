@@ -1,4 +1,7 @@
 
+// FIXME rename to app.js
+
+import { startupChecks } from './startupChecks.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
@@ -147,7 +150,7 @@ export function updateMain(searchString) {
 	updateMainInProcess = false;
 };
 
-export function main() {
+function main() {
   let currentVersion = 4;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
@@ -156,6 +159,14 @@ export function main() {
   initializeFavorites(initializationProps);
 
 	updateMain();
+	/*FIXME change to quick tutorial
+	if (window.eyevocalizeUser === '') {
+		setTimeout(() => {
+			let props = { refNodeSelector: '.main' };
+			showLoginSignupPopup(props);
+		}, 0);
+	}
+	*/
 
 	document.addEventListener('keydown', e => {
 		let shift = e.getModifierState("Shift");
@@ -184,3 +195,7 @@ export function main() {
 	}, false);
 
 };
+
+startupChecks(() => {
+	main();
+}, () => {});

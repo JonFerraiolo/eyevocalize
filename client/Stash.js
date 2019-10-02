@@ -97,7 +97,7 @@ function slideInAddEntryToStashScreen(props) {
   let params = {
     renderFunc: EditPhrase,
     renderFuncParams: {
-      title: 'Add Entry to Noteboard',
+      title: 'Add Entry to Clipboard',
       doItButtonLabel: 'Add Entry',
       doItCallback: function(phrase) {
         // add phrase to Stash, go back to parent screen
@@ -134,7 +134,7 @@ export function updateStash(parentElement, props) {
       });
     });
   }
-  let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Noteboard", "StashTitleIcon");
+  let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Clipboard", "StashTitleIcon");
   let localUpdate = () => {
     render(html`
       <style>${css}</style>
@@ -220,8 +220,8 @@ export function editStash(parentElement, props) {
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
-        title: 'Add New Entry To Noteboard',
-        doItButtonLabel: 'Add to Noteboard',
+        title: 'Add New Entry To Clipboard',
+        doItButtonLabel: 'Add to Clipboard',
         doItCallback: function(phrase) {
           // add phrase to Stash, go back to parent screen
           addToStash(phrase);
@@ -247,7 +247,7 @@ export function editStash(parentElement, props) {
       renderFunc: EditPhrase,
       renderFuncParams: {
         phrase,
-        title: 'Edit Entry From Noteboard',
+        title: 'Edit Entry From Clipboard',
         doItButtonLabel: 'Update Entry',
         doItCallback: function(phrase) {
           // add phrase to Stash, go back to parent screen
@@ -374,7 +374,7 @@ export function editStash(parentElement, props) {
     <style>${css}</style>
     <div class="Stash editStash skinnyScreenParent">
       <div class=skinnyScreenChild>
-        ${buildSlideRightTitle("Manage Noteboard", onEditStashReturn)}
+        ${buildSlideRightTitle("Manage Clipboard", onEditStashReturn)}
         <div class=ScreenInstructions>
           (Click to select, control-click to toggle, shift-click for range)
         </div>

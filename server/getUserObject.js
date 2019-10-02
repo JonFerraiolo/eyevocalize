@@ -48,6 +48,7 @@ module.exports = function(email, alreadyHave) {
     });
     accountPromise.then(account => {
       userObject.account = account;
+      delete account.password;
       connection.query(`SELECT * FROM ${accountTable} WHERE userId = ?`, [account.id], function (error, results, fields) {
         if (error) {
           masterReject("getUserObject database failure for query progress for email '" + account.email + "'");

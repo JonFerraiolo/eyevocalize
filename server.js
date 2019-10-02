@@ -79,11 +79,53 @@ const authMiddleware = sessionMgmt.auth;
 // this call results in app.use with session middleware, which needs to be first in line
 sessionMgmt.init(app).then(() => {
 
+  logger.info('server.js sessionMgmt.init successful return');
   app.use(express.static('client'));
   app.use(bodyParser.urlencoded({ extended: true })); // for uploading files
   app.use(bodyParser.json());
-  app.get('/', (req, res) => res.sendFile(rootDir+'/client/app.html'));
+  app.use(function(req, res, next) { // strip trailing slash from path and redirect
+    if (req.path.substr(-1) == '/' && req.path.length > 1) {
+      let query = req.url.slice(req.path.length);
+      res.redirect(301, req.path.slice(0, -1) + query);
+    } else {
+      next();
+    }
+  });
+  app.get('/', (req, res) => res.sendFile(rootDir+'/index.html'));
+  app.get(['/signup','/login','/activate','/forgot','/reset'], (req, res) => res.sendFile(rootDir+'/session.html'));
+  app.get(['/TermsOfUse','/PrivacyPolicy','/Cookies'], (req, res) => {
+    fs.readFile(rootDir+'/legal.html', (err, html) => {
+      if (err) { logSendSE(res, err, 'could not load '+req.path+' (html)'); }
+      else {
+        fs.readFile(rootDir+'/md'+req.path+'.md', (err, markdown) => {
+          if (err) { logSendSE(res, err, 'could not load '+req.path+' (md)'); }
+          else {
+            const s = html.toString().replace('((EVMARKDOWN))', markdown.toString());
+            res.send(s);
+          }
+        });
+      }
+    });
+  });
+  app.get('/app', (req, res) => {
+    fs.readFile(rootDir+'/app.html', (err, data) => {
+      if (err) { logSendSE(res, err, 'app.html'); }
+      else {
+        const email = (req.session && req.session.user && req.session.user.email) || '';
+        const s = data.toString().replace('((EVUSER))', email);
+        res.send(s);
+      }
+    });
+  });
+  logger.info('server.js before setting up /api');
+  global.apiBasePath = '/api';
+  global.appUrl = global.config.BASE_URL + '/app';
+  logger.info('server.js before setting up /signup');
   app.post('/api/signup', sessionRoutes.signup)
+  app.post('/api/login', sessionRoutes.login)
+  app.post('/api/resendverification', sessionRoutes.resendVerificationEmail);
+  logger.info('server.js before setting up /api/verifyaccount');
+  app.get('/api/verifyaccount/:token', sessionRoutes.verifyAccount)
 
   app.listen(port, () => logger.info(`App listening on port ${port}!`));
 

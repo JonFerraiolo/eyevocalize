@@ -6,9 +6,11 @@ const dbconnection = require('./dbconnection');
 module.exports = {
   init: function(app) {
     const logger = global.logger;
-
+    logger.info('sessionMgmt.init entered');
     return new Promise((resolve, reject) => {
+      logger.info('sessionMgmt.init before calling dbReady');
       dbconnection.dbReady().then(connectionPool => {
+        logger.info('sessionMgmt.init dbReady then return ok');
         let options = {
           checkExpirationInterval: 60*60*1000,// How frequently expired sessions will be cleared; milliseconds.
           expiration: 24*60*60*1000,// The maximum age of a valid session; milliseconds.
@@ -17,7 +19,9 @@ module.exports = {
           keepAliveInterval: 60*60*1000,// How frequently keep-alive pings will be sent; milliseconds
         };
         try {
+          logger.info('sessionMgmt.init before getting sessionStore');
           let sessionStore = new MySQLStore(options, connectionPool);
+          logger.info('sessionMgmt.init after getting sessionStore');
           app.use(session({
               cookie: { secure: false , maxAge:24*60*60*1000 }, // FIXME secure:true once https
               proxy: true,
@@ -26,6 +30,7 @@ module.exports = {
               resave: false,
               saveUninitialized: false
           }));
+          logger.info('sessionMgmt.init after app.use');
           resolve();
         } catch(e) {
           logger.error('setting store error');

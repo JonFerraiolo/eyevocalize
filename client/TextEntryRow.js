@@ -182,10 +182,10 @@ export function updateTextEntryRow(parentElement, props) {
         ><span class=TextEntryIconBlock
           ><button class="TextEntryIcon TextEntrySpeak" @click=${onSpeak}
             title='Vocalize the words in the text entry box using speech synthesis'></button
-          ><button class="TextEntryIcon TextEntryStash" @click=${onStash}
-            title='Save these words in the "Stash", the storage area for things you might need to say soon'></button
           ><button class="TextEntryIcon TextEntryAddFavorite" @click=${onAddFavorite}
             title='Save these words as a new favorite'></button
+          ><button class="TextEntryIcon TextEntryStash" @click=${onStash}
+            title='Save these words in the "Clipboard", the storage area for things you might need to say soon'></button
           ><button class="TextEntryIcon TextEntrySearch" @click=${search}
             title='Filter the stash, the history and your favorites using the search words typed into the text entry box'></button
         ></span

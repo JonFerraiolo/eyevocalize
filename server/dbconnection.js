@@ -16,11 +16,14 @@ const dbReady = function() {
       let initializeCounter = 0;
       let check = (() => {
         if (dbInitialized) {
+          logger.info('dbconnection.init initialize promise resolved');
           resolve();
         } else {
           if (initializeCounter >= 5) {
+            logger.error('dbconnection.init initialize promise rejected after 5 tries');
             reject();
           } else {
+            logger.info('dbconnection.init initialize promise incrementing counter');
             initializeCounter++;
             setTimeout(() => {
               check();
@@ -31,8 +34,13 @@ const dbReady = function() {
       check();
     });
     return Promise.all([connectionPromise, initializePromise]).then(function(values) {
-      outerResolve(pool );
+      logger.info('dbconnection.init outer promise resolved');
+      outerResolve(pool);
     }, () => {
+      logger.error('dbconnection.init outer promise rejected');
+      outerReject();
+    }).catch(e => {
+      logger.error('dbconnection.init outer promise catch. e='+JSON.stringify(e));
       outerReject();
     });
   });
@@ -52,7 +60,10 @@ const getConnection = function() {
         logger.info("getConnection reconnect has returned a new connection");
         resolve(pool);
       }, () => {
-        logger.error("getConnection reconnect failed");
+        logger.error("getConnection reconnect rejected");
+        reject();
+      }).catch(e => {
+        logger.error("getConnection reconnect catch e="+JSON.stringify(e));
         reject();
       });
     }
@@ -139,11 +150,16 @@ function reconnect() {
       });
     }
     inner().then(() => {
+      logger.info('reconnect inner promise resolved');
       outerResolve(pool);
     }, finishOuter => {
+      logger.info('reconnect inner promise rejected. finishOuter='+finishOuter);
       if (finishOuter) {
         outerReject();
       }
+    }).catch(e => {
+      logger.error('reconnect inner promise catch e='+JSON.stringify(e));
+      outerReject();
     });
   });
 }

@@ -1,6 +1,105 @@
 
+ResendAccountVerification - don't do this
+/forgotpassword 
+/resetpassword:token is where you go after clicking link in email
+/accountverified:token, after clicking link in Signup email, with button to go to /app
+
+/signup
+Sign up for EyeVocalize.com
+Email []
+Password [] Show password
+By clicking Sign Up below, you are agreeing to the [Terms of Use].
+[ Sign Up ]
+Already registered? Then [ Login ]
+
+======
+
+/login
+Email []
+Password [] Show password
+[ Login ]
+Not yet registered? Then [ Sign Up ]
+Forgot password
+
+======
+
+/forgotpassword
+Email []
+[ Reset password  ]
+Return to login
+
+======
+
+/app when window.eyevocalizeUser==''
+Try it experience
+
+Application always comes up with draggable popup in top middle that says:
+
+Thanks for trying the EyeVocalize app.
+
+drag bar with title, Quick tutorial, close icon on right
+[Help topics] [Prev] [Next] [dblleft] left right dblright dblup up down  dbldown
+* to say something, type text into the composition box at the top, then press Return or
+click the Speak icon (show icon)
+* to use one of the built-in Favorites, simply click on one and the computer will speak
+* to add your own favorite, type text into the composition box and press the add favorite icon
+(show icon)
+* to prepare some text to Vocalize later type text into the composition box and click the
+Add to Clipboard icon (show icon)
+* to choose a different voice or change speaking speed, click the Settings icon (show icon)
+You can close this help screen by pressing the X at the top right.
+You can move this box by dragging the title bar or pressing one of the arrow icons.
+To continue onto the next help topic, press Next.
+
+The account icon is replaced by a Trial user / Signup now button
+
+======
+
+/
+Landing page, full page
+
+pictures of me using the eye gaze system in the background
+
+logo on left, EyeVocalize.com To get started, go to [ Login ] [ Sign Up ] [ Try It ]
+
+Welcome to EyeVocalize.com!
+
+This website is a free, public version of a Web application that I wrote for myself
+so that I can participate in conversations and communicate my needs
+using only my eye, despite the fact that I have advanced ALS.
+
+Only a few people will find this application useful. If you, like me, are:
+* Paralyzed in your arms and hands
+* Unable to talk
+* Proficient in using [eye gaze technology], particularly the
+[Tobii PC Eye Mini]
+
+You run EyeVocalize in a browser tab,
+which allows you to quickly switch between speech synthesis (using EyeVocalize)
+other browser tabs (eg, web mail, search, calendar, chat, document authoring)
+and other desktop applications (which for me is mostly programming tools).
+
+EyeVocalize features:
+* you can type text, then press Return (or click the speak icon) to cause the words to be spoken
+using voice synthesis
+* a built-in library of common expressions, such as yes, no,
+thank you, toilet please, etc.
+* you can define your own favorites for phrases that you use repeatedly
+* you can prepare text in advance and
+store on the Clipboard for one-click speaking at just the right time
+* for fun, you can play Web audio clips or YouTube clips, such as
+"Houston, we have a problem"
+
+To explore, press the Try It button at the top of this window.
+To sign up as a member of EyeVocalize.com, which unlocks
+[cross-device syncing] and allows you to [contribute] to making the
+application better, press the Sign Up button.
+
+======
+
 if not a session, take to login screen or sign up screen, depending on cookie
 
+If you just want to explore the application, simply
 Login
   email
   password
