@@ -45,7 +45,7 @@ exports.signup = function(req, res, next) {
              if (error) {
                logger.error('DELETE failed after sendMail failure. error='+error)
              }
-             res.send(500, { msg, error: UNSPECIFIED_SYSTEM_ERROR })
+             res.send(500, { msg: 'Send email verification error', error: UNSPECIFIED_SYSTEM_ERROR })
            });
          } else {
             let payload = { account: { email: account.email, modified: account.modified }};

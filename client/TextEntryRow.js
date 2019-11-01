@@ -161,13 +161,6 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onUser = e => {
     e.preventDefault();
-    fetch('/api/signup', {
-      method: 'POST',
-      body: JSON.stringify({email:'111',password:'222'}),
-      headers: { 'Content-Type': 'application/json' }
-    })
-    .then(res => res.json())
-    .then(res => console.log('res='+res));
     TextEntryRowSetFocus();
   }
   let localUpdate = () => {

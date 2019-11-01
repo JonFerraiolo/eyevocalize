@@ -126,6 +126,7 @@ sessionMgmt.init(app).then(() => {
   app.post('/api/resendverification', sessionRoutes.resendVerificationEmail);
   logger.info('server.js before setting up /api/verifyaccount');
   app.get('/api/verifyaccount/:token', sessionRoutes.verifyAccount)
+  app.get('/*', (req, res) => res.sendFile(rootDir+'/index.html'));  
 
   app.listen(port, () => logger.info(`App listening on port ${port}!`));
 
