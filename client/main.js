@@ -2,6 +2,7 @@
 // FIXME rename to app.js
 
 import { startupChecks } from './startupChecks.js';
+import { popupShowing } from './popup.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
@@ -193,6 +194,21 @@ function main() {
       // just pass through to default processing, which will add the character
     }
 	}, false);
+
+	document.addEventListener('focusout', e => {
+		if (mainShowing && !popupShowing() && !e.relatedTarget) {
+			event.preventDefault();
+			TextEntryRowSetFocus();
+		}
+	}, false);
+	document.addEventListener('visibilitychange', e => {
+		if (!document.hidden) {
+			if (mainShowing && !popupShowing()) {
+				TextEntryRowSetFocus();
+			}
+		}
+	}, false);
+
 
 };
 

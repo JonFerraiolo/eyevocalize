@@ -3,7 +3,9 @@ import { playYoutubeVideo } from './youtube.js' ;
 import { addToHistory } from './History.js' ;
 import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { getVoice, getVolume, getRate, getPitch } from './Settings.js';
+import { showPopup, hidePopup } from './popup.js';
 import { updateMain, isChrome } from './main.js';
+import { html, render } from './lib/lit-html/lit-html.js';
 
 // Add text to the voice synthesis queue
 export function speak(text) {
@@ -25,6 +27,11 @@ export function speak(text) {
 			TextEntryRowSetText('');
 			addToHistory({ type: 'text', text, timestamp: Date.now() });
       updateMain();
+			vocalizePopup('Now vocalizing:', text, () => {
+				window.speechSynthesis.cancel();
+			}, () => {
+				return window.speechSynthesis.pending || window.speechSynthesis.speaking;
+			});
 		}
 	}
 };
@@ -38,6 +45,11 @@ export function playAudio(phrase) {
 		TextEntryRowSetText('');
 		addToHistory(Object.assign({}, phrase, { timestamp: Date.now() }));
     updateMain();
+		vocalizePopup('Playing Web audio:', phrase.label || '', () => {
+			audio.pause();
+		}, () => {
+			return !audio.paused && !audio.ended;
+		});
 	}
 };
 
@@ -45,3 +57,29 @@ export function playAudio(phrase) {
 export function playYoutube(phrase) {
 	playYoutubeVideo(phrase);
 };
+
+function vocalizePopup(title, content, cancelCB, inProcessCB) {
+	let params = {
+		content: html`<div class=Vocalize>
+				<div class=VocalizeTitle>${title}</div>
+				<div class=VocalizeContent>${content}</div>
+			</div>`,
+		refNode: document.querySelector('.main'),
+		hideCallback: () => {
+			if (popupUp) {
+				cancelCB();
+				render(html``, popupRootElement);
+				popupUp = false;
+			}
+			updateMain();
+		}
+	};
+	let popupUp = true;
+	let popupRootElement = showPopup(params);
+	let interval = setInterval(function () {
+		if (!popupUp || !inProcessCB()) {
+			clearInterval(interval);
+			hidePopup();
+		}
+	}, 10);
+}

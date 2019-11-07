@@ -231,3 +231,19 @@ button,input,textarea,select {
   flex: 1;
   font-size: 95%;
 }
+.Vocalize {
+  padding: 1.5em;
+  font-size: 0.9em;
+  background: white;
+  border: 1px solid black;
+  max-width: 400px;
+  min-width: 25em;
+  max-height: 400px;
+  overflow: auto;
+  text-align: left;
+}
+.VocalizeTitle {
+  font-size: 0.95em;
+  font-style: italic;
+  margin-bottom: 0.5em;
+}

@@ -2,6 +2,7 @@
 import { html, render } from './lib/lit-html/lit-html.js';
 
 let popupUnderlay, popupOverlay, hideCallback;
+let popupIsShowing = false;
 
 /**
  * Show a popup.
@@ -105,14 +106,20 @@ export function showPopup(params) {
 		popupOverlay.style.top = y + 'px';
 		popupOverlay.style.opacity = 1;
 	}, 0);
+  popupIsShowing = true;
 	return popupOverlay;
 }
 
 export function hidePopup(hideCallbackParams) {
+  popupIsShowing = false;
 	popupUnderlay.style.display = 'none';
 	popupOverlay.style.display = 'none';
 	if (hideCallback) {
 		hideCallback(hideCallbackParams);
 		hideCallback = null;
 	}
+}
+
+export function popupShowing() {
+  return popupIsShowing;
 }
