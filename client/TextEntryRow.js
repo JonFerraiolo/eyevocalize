@@ -5,6 +5,7 @@ import { slideInAddFavoriteScreen } from './Favorites.js';
 import { search, clear, getAppMinOrMax, setAppMinOrMax } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
 import { slideInAddSettingsScreen } from './Settings.js';
+import { toggleHelp } from './help.js';
 import { html, render } from './lib/lit-html/lit-html.js';
 
 let css = `
@@ -156,7 +157,7 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onHelp = e => {
     e.preventDefault();
-    debugger;
+    toggleHelp('welcome');;
     TextEntryRowSetFocus();
   }
   let onUser = e => {
@@ -165,7 +166,7 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let localUpdate = () => {
     render(html`
-    <style>${css} </style>
+    <style>${css}</style>
     <div class=TextEntryRow>
       <label class=TextEntryLabel for=TextEntryRowTextArea>Compose:</label
       ><textarea id=TextEntryRowTextArea>${text}</textarea

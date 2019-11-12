@@ -2,6 +2,7 @@
 // FIXME rename to app.js
 
 import { startupChecks } from './startupChecks.js';
+import { helpShowing } from './help.js';
 import { popupShowing } from './popup.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize } from './Settings.js';
@@ -135,6 +136,7 @@ export function updateMain(searchString) {
 		        <div class=secondlevelleft></div>
 		        <div class=secondlevelright></div>
 		      </div>
+					<div class=Help style=${styleMap({display: helpShowing() ? 'block' : 'none'})}></div>
 		    </div>
 			</div>
 			<div class=appinitiallyblank>

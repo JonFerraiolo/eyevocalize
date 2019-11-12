@@ -1,67 +1,172 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
+import { unsafeHTML } from './lib/lit-html/directives/unsafe-html.js';
+import { markedLoadedPromise } from './startupChecks.js';
 import { showPopup, hidePopup } from './popup.js';
+import { mainAppPercentWhenSmall } from './Settings.js';
+import { welcome } from './help/welcome.js';
+
+const helpPages = {
+  welcome
+};
 
 let css = `
+.Help {
+  background: white;
+  position: fixed;
+  z-index: 411;
+  border: 1px solid black;
+  font-size: 0.85em;
+  top: 0px;
+  left: 0px;
+  width: 30%;
+  height: 30%;
+  text-align: left;
+}
+.HelpHeader {
+  z-index: 412;
+  font-weight: bold;
+  text-align: center;
+  background: #bbb;
+  border-bottom: 1px solid #555;
+  height: 1.5em;
+  line-height: 1.5em;
+  vertical-align: middle;
+}
+.HelpContent {
+  font-size: 0.9em;
+}
+.HelpHeaderIcon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-size: 0.75em 0.75em;
+  background-image: url('./images/helpicon.svg');
+  background-position: 50% 95%;
+  background-repeat: no-repeat;
+  margin: 0 0.1em 0 0;
+}
+.HelpHeaderClose {
+  float: right;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  background-size: 1em 1em;
+  background-image: url('./images/close.svg');
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  margin: 0 0.1em 0 0;
+  cursor: pointer;
+}
 `;
-/*
-export function showHelpPopup(props) {
-  let { refNodeSelector } = props;
-  let params = {
-    //content: FavoritesChooseCategoryDialog,
-    content: dialog(),
-    refNode: document.querySelector(refNodeSelector),
-    clickAwayToClose: false,
-    underlayOpacity: 0.85,
-    hideCallback: hideCallbackParams => {
-      render(html``, popupRootElement);
-      //buildChooseCategoryControl(hideCallbackParams.parentElement, hideCallbackParams);
-    },
+
+let oldClientX, oldClientY;
+let showingHelp = false;
+
+function showHelp(topic) {
+  const helpDiv = document.querySelector('.Help');
+  if (!helpDiv) return;
+  showingHelp = true;
+  let onClose = e => {
+    e.preventDefault();
+    hideHelp();
   };
-  console.dir(params);
-  let popupRootElement = showPopup(params);
+  let dragMouseDown = e => {
+    e.preventDefault();
+    oldClientX = e.clientX;
+    oldClientY = e.clientY;
+    document.addEventListener('mousemove', dragElement, false);
+    document.addEventListener('mouseup', closeDragElement, false);
+  };
+  let content = helpPages[topic] || '';
+  render(html`
+    <style>${css}</style>
+    <div class=HelpHeader @mousedown=${dragMouseDown}>
+      <span class=HelpHeaderIcon></span>Help
+      <span class=HelpHeaderClose @click=${onClose}></span>
+    </div>
+    <div class=HelpContent></div>
+  `, helpDiv);
+  helpDiv.style.visibility = 'hidden';
+  helpDiv.style.display = 'block';
+  markedLoadedPromise.then(() => {
+    render(html`${unsafeHTML(marked(content))}`, helpDiv.querySelector('.HelpContent'));
+    setTimeout(() => {
+      // setTimeout to allow browser to lay out the help content so that everything has a size
+      let bounds = helpDiv.getBoundingClientRect();
+      let left = Math.max((window.innerWidth - bounds.width) / 2, 0);
+      let topSection = mainAppPercentWhenSmall() / 100;
+      let top = Math.max((window.innerHeight*topSection - bounds.height) / 2, 0); // force to top part
+      helpDiv.style.left = left + 'px';
+      helpDiv.style.top = top + 'px';
+      helpDiv.style.visibility = 'visible';
+    })
+  }).catch(e => {
+    console.error('failure loading marked.js. e='+e);
+  });
 }
 
-let dialog = () => {
-  let localStorageEmail = localStorage.getItem('email');
-  if (localStorageEmail) {
-    return loginDialog();
+function hideHelp() {
+  showingHelp = false;
+  const helpDiv = document.querySelector('.Help');
+  if (!helpDiv) return;
+  helpDiv.style.display = 'none';
+}
+
+export function toggleHelp(topic) {
+  const helpDiv = document.querySelector('.Help');
+  if (!helpDiv) return;
+  if (helpDiv.style.display === 'none') {
+    showHelp(topic);
   } else {
-    return signupDialog();
+    hideHelp();
+  }
+}
+
+export function helpShowing() {
+  return showingHelp;
+}
+
+let dragElement = e => {
+  e.preventDefault();
+  const helpDiv = document.querySelector('.Help');
+  if (!helpDiv) return;
+  let deltaX = oldClientX - e.clientX;
+  let deltaY = oldClientY - e.clientY;
+  oldClientX = e.clientX;
+  oldClientY = e.clientY;
+  helpDiv.style.top = (helpDiv.offsetTop - deltaY) + "px";
+  helpDiv.style.left = (helpDiv.offsetLeft - deltaX) + "px";
+}
+
+let closeDragElement = e => {
+  document.removeEventListener('mousemove', dragElement, false);
+  document.removeEventListener('mouseup', closeDragElement, false);
+  let minVisibleX = 75;
+  let minVisibleY = 35;
+  const helpDiv = document.querySelector('.Help');
+  if (!helpDiv) return;
+  let bounds = helpDiv.getBoundingClientRect();
+  let { left, right, top, bottom, width, height } = bounds;
+  let anyChanges = false;
+  if (right < minVisibleX) {
+    left = minVisibleX - width;
+    anyChanges = true;
+  }
+  if (left > window.innerWidth - minVisibleX) {
+    left = window.innerWidth - minVisibleX;
+    anyChanges = true;
+  }
+  if (top > window.innerHeight - minVisibleY) {
+    top = window.innerHeight - minVisibleY;
+    anyChanges = true;
+  }
+  if (top < 0) {
+    top = 0;
+    anyChanges = true;
+  }
+  if (anyChanges) {
+    helpDiv.style.left = left + 'px';
+    helpDiv.style.top = top + 'px';
   }
 };
-
-let loginDialog = () => {
-  return html`<style>h1 {background:yellow;color:red;}</style><h1>Login</h1>`;
-};
-
-let signupDialog = () => {
-  let onClickSignup = e => {
-    e.preventDefault();
-    hidePopup();
-  };
-  let onClickShowPassword = e => {
-    e.preventDefault();
-  };
-  let showHideText = 'show password';
-  return html`
-    <style>${css}</style>
-    <div class=Help>
-      <div class=HelpTitle>Signup</div>
-      <div class=HelpData>
-      <div class="gridlayout HelpAppearance">
-        <label for="email">Email</label>
-        <input type="email" name="username" id="email" placeholder="Enter email" autofocus=""></input>
-        <label for="email">Password</label>
-        <span class=HelpPasswordSpan>
-          <input type="password" name="password" id="password" placeholder="Enter password"></input>
-          <a @click=${onClickShowPassword} href="" title="show/hide password">${showHideText}</a>
-        </span>
-      </div>
-      <div class=HelpButtonRow>
-        <button @click=${onClickSignup}>Sign Up</button>
-      </div>
-    </div>
-  `;
-};
-*/

@@ -1,6 +1,10 @@
+help
+  permanent div that floats above with absolute position but variable size
+  and is movable
 
+  
 ResendAccountVerification - don't do this
-/forgotpassword 
+/forgotpassword
 /resetpassword:token is where you go after clicking link in email
 /accountverified:token, after clicking link in Signup email, with button to go to /app
 

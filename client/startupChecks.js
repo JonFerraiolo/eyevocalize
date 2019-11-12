@@ -4,6 +4,15 @@ import { html, render } from './lib/lit-html/lit-html.js';
 let css = `
 `;
 
+export const markedLoadedPromise = new Promise((resolve, reject) => {
+  let elem = document.createElement('script');
+  elem.setAttribute('src', 'lib/marked.js');
+  elem.addEventListener('load', e => {
+    resolve();
+  }, false);
+  document.head.appendChild(elem);
+});
+
 /**
  * Called at the very beginning of each distinct HTML endpoint
  * to do redirect to https if necessary and to
@@ -17,7 +26,7 @@ export function startupChecks(successCB, failureCB) {
   }
 
   if ('speechSynthesis' in window) {
-  	successCB();
+    successCB();
 
   } else {
   	render(html`
