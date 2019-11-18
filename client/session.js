@@ -46,6 +46,9 @@ html {
 }
 .LoginSignupButtonRow {
   padding: 1em;
+  text-align: center;
+  margin-top: 1em;'
+
 }
 .LoginSignupData {
   width: fit-content;
@@ -71,10 +74,6 @@ html {
 .LoginSignupBottomMessage {
   margin-top: 2em;
   font-size: 85%;
-}
-.LoginSignupButtonRow {
-  text-align: center;
-  margin-top: 1em;'
 }
 .LoginSignupGoElsewhere {
   margin: 1em 0 1em;
@@ -147,9 +146,9 @@ const Signup = () => {
     localUpdate();
   };
   let onInput = e => {
-    enableDisable();
+    enableDisableLogin();
   };
-  let enableDisable = () => {
+  let enableDisableLogin = () => {
     let email = document.getElementById('email');
     let password = document.getElementById('password');
     let SignupButton = document.getElementById('SignupButton');
@@ -161,7 +160,7 @@ const Signup = () => {
   let successEmail = null;
   let localUpdate = () => {
     let mainBody;
-    if (successEmail) {
+    if (successEmail !== null) {
       mainBody = html`
         <div class=LoginSignupSuccess>
           <div>Thank you for filling out the Sign Up form.</div>
@@ -170,7 +169,7 @@ const Signup = () => {
           After you click on the link in the email, you will be fully registered.</div>
         </div>
       `;
-    } else if (errorMessage) {
+    } else if (errorMessage !== null) {
       mainBody = html`
         <div class=LoginSignupErrorMessage>${errorMessage}</div>
         <div class=LoginSignupErrorReturn>Return to
@@ -184,7 +183,7 @@ const Signup = () => {
           <div class="gridlayout LoginSignupAppearance">
             <label for="email">Email</label>
             <input type="email" id="email" @input=${onInput} required placeholder="Enter email" autofocus="" autocomplete=email></input>
-            <label for="email">Password</label>
+            <label for="password">Password</label>
             <span class=LoginSignupPasswordSpan>
               <input type=${passwordType} id=password @input=${onInput} required placeholder="Enter password"></input>
               <a @click=${onClickShowPassword} href="" title="show/hide password">
@@ -221,7 +220,7 @@ const Signup = () => {
   };
   localUpdate();
   setTimeout(() => {
-    enableDisable();
+    enableDisableLogin();
   },  1000); // delay to allow browser to do autocomplete
 };
 
@@ -282,10 +281,13 @@ const Login = () => {
   };
   let onClickReturn = e => {
     e.preventDefault();
-    errorMessage = null;
-    resendSuccessEmail = null;
-    notVerifiedEmail = null;
-    loginMessage = '';
+    resetInitialState();
+    localUpdate();
+  };
+  let onClickForgotPassword = e => {
+    e.preventDefault();
+    resetInitialState();
+    forgotPasswordEmail = document.getElementById('email').value;
     localUpdate();
   };
   let onClickResendVerification = e => {
@@ -307,38 +309,118 @@ const Login = () => {
           loginMessage = '';
           localUpdate();
         });
+      } else if (resp.status === 401) {
+        resp.json().then(data => {
+          console.log('resendverification fetch 401 return data=');
+          console.dir(data);
+          let email = document.getElementById('email').value;
+          if (data.error === EMAIL_NOT_REGISTERED) {
+            errorMessage = `*** Error: '${email}' not registered ***`;
+          } else {
+            resetInitialState();
+            errorMessage = `Very sorry. Something unexpected went wrong(resendverification 401-1). Perhaps try again. `;
+          }
+          localUpdate();
+        }).catch(e => {
+          resetInitialState();
+          errorMessage = `Very sorry. Something unexpected went wrong (resendverification 401-2). Perhaps try again. `;
+        });
+        localUpdate();
       } else {
         console.error('resendverification fetch bad status='+resp.status);
+        resetInitialState();
         errorMessage = `Very sorry. Something unexpected went wrong (resendverification). Perhaps try again. `;
-        resendSuccessEmail = null;
-        notVerifiedEmail = null;
-        loginMessage = '';
         localUpdate();
       }
     }).catch(e => {
       console.error('resendverification fetch error e='+e);
     });
   };
-  let onInput = e => {
-    enableDisable();
+  let onClickForgotSendEmail = e => {
+    e.preventDefault();
+    let emailValue = document.getElementById('email').value;
+    let fetchPostOptions = JSON.parse(JSON.stringify(fetchPostOptionsTemplate));
+    let credentials = {
+      email: emailValue,
+    };
+    fetchPostOptions.body = JSON.stringify(credentials);
+    fetch('/api/sendresetpassword', fetchPostOptions).then(resp => {
+      console.log('status='+resp.status);
+      if (resp.status === 200) {
+        resp.json().then(data => {
+          console.log('sendresetpassword fetch return data=');
+          console.dir(data);
+          resetInitialState();
+          sendResetSuccessEmail = emailValue;
+          localUpdate();
+        });
+      } else if (resp.status === 401) {
+        resp.json().then(data => {
+          console.log('sendresetpassword fetch 401 return data=');
+          console.dir(data);
+          if (data.error === EMAIL_NOT_REGISTERED) {
+            forgotPasswordMessage = `*** Error: '${emailValue}' not registered ***`;
+          } else {
+            resetInitialState();
+            errorMessage = `Very sorry. Something unexpected went wrong(sendresetpassword 401-1). Perhaps try again. `;
+          }
+          localUpdate();
+        }).catch(e => {
+          resetInitialState();
+          errorMessage = `Very sorry. Something unexpected went wrong (sendresetpassword 401-2). Perhaps try again. `;
+        });
+        localUpdate();
+      } else {
+        console.error('resendverification fetch bad status='+resp.status);
+        resetInitialState();
+        errorMessage = `Very sorry. Something unexpected went wrong (sendresetpassword). Perhaps try again. `;
+        localUpdate();
+      }
+    }).catch(e => {
+      console.error('sendresetpassword fetch error e='+e);
+    });
   };
-  let enableDisable = () => {
+  let onInput = e => {
+    enableDisableLogin();
+  };
+  let onInputForgotPassword = e => {
+    enableDisableForgotPassword();
+  };
+  let enableDisableLogin = () => {
     let email = document.getElementById('email');
     let password = document.getElementById('password');
     let LoginButton = document.getElementById('LoginButton');
+    if (!email || !password || !LoginButton) return;
     LoginButton.disabled  = !(email.validity.valid && password.value.length > 0);
   };
+  let enableDisableForgotPassword = () => {
+    let email = document.getElementById('email');
+    let ForgotSendEmailButton = document.getElementById('ForgotSendEmailButton');
+    if (!email || !ForgotSendEmailButton) return;
+    ForgotSendEmailButton.disabled  = !email.validity.valid;
+  };
   let passwordType = 'password';
-  let errorMessage = null;
-  let notVerifiedEmail = null;
-  let resendSuccessEmail = null;
-  let loginMessage = '';
+  let errorMessage, notVerifiedEmail, resendSuccessEmail, sendResetSuccessEmail,
+    loginMessage, resendVerificationMessage, forgotPasswordMessage, forgotPasswordEmail ;
+  let resetInitialState = (() => {
+    errorMessage = null;
+    notVerifiedEmail = null;
+    resendSuccessEmail = null;
+    sendResetSuccessEmail = null;
+    loginMessage = '';
+    forgotPasswordMessage = '';
+    forgotPasswordEmail = null;
+  });
+  resetInitialState();
+  let loginTitle = 'You are logging into EyeVocalize.com';
+  let forgotPasswordTitle = 'Forgot password for EyeVocalize.com';
   let localUpdate = () => {
-    let mainBody;
-    if (notVerifiedEmail) {
+    let mainBody, title;
+    if (notVerifiedEmail !== null) {
+      title = loginTitle;
       mainBody = html`
         <div class=LoginSignupResend>
-          <div class=LoginSignResendErrorMessage>${`*** Error: '${notVerifiedEmail}' registered, but not yet verified ***`}/div>
+          <div class=LoginSignResendErrorMessage>${`*** Error: '${notVerifiedEmail}' registered, but not yet verified ***`}</div>
           <div class=LoginSignupToComplete>To complete the Sign Up / Registration process,
           you need to click on the account verification link found in the email you should have
           received from EyeVocalize.com.</div>
@@ -349,7 +431,8 @@ const Login = () => {
           </div>
         </div>
       `;
-    } else if (resendSuccessEmail) {
+    } else if (resendSuccessEmail !== null) {
+      title = loginTitle;
       mainBody = html`
         <div class=LoginSignupSuccess>
           <div>Another account verification email has been sent to ${resendSuccessEmail}</div>
@@ -363,21 +446,54 @@ const Login = () => {
 
         </div>
       `;
-    } else if (errorMessage) {
+    } else if (errorMessage !== null) {
+      title = loginTitle;
       mainBody = html`
         <div class=LoginSignupErrorMessage>${errorMessage}</div>
         <div class=LoginSignupErrorReturn>To return to the login form, please click
           <a href="" @click=${onClickReturn} title="return to login form">here</a>.
         </div>
       `;
+    } else if (forgotPasswordEmail !== null) {
+      title = forgotPasswordTitle;
+      mainBody = html`
+      <div class=LoginSignupErrorMessage>${forgotPasswordMessage}</div>
+      <div class=LoginSignupData>
+        <div class="gridlayout LoginSignupAppearance">
+          <label for="email">Email</label>
+          <input type="email" id="email" @input=${onInputForgotPassword} required placeholder="Enter email" autofocus="" autocomplete=email></input>
+        </div>
+        <div class=LoginSignupButtonRow>
+          <button @click=${onClickForgotSendEmail} id=ForgotSendEmailButton>Create new password</button>
+        </div>
+        <div class=LoginSignupErrorReturn>To return to the login form, please click
+          <a href="" @click=${onClickReturn} title="return to login form">here</a>.
+        </div>
+      `;
+    } else if (sendResetSuccessEmail !== null) {
+      title = forgotPasswordTitle;
+      mainBody = html`
+        <div class=LoginSignupSuccess>
+          <div>A reset password email has been sent to ${sendResetSuccessEmail}</div>
+          <div class=LoginSignupToComplete>To reset your password,
+          go to your email and look for an email from EyeVocalize.com.
+          After you click on the link in the email, you will be able to create a new password.
+          (Note that if you find multiple reset password emails, only the last one sent will work.)</div>
+          <div class=LoginSignupErrorReturn>To return to the login form, please click
+            <a href="" @click=${onClickReturn} title="return to login form">here</a>.
+          </div>
+
+        </div>
+      `;
     } else {
+      title = loginTitle;
       mainBody = html`
         <div class=LoginSignupErrorMessage>${loginMessage}</div>
         <div class=LoginSignupData>
           <div class="gridlayout LoginSignupAppearance">
             <label for="email">Email</label>
             <input type="email" id="email" @input=${onInput} required placeholder="Enter email" autofocus="" autocomplete=email></input>
-            <label for="email">Password</label>
+            <label for="password">Password</label>
             <span class=LoginSignupPasswordSpan>
               <input type=${passwordType} id=password @input=${onInput} required placeholder="Enter password"></input>
               <a @click=${onClickShowPassword} href="" title="show/hide password">
@@ -389,6 +505,9 @@ const Login = () => {
             <button @click=${onClickLogin} id=LoginButton>Login</button>
           </div>
           <div class=LoginSignupGoElsewhere>
+            <a href="/forgotpassword" title="forgot password" @click=${onClickForgotPassword}>Forgot password?</a>
+          </div>
+          <div class=LoginSignupGoElsewhere>
             Not yet registered? Then,
             <a href="/signup" title="go to login page">sign up</a>
           </div>
@@ -398,8 +517,120 @@ const Login = () => {
     render(html`
       <style>${css}</style>
       <div class=LoginSignup>
+        <div class=LoginSignupTitle>${title}<span class=logo></span></div>
+        ${mainBody}
+      </div>
+    `, document.body);
+    setTimeout(() => {
+      enableDisableLogin();
+      enableDisableForgotPassword();
+    },  1000); // delay to allow browser to do autocomplete
+  };
+  localUpdate();
+};
+
+const ResetPassword = () => {
+  let params = (new URL(window.location)).searchParams;
+  let token = params.get('t');
+  let onClickResetPassword = e => {
+    e.preventDefault();
+    let password = document.getElementById('password');
+    let ResetPasswordButton = document.getElementById('ResetPasswordButton');
+    ResetPasswordButton.disabled = password.value.length === 0;
+    if (ResetPasswordButton.disabled) return; // overcome Chrome bug https://stackoverflow.com/questions/35049555/chrome-autofill-autocomplete-no-value-for-password
+    let fetchPostOptions = JSON.parse(JSON.stringify(fetchPostOptionsTemplate));
+    let credentials = {
+      token,
+      password: password.value,
+    };
+    fetchPostOptions.body = JSON.stringify(credentials);
+    fetch('/api/resetpassword', fetchPostOptions).then(resp => {
+      console.log('status='+resp.status);
+      if (resp.status === 200) {
+        resp.json().then(data => {
+          console.log('signup fetch return data=');
+          console.dir(data);
+          resetPasswordSuccess = true;
+          localUpdate();
+        });
+      } else if (resp.status === 400) {
+        resp.json().then(data => {
+          console.log('reset password fetch 400 return data=');
+          if (data.error === TOKEN_NOT_FOUND) {
+            errorMessage = `Reset password token expired. Please return to the Login page and try Forgot Password again. `;
+          } else {
+            errorMessage = `Very sorry. Something unexpected went wrong(reset password 400-1). Perhaps try again. `;
+          }
+          localUpdate();
+        }).catch(e => {
+          errorMessage = `Very sorry. Something unexpected went wrong (forgot password 401-2). Perhaps try again. `;
+          localUpdate();
+        });
+      } else {
+        console.error('signup fetch bad status='+resp.status);
+        errorMessage = `Very sorry. Something unexpected went wrong. Perhaps try again. `;
+        localUpdate();
+      }
+    }).catch(e => {
+      console.error('signup fetch error e='+e);
+    });
+  };
+  let onClickShowPassword = e => {
+    e.preventDefault();
+    passwordType = passwordType === 'password' ? 'text' : 'password';
+    localUpdate();
+  };
+  let onInput = e => {
+    enableDisableResetPassword();
+  };
+  let enableDisableResetPassword = () => {
+    let password = document.getElementById('password');
+    let ResetPasswordButton = document.getElementById('ResetPasswordButton');
+    ResetPasswordButton.disabled = password.value.length === 0;
+  };
+  let passwordType = 'password';
+  let errorMessage = null;
+  let resetPasswordSuccess = false;
+  let localUpdate = () => {
+    let mainBody;
+    if (resetPasswordSuccess === true) {
+      mainBody = html`
+        <div class=LoginSignupSuccess>
+          <div>Your password has been changed.</div>
+          <div class=LoginSignupToComplete>
+          <a href="/login">Click here to login</a></div>
+        </div>
+      `;
+    } else if (errorMessage !== null) {
+      mainBody = html`
+        <div class=LoginSignupErrorMessage>${errorMessage}</div>
+        <div class=LoginSignupErrorReturn>Return to
+          <a href="/login" title="return to login page">Login page</a>
+        </div>
+      `;
+    } else {
+      mainBody = html`
+        <div class=LoginSignupData>
+          <div class="gridlayout LoginSignupAppearance">
+            <label for="password">Password</label>
+            <span class=LoginSignupPasswordSpan>
+              <input type=${passwordType} id=password @input=${onInput} required placeholder="Enter password"></input>
+              <a @click=${onClickShowPassword} href="" title="show/hide password">
+                ${passwordType === 'password' ? 'show' : 'hide'} password
+              </a>
+            </span>
+          </div>
+          <div class=LoginSignupButtonRow>
+            <button @click=${onClickResetPassword} id=ResetPasswordButton>Reset Password</button>
+          </div>
+        </div>
+      `;
+    }
+    render(html`
+      <style>${css}</style>
+      <div class=LoginSignup>
         <div class=LoginSignupTitle>
-          You are logging into EyeVocalize.com
+          You are resetting your password for EyeVocalize.com
           <span class=logo></span>
         </div>
         ${mainBody}
@@ -408,7 +639,7 @@ const Login = () => {
   };
   localUpdate();
   setTimeout(() => {
-    enableDisable();
+    enableDisableResetPassword();
   },  1000); // delay to allow browser to do autocomplete
 };
 
@@ -416,69 +647,9 @@ startupChecks(() => {
   const path = window.location.pathname;
   if (path === '/signup') {
     Signup();
+  } else if (path === '/resetpassword') {
+    ResetPassword();
   } else {
     Login();
   }
 }, () => {});
-
-/*
-export function showLoginSignupPopup(props) {
-  let { refNodeSelector } = props;
-  let params = {
-    //content: FavoritesChooseCategoryDialog,
-    content: dialog(),
-    refNode: document.querySelector(refNodeSelector),
-    clickAwayToClose: false,
-    underlayOpacity: 0.85,
-    hideCallback: hideCallbackParams => {
-      render(html``, popupRootElement);
-      //buildChooseCategoryControl(hideCallbackParams.parentElement, hideCallbackParams);
-    },
-  };
-  console.dir(params);
-  let popupRootElement = showPopup(params);
-}
-
-let dialog = () => {
-  let localStorageEmail = localStorage.getItem('email');
-  if (localStorageEmail) {
-    return loginDialog();
-  } else {
-    return signupDialog();
-  }
-};
-
-let loginDialog = () => {
-  return html`<style>h1 {background:yellow;color:red;}</style><h1>Login</h1>`;
-};
-
-let signupDialog = () => {
-  let onClickSignup = e => {
-    e.preventDefault();
-    hidePopup();
-  };
-  let onClickShowPassword = e => {
-    e.preventDefault();
-  };
-  let showHideText = 'show password';
-  return html`
-    <style>${css}</style>
-    <div class=LoginSignup>
-      <div class=LoginSignupTitle>Signup</div>
-      <div class=LoginSignupData>
-      <div class="gridlayout LoginSignupAppearance">
-        <label for="email">Email</label>
-        <input type="email" name="username" id="email" placeholder="Enter email" autofocus=""></input>
-        <label for="email">Password</label>
-        <span class=LoginSignupPasswordSpan>
-          <input type="password" name="password" id="password" placeholder="Enter password"></input>
-          <a @click=${onClickShowPassword} href="" title="show/hide password">${showHideText}</a>
-        </span>
-      </div>
-      <div class=LoginSignupButtonRow>
-        <button @click=${onClickSignup}>Sign Up</button>
-      </div>
-    </div>
-  `;
-};
-*/

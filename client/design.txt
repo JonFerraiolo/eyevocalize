@@ -1,8 +1,19 @@
-help
-  permanent div that floats above with absolute position but variable size
-  and is movable
+account
 
-  
+forgot password user interface and back end
+
+person icon contains popup with two items, logout and my account
+
+my account opens the settings dialog to the fourth new account pane
+which contains
+  checkbox, synchronize my data across all client devices and browsers, default
+  checkbox, allow EyeVocalize administrators to see and use my data, default off
+  explanation of second checkbox
+  link to privacy page
+  divider
+  close account and delete my data
+    are you sure confirmation that includes link to privacy page
+
 ResendAccountVerification - don't do this
 /forgotpassword
 /resetpassword:token is where you go after clicking link in email

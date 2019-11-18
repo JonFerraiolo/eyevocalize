@@ -148,6 +148,7 @@ exports.logout = function(req, res, next) {
   logSendOK(res, null, "Logout success");
 }
 
+/* not currently used
 exports.loginexists = function(req, res, next) {
   dbconnection.dbReady().then(connectionPool => {
     const logger = global.logger;
@@ -170,6 +171,7 @@ exports.loginexists = function(req, res, next) {
     logSendSE(res, e, "loginexists: promise error");
   });
 }
+*/
 
 exports.resendVerificationEmail = function(req, res, next) {
   dbconnection.dbReady().then(connectionPool => {
@@ -223,59 +225,62 @@ exports.resendVerificationEmail = function(req, res, next) {
     logSendSE(res, e, "resendverification: promise error");
   });
 }
-/*
+
 exports.sendResetPasswordEmail = function(req, res, next) {
-  logger.info('sendResetPasswordEmail req.body='+req.body);
-  logger.info(req.body);
-  const email = req.body.email;
-  logger.info('email='+email);
-  connectionPool.query(`SELECT * FROM ${accountTable} WHERE email = ?`, [email], function (error, results, fields) {
-    if (error) {
-      logSendSE(res, error, "sendResetPasswordEmail database failure for email '" + email + "'");
-    } else {
-      let msg = "sendResetPasswordEmail database success for email '" + email + "'";
-      logger.info(msg + ", results= ", results);
-      let exists = (results.length > 0)
-      if (exists) {
-        const account = results[0]
-        const token = makeToken(account)
-        let now = new Date();
-        connectionPool.query(`UPDATE ${accountTable} SET resetPasswordToken = ?, resetPasswordTokenDateTime = ?, modified = ? WHERE email = ?`, [token, now, now, email], function (error, results, fields) {
-          if (error) {
-            logSendSE(res, error, "sendResetPasswordEmail update database failure for email '" + account.email + "'");
-          } else {
-            account.resetPasswordToken = token
-            account.resetPasswordTokenDateTime = now
-            account.modified = now
-            sendResetPasswordEmailToUser(account, function(error) {
-              delete account.password
-              if (error) {
-                logSendSE(res, error, "sendResetPasswordEmail email send failure for email '" + account.email + "'");
-              } else {
-                logger.info("results= ", results);
-                getUserObject(account.email, {account}).then(userObject => {
-                  logSendOK(res, userObject, "sendResetPasswordEmail success for email '" + account.email + "'");
-                }).catch(error => {
-                  logSendSE(res, error, 'getUserObjectError');
-                });
-              }
-            });
-          }
-        });
+  dbconnection.dbReady().then(connectionPool => {
+    logger.info('sendResetPasswordEmail req.body='+req.body);
+    logger.info(req.body);
+    const email = req.body.email;
+    logger.info('email='+email);
+    connectionPool.query(`SELECT * FROM ${accountTable} WHERE email = ?`, [email], function (error, results, fields) {
+      if (error) {
+        logSendSE(res, error, "sendResetPasswordEmail database failure for email '" + email + "'");
       } else {
-        logSendCE(res, 401, EMAIL_NOT_REGISTERED, "No account for '" + email + "'");
+        let msg = "sendResetPasswordEmail database success for email '" + email + "'";
+        logger.info(msg + ", results= ", results);
+        let exists = (results.length > 0)
+        if (exists) {
+          const account = results[0]
+          const token = makeToken(account)
+          let now = new Date();
+          connectionPool.query(`UPDATE ${accountTable} SET resetPasswordToken = ?, resetPasswordTokenDateTime = ?, modified = ? WHERE email = ?`, [token, now, now, email], function (error, results, fields) {
+            if (error) {
+              logSendSE(res, error, "sendResetPasswordEmail update database failure for email '" + account.email + "'");
+            } else {
+              account.resetPasswordToken = token
+              account.resetPasswordTokenDateTime = now
+              account.modified = now
+              sendResetPasswordEmailToUser(account, function(error) {
+                delete account.password
+                if (error) {
+                  logSendSE(res, error, "sendResetPasswordEmail email send failure for email '" + account.email + "'");
+                } else {
+                  logger.info("results= ", results);
+                  let payload = { account: { email: account.email, modified: account.modified }};
+                  logSendOK(res, payload, "sendResetPasswordEmail success for email '" + account.email + "'");
+                }
+              });
+            }
+          });
+        } else {
+          logSendCE(res, 401, EMAIL_NOT_REGISTERED, "No account for '" + email + "'");
+        }
       }
-    }
+    });
+  }, () => {
+    logSendSE(res, null, "sendResetPasswordEmail: no database connection");
+  }).catch(e => {
+    logSendSE(res, e, "sendResetPasswordEmail: promise error");
   });
 }
-*/
+
 exports.verifyAccount = function(req, res, next) {
   dbconnection.dbReady().then(connectionPool => {
     logger.info('verifyAccount req.params='+req.params);
     logger.info(req.params);
     let token = req.params.token
     res.type('html')
-    let resendVerificationUrl = global.config.BASE_URL + global.apiBasePath + '/resendverification';
+    let loginUrl = global.config.BASE_URL + '/login';
     connectionPool.query(`SELECT email, emailValidateTokenDateTime FROM ${accountTable} WHERE emailValidateToken = ?`, [token], function (error, results, fields) {
       if (error || results.length !== 1) {
         let msg = "verifyAccount failure for token '" + token + "'";
@@ -286,7 +291,7 @@ exports.verifyAccount = function(req, res, next) {
       Only the most recent account verification email will work correctly.
       If you are unsure which email is the most recent,
       put all existing verification emails into the Trash,
-      then go to <a href="${resendVerificationUrl}">${resendVerificationUrl}</a> to request a brand new account verification email.</p>
+      then go to <a href="${loginUrl}">${loginUrl}</a> and try to login. From there, you will be able to request a brand new account verification email.</p>
   </body></html>`
         res.send(html)
       } else {
@@ -301,7 +306,7 @@ exports.verifyAccount = function(req, res, next) {
         if (tokenTime < twentyfourHoursAgo) {
           let html = `<html><body>
   <h1>Sorry! Verification expiration</h1>
-  <p>Please go to <a href="${resendVerificationUrl}">${resendVerificationUrl}</a> to request a new account verification email.</p>
+  <p>Please go to <a href="${loginUrl}">${loginUrl}</a> and try to login. From there, you will be able to request a new account verification email.</p>
   </body></html>`
           res.send(html)
         } else {
@@ -335,83 +340,96 @@ exports.verifyAccount = function(req, res, next) {
     logSendSE(res, e, "verifyAccount: promise error");
   });
 }
-/*
+
 exports.gotoResetPasswordPage = function(req, res, next) {
-  logger.info('gotoResetPasswordPage req.params='+req.params);
-  logger.info(req.params);
-  let token = req.params.token
-  res.type('html')
-  connectionPool.query(`SELECT email, resetPasswordTokenDateTime FROM ${accountTable} WHERE resetPasswordToken = ?`, [token], function (error, results, fields) {
-    if (error || results.length !== 1) {
-      let msg = "gotoResetPasswordPage failure for token '" + token + "'";
-      logger.info(msg + ", error= ", error, 'results=', JSON.stringify(results));
-      let html = `<html><body>
-  <h1>Reset Password Failure</h1>
-  <p>This is most likely because you clicked on Reset My Password from an older password reset email.
-    Only the most recent password reset email will work correctly.
-    If you are unsure which email is the most recent,
-    put all existing password reset emails into the Trash,
-    then go to <a href="${forgotPasswordUrl}">${forgotPasswordUrl}</a> to request a brand new password reset email.</p>
-</body></html>`
-      res.send(html)
-    } else {
-      logger.info("results= ", JSON.stringify(results));
-      let { email, resetPasswordTokenDateTime } = results[0]
-      logger.info('typeof resetPasswordTokenDateTime= ', typeof resetPasswordTokenDateTime)
-      let msg = "gotoResetPasswordPage success for email '" + email + "'";
-      let now = new Date();
-      let twentyfourHoursAgo = (new Date().getTime() - (24 * 60 * 60 * 1000));
-      let tokenTime = resetPasswordTokenDateTime.getTime()
-      logger.info('tokenTime='+tokenTime+', twentyfourHoursAgo='+twentyfourHoursAgo)
-      if (tokenTime < twentyfourHoursAgo) {
+  dbconnection.dbReady().then(connectionPool => {
+    logger.info('gotoResetPasswordPage req.params='+req.params);
+    logger.info(req.params);
+    let token = req.params.token
+    res.type('html')
+    connectionPool.query(`SELECT email, resetPasswordTokenDateTime FROM ${accountTable} WHERE resetPasswordToken = ?`, [token], function (error, results, fields) {
+      if (error || results.length !== 1) {
+        let msg = "gotoResetPasswordPage failure for token '" + token + "'";
+        logger.info(msg + ", error= ", error, 'results=', JSON.stringify(results));
         let html = `<html><body>
-<h1>Reset password expiration</h1>
-<p>Please go to <a href="${forgotPasswordUrl}">${forgotPasswordUrl}</a> to request a new password reset email.</p>
-</body></html>`
+    <h1>Reset Password Failure</h1>
+    <p>This is most likely because you clicked on Reset My Password from an older password reset email.
+      Only the most recent password reset email will work correctly.
+      If you are unsure which email is the most recent,
+      put all existing password reset emails into the Trash,
+      then go to <a href="${forgotPasswordUrl}">${forgotPasswordUrl}</a> to request a brand new password reset email.</p>
+  </body></html>`
         res.send(html)
       } else {
-        logger.info('before sending redirect')
-        res.redirect(302, resetPasswordUrl+'?t='+token)
+        logger.info("results= ", JSON.stringify(results));
+        let { email, resetPasswordTokenDateTime } = results[0]
+        logger.info('typeof resetPasswordTokenDateTime= ', typeof resetPasswordTokenDateTime)
+        let msg = "gotoResetPasswordPage success for email '" + email + "'";
+        let now = new Date();
+        let twentyfourHoursAgo = (new Date().getTime() - (24 * 60 * 60 * 1000));
+        let tokenTime = resetPasswordTokenDateTime.getTime()
+        logger.info('tokenTime='+tokenTime+', twentyfourHoursAgo='+twentyfourHoursAgo)
+        if (tokenTime < twentyfourHoursAgo) {
+          let html = `<html><body>
+  <h1>Reset password expiration</h1>
+  <p>Please go to <a href="${forgotPasswordUrl}">${forgotPasswordUrl}</a> to request a new password reset email.</p>
+  </body></html>`
+          res.send(html)
+        } else {
+          logger.info('before sending redirect')
+          let resetPasswordUrl = global.config.BASE_URL + '/resetpassword';
+          res.redirect(302, resetPasswordUrl+'?t='+token)
+        }
       }
-    }
+    });
+  }, () => {
+    logSendSE(res, null, "gotoResetPasswordPage: no database connection");
+  }).catch(e => {
+    logSendSE(res, e, "gotoResetPasswordPage: promise error");
   });
 }
 
 exports.resetPassword = function(req, res, next) {
-  logger.info('resetpassword req.body='+req.body);
-  logger.info(req.body);
-  const password = req.body.password;
-  const token = req.body.token;
-  logger.info('req.session.id='+req.session.id);
-  connectionPool.query(`SELECT email, resetPasswordTokenDateTime FROM ${accountTable} WHERE resetPasswordToken = ?`, [token], function (error, results, fields) {
-    if (error || results.length !== 1) {
-      logSendCE(res, 400, TOKEN_NOT_FOUND, "resetPassword select failure for token '" + token + "'");
-    } else {
-      logger.info("results= ", JSON.stringify(results));
-      let { email, resetPasswordTokenDateTime } = results[0]
-      logger.info('typeof resetPasswordTokenDateTime= ', typeof resetPasswordTokenDateTime)
-      let msg = "resetPassword success for email '" + email + "'";
-      let now = new Date();
-      let twentyfourHoursAgo = (new Date().getTime() - (24 * 60 * 60 * 1000));
-      let tokenTime = resetPasswordTokenDateTime.getTime()
-      logger.info('tokenTime='+tokenTime+', twentyfourHoursAgo='+twentyfourHoursAgo)
-      if (tokenTime < twentyfourHoursAgo) {
-        logSendCE(res, 400, TOKEN_EXPIRED, "resetPassword expired token for email '" + email + "'");
+  dbconnection.dbReady().then(connectionPool => {
+    logger.info('resetpassword req.body='+req.body);
+    logger.info(req.body);
+    const password = req.body.password;
+    const token = req.body.token;
+    logger.info('req.session.id='+req.session.id);
+    connectionPool.query(`SELECT email, resetPasswordTokenDateTime FROM ${accountTable} WHERE resetPasswordToken = ?`, [token], function (error, results, fields) {
+      if (error || results.length !== 1) {
+        logSendCE(res, 400, TOKEN_NOT_FOUND, "resetPassword select failure for token '" + token + "'");
       } else {
-        logger.info('now='+now+', email='+email)
-        connectionPool.query(`UPDATE ${accountTable} SET password = ?, resetPasswordToken = NULL, resetPasswordTokenDateTime = NULL, modified = ? WHERE email = ?`, [password, now, email], function (error, results, fields) {
-          logger.info('error='+error+", results= ", JSON.stringify(results));
-          if (error) {
-            logSendSE(res, error, "resetPassword update resetPasswordToken database failure for email '" + account.email + "'");
-          } else {
-            logSendOK(res, null, 'resetpassword success');
-          }
-        });
+        logger.info("results= ", JSON.stringify(results));
+        let { email, resetPasswordTokenDateTime } = results[0]
+        logger.info('typeof resetPasswordTokenDateTime= ', typeof resetPasswordTokenDateTime)
+        let msg = "resetPassword success for email '" + email + "'";
+        let now = new Date();
+        let twentyfourHoursAgo = (new Date().getTime() - (24 * 60 * 60 * 1000));
+        let tokenTime = resetPasswordTokenDateTime.getTime()
+        logger.info('tokenTime='+tokenTime+', twentyfourHoursAgo='+twentyfourHoursAgo)
+        if (tokenTime < twentyfourHoursAgo) {
+          logSendCE(res, 400, TOKEN_EXPIRED, "resetPassword expired token for email '" + email + "'");
+        } else {
+          logger.info('now='+now+', email='+email)
+          connectionPool.query(`UPDATE ${accountTable} SET password = ?, resetPasswordToken = NULL, resetPasswordTokenDateTime = NULL, modified = ? WHERE email = ?`, [password, now, email], function (error, results, fields) {
+            logger.info('error='+error+", results= ", JSON.stringify(results));
+            if (error) {
+              logSendSE(res, error, "resetPassword update resetPasswordToken database failure for email '" + account.email + "'");
+            } else {
+              logSendOK(res, null, 'resetpassword success');
+            }
+          });
+        }
       }
-    }
+    });
+  }, () => {
+    logSendSE(res, null, "resetPassword: no database connection");
+  }).catch(e => {
+    logSendSE(res, e, "resetPassword: promise error");
   });
 }
-*/
+
 function sendAccountVerificationEmailToUser(account, callback) {
   const url = global.config.BASE_URL + global.apiBasePath + '/verifyaccount/' + account.emailValidateToken
   const params = {
@@ -420,7 +438,7 @@ function sendAccountVerificationEmailToUser(account, callback) {
   <p>&nbsp;&nbsp;&nbsp;&nbsp;<a href="${url}" style="font-size:110%;color:darkblue;font-weight:bold;">Activate My Account</a></p>
   <p>to complete the signup process.</p>`,
     text: 'Welcome to EyeVocalize.com!\n\nPlease go to the following URL in a Web browser to Activate Your Account and complete the signup process:\n\n'+url,
-    subject: 'Please confirm your '+SITENAME+' account',
+    subject: 'Please confirm your '+global.SITENAME+' account',
     email: account.email,
   };
   sendMail(params, function(err) {
@@ -432,18 +450,16 @@ function sendAccountVerificationEmailToUser(account, callback) {
     callback(err)
   });
 }
-/*
+
 function sendResetPasswordEmailToUser(account, callback) {
   const url = global.config.BASE_URL + global.apiBasePath + '/gotoresetpasswordpage/' + account.resetPasswordToken
-  const name = account.firstName+' '+account.lastName;
   const params = {
-    html: `<p>Reset your ${SITENAME} password</p>
+    html: `<p>Reset your ${global.SITENAME} password</p>
   <p>Please click on this link to reset your password: </p>
   <p>&nbsp;&nbsp;&nbsp;&nbsp;<a href="${url}" style="font-size:110%;color:darkblue;font-weight:bold;">Reset My Password</a></p>`,
     text: 'Please go to the following URL in a Web browser to reset your password:\n\n'+url,
-    subject: 'Reset your '+SITENAME+' password',
-    email: account.email,
-    name: name
+    subject: 'Reset your '+global.SITENAME+' password',
+    email: account.email
   };
   sendMail(params, function(err) {
     if (err) {
@@ -451,10 +467,10 @@ function sendResetPasswordEmailToUser(account, callback) {
     } else {
       logger.info('sendResetPasswordEmailToUser sendMail no errors.');
     }
-    callback(err, result)
+    callback(err)
   });
 }
-*/
+
 function makeToken(account) {
   const buf = crypto.randomBytes(8);
   let token = buf.toString('hex')

@@ -92,7 +92,7 @@ sessionMgmt.init(app).then(() => {
     }
   });
   app.get('/', (req, res) => res.sendFile(rootDir+'/index.html'));
-  app.get(['/signup','/login','/activate','/forgot','/reset'], (req, res) => res.sendFile(rootDir+'/session.html'));
+  app.get(['/signup','/login', '/resetpassword'], (req, res) => res.sendFile(rootDir+'/session.html'));
   app.get(['/TermsOfUse','/PrivacyPolicy','/Cookies'], (req, res) => {
     fs.readFile(rootDir+'/legal.html', (err, html) => {
       if (err) { logSendSE(res, err, 'could not load '+req.path+' (html)'); }
@@ -123,7 +123,11 @@ sessionMgmt.init(app).then(() => {
   logger.info('server.js before setting up /signup');
   app.post('/api/signup', sessionRoutes.signup)
   app.post('/api/login', sessionRoutes.login)
-  app.post('/api/resendverification', sessionRoutes.resendVerificationEmail);
+  app.post('/api/logout', sessionRoutes.logout)
+  app.post('/api/resendverification', sessionRoutes.resendVerificationEmail)
+  app.post('/api/sendresetpassword', sessionRoutes.sendResetPasswordEmail)
+  app.get('/api/gotoresetpasswordpage/:token', sessionRoutes.gotoResetPasswordPage)
+  app.post('/api/resetpassword', sessionRoutes.resetPassword)
   logger.info('server.js before setting up /api/verifyaccount');
   app.get('/api/verifyaccount/:token', sessionRoutes.verifyAccount)
   app.get('/*', (req, res) => res.redirect(301, '/'));
