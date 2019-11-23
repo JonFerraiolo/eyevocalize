@@ -305,7 +305,7 @@ export function initializeFavorites(props) {
           { type: 'text', label: 'air', text: 'Can I have air?'},
           { type: 'text', label: 'mask', text: 'Can you please fix my breathing mask?'},
           { type: 'text', label: 'nebulizer', text: 'Time for nebulizer and feeding'},
-          { type: 'text', label: 'stretch', text: 'Can I please stretch? Tilt me back all the way, lift my feet all the way and then hold my ankles.'},
+          { type: 'text', label: 'stretch', text: 'Can I please stretch?'},
           { type: 'text', label: 'toilet', text: 'Take me to the toilet, please'},
           { type: 'text', label: 'urinal', text: 'can I please use the urinal'},
           { type: 'text', label: 'bed', text: 'Can I please go to my bed?'},

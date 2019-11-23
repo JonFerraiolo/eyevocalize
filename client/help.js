@@ -2,7 +2,6 @@
 import { html, render } from './lib/lit-html/lit-html.js';
 import { unsafeHTML } from './lib/lit-html/directives/unsafe-html.js';
 import { markedLoadedPromise } from './startupChecks.js';
-import { showPopup, hidePopup } from './popup.js';
 import { mainAppPercentWhenSmall } from './Settings.js';
 import { welcome } from './help/welcome.js';
 

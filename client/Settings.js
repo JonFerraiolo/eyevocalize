@@ -2,6 +2,7 @@
 import { html, render } from './lib/lit-html/lit-html.js';
 import { buildSlideRightTitle, secondLevelScreenShow, secondLevelScreenHide, updateMain, isChrome } from './main.js';
 import { speak } from './vocalize.js';
+import { showCloseAccountPopup } from './account.js';
 import { combobox } from './combobox.js';
 
 let css = `
@@ -68,6 +69,17 @@ let css = `
 #SettingsVoiceSampleText {
   font-size: 115%;
 }
+.SettingsAccountUseMyDataExplanation {
+  font-size: 90%;
+  margin: 0.5em 0 0.5em 2em;
+  text-align: left;
+}
+.SettingsAccountCloseAccountDiv {
+  text-align: right;
+  margin: 2em 0 0;
+  padding: 1em 0;
+  border-top: 2px solid gray;
+}
 `;
 
 let currentVersion;
@@ -99,6 +111,10 @@ let autoDeleteHistoryOptions = [
   { value: 'never',  label: 'never' },
 ];
 let autoDeleteHistoryIndex = autoDeleteHistoryOptions.length -  1;
+let defaultSyncData = true;
+let syncData = defaultSyncData;
+let defaultOKUseMyData = false;
+let okUseMyData = defaultOKUseMyData;
 
 let volumeCombo = new combobox();
 let rateCombo = new combobox();
@@ -113,7 +129,8 @@ export function initializeSettings(props) {
   window.speechSynthesis.onvoiceschanged = function(e) {
     voices = speechSynthesis.getVoices();
   };
-  let initialSettings = { voiceName, volume, rate, pitch, sampleText, appFontSize, minScreenPercent };
+  let initialSettings = { voiceName, volume, rate, pitch, sampleText, appFontSize,
+    minScreenPercent, autoDeleteHistory, syncData, okUseMyData };
   let Settings;
   let SettingsString = localStorage.getItem("Settings");
   try {
@@ -133,22 +150,23 @@ export function initializeSettings(props) {
   appFontSize = Settings.appFontSize;
   minScreenPercent = Settings.minScreenPercent;
   autoDeleteHistory = Settings.autoDeleteHistory;
+  syncData = Settings.syncData;
+  okUseMyData = Settings.okUseMyData;
 };
 
 let updateLocalStorage = () => {
   let Settings = { version: currentVersion, section,
     voiceName, volume, rate, pitch, sampleText,
-    appFontSize, minScreenPercent, autoDeleteHistory };
+    appFontSize, minScreenPercent, autoDeleteHistory, syncData, okUseMyData };
   localStorage.setItem("Settings", JSON.stringify(Settings));
 };
 
-export function slideInAddSettingsScreen(props) {
+export function slideInSettingsScreen(props) {
   props = props || {};
-  let { phrase } = props;
-  let customControlsData = {};
+  let { initialSection } = props;
   let params = {
     renderFunc: editSettings,
-    renderFuncParams: {},
+    renderFuncParams: { initialSection },
   };
   secondLevelScreenShow(params);
 };
@@ -159,6 +177,12 @@ function onSettingsReturn() {
 }
 
 export function editSettings(parentElement, params) {
+  params = params || {};
+  let { initialSection } = params;
+  if (initialSection) {
+    section = initialSection;
+    updateLocalStorage();
+  }
   if (isChrome()) pitch = 1;  // chrome freezes voice synthesis if you speak with pitch! =1
   let buildSectionRadioButton = (id, value, label) => {
     let cls = 'TabControlRadioButton' + (section===value ? ' TabControlRadioButtonChecked' : '');
@@ -237,6 +261,22 @@ export function editSettings(parentElement, params) {
     updateMain();
     updateLocalStorage();
   };
+  let onChangeSyncData = e => {
+    e.preventDefault();
+    syncData = e.target.checked;
+    updateMain();
+    updateLocalStorage();
+  };
+  let onChangeOKUseMyData = e => {
+    e.preventDefault();
+    okUseMyData = e.target.checked;
+    updateMain();
+    updateLocalStorage();
+  };
+  let onClickCloseAccount = e => {
+    e.preventDefault();
+    showCloseAccountPopup();
+  };
   let onClickRestoreDefaults = e => {
     e.preventDefault();
     if (section === 'Appearance') {
@@ -250,6 +290,9 @@ export function editSettings(parentElement, params) {
       rate = defaultRate;
       pitch = defaultPitch;
       sampleText = defaultSampleText;
+    } else if (section === 'Account') {
+      syncData = defaultSyncData;
+      okUseMyData = defaultOKUseMyData;
     }
     localUpdate();
     updateMain();
@@ -277,6 +320,7 @@ export function editSettings(parentElement, params) {
     if (autoDeleteHistoryIndex === -1) autoDeleteHistoryIndex = autoDeleteHistoryOptions.length - 1;
     autoDeleteHistory = autoDeleteHistoryOptions[autoDeleteHistoryIndex].value;
     let SettingsData;
+    let BottomData = '';
     if (section === 'Appearance') {
       SettingsData = html`
         <div class="gridlayout SettingsAppearance">
@@ -295,6 +339,27 @@ export function editSettings(parentElement, params) {
           </select>
         </div>
       `;
+    } else if (section === 'Account') {
+      SettingsData = html`
+        <div class="gridlayout SettingsAccount">
+          <input type=checkbox id=SettingsSyncData @change=${onChangeSyncData} class=chooseVoiceRow>
+          </input>
+          <label for="SettingsSyncData" class=chooseFontSizeRow>Synchronize my data across all client devices and browsers</label>
+          <input type=checkbox id=SettingsOKUseMyData @change=${onChangeOKUseMyData} class=chooseVoiceRow>
+          </input>
+          <label for="SettingsOKUseMyData" class=chooseFontSizeRow>Allow EyeVocalize team to use my data (*)</label>
+        </div>
+        <div class=SettingsAccountUseMyDataExplanation>
+          (*) Your data will be used anonymously only for the purpose of improving the EyeVocalize app and website.
+          For more, read the <a href="/PrivacyPolicy" target="_blank">EyeVocalize Privacy Policy</a>.
+        </div>
+      `;
+      BottomData = html`
+      <div class=SettingsAccountCloseAccountDiv>
+        <button @click=${onClickCloseAccount}>Close My Account</button>
+      </div>
+      `;
+
     } else {
       SettingsData = html`
         <div class="gridlayout SettingsVoice">
@@ -326,6 +391,7 @@ export function editSettings(parentElement, params) {
               ${buildSectionRadioButton('SettingsSectionVoice', 'Voice', 'Voice')}
               ${buildSectionRadioButton('SettingsSectionAppearance', 'Appearance', 'Appearance')}
               ${buildSectionRadioButton('SettingsSectionHistory', 'History', 'History')}
+              ${buildSectionRadioButton('SettingsSectionAccount', 'Account', 'Account')}
             </div>
             <div class=TabControlRadioData>
               <div class=SettingsData>
@@ -333,6 +399,7 @@ export function editSettings(parentElement, params) {
                 <div class=SettingsRestoreDefaultsRow>
                   <button @click=${onClickRestoreDefaults}>Restore defaults</button>
                 </div>
+                ${BottomData}
               </div>
             </div>
           </div>
@@ -367,6 +434,9 @@ export function editSettings(parentElement, params) {
       });
     } else if (section === 'History') {
       document.getElementById('SettingsAutoDeleteHistory').selectedIndex = autoDeleteHistoryIndex;
+    } else if (section === 'Account') {
+      document.getElementById('SettingsSyncData').checked = syncData;
+      document.getElementById('SettingsOKUseMyData').checked = okUseMyData;
     }
   };
   localUpdate();
@@ -399,4 +469,12 @@ export function getAppFontSize() {
 
 export function getAutoDeleteHistory() {
   return autoDeleteHistory;
+}
+
+export function getSyncData() {
+  return syncData;
+}
+
+export function getOKUseMyData() {
+  return okUseMyData;
 }

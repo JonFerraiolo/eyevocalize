@@ -98,7 +98,7 @@ function reconnect() {
         }
         logger.info("after createPool . pool="+pool);
         pool.on('acquire', function (connection) {
-          logger.info('Connection %d acquired', connection.threadId);
+          //logger.info('Connection %d acquired', connection.threadId);
         });
         pool.on('connection', function (connection) {
           logger.info('Connection %d connected', connection.threadId);
@@ -107,7 +107,7 @@ function reconnect() {
           logger.info('Waiting for connection');
         });
         pool.on('release', function (connection) {
-          logger.info('Connection %d released', connection.threadId);
+          //logger.info('Connection %d released', connection.threadId);
         });
         innerResolve(pool);
 
@@ -178,6 +178,7 @@ exports.initialize = function() {
     email varchar(100) COLLATE utf8_unicode_ci UNIQUE NOT NULL,
     password varchar(255) COLLATE utf8_unicode_ci NOT NULL,
     isAdmin TINYINT unsigned DEFAULT 0,
+    accountClosedDateTime datetime DEFAULT NULL,
     created datetime NOT NULL,
     emailValidateToken varchar(20) NOT NULL,
     emailValidateTokenDateTime datetime NOT NULL,
@@ -188,9 +189,6 @@ exports.initialize = function() {
     PRIMARY KEY (id),
     INDEX(email(100),emailValidateToken)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
-  const adminInsert = `insert into ${accountTable}
-    (email, password, isAdmin, created, emailValidateToken, emailValidateTokenDateTime, emailValidated, modified)
-    VALUES('JONEMAIL', 'JONPASSWORD', 1, now(), 'x', now(), now(), now());`;
 
   getConnection().then(pool  => {
     logger.info("dbconnection.initialize we have a connection");
@@ -249,21 +247,7 @@ exports.initialize = function() {
       } else {
         logger.info("create account table success");
         logger.info(JSON.stringify(results));
-        dbInitialized = true; //FIXME probably don't need addAdmin
-        addAdmin();
-      }
-    });
-  });
-
-  let addAdmin = (() => {
-    logger.info("addAdmin entered");
-    pool.query(adminInsert, function (error, results, fields) {
-      if (error) {
-        logger.error("insert admin account table error");
-        logger.error(JSON.stringify(error));
-      } else {
-        logger.info("insert admin account table success");
-        logger.info(JSON.stringify(results));
+        dbInitialized = true;
       }
     });
   });

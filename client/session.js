@@ -643,12 +643,26 @@ const ResetPassword = () => {
   },  1000); // delay to allow browser to do autocomplete
 };
 
+const AccountClosed = () => {
+  render(html`
+    <style>${css}</style>
+    <div class=LoginSignup>
+      <div class=LoginSignupTitle>
+        Your account on EyeVocalize.com has been closed. We will miss you.
+        <span class=logo></span>
+      </div>
+    </div>
+  `, document.body);
+};
+
 startupChecks(() => {
   const path = window.location.pathname;
   if (path === '/signup') {
     Signup();
   } else if (path === '/resetpassword') {
     ResetPassword();
+  } else if (path === '/accountclosed') {
+    AccountClosed();
   } else {
     Login();
   }

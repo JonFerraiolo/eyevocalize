@@ -92,7 +92,7 @@ sessionMgmt.init(app).then(() => {
     }
   });
   app.get('/', (req, res) => res.sendFile(rootDir+'/index.html'));
-  app.get(['/signup','/login', '/resetpassword'], (req, res) => res.sendFile(rootDir+'/session.html'));
+  app.get(['/signup','/login', '/resetpassword', '/accountclosed'], (req, res) => res.sendFile(rootDir+'/session.html'));
   app.get(['/TermsOfUse','/PrivacyPolicy','/Cookies'], (req, res) => {
     fs.readFile(rootDir+'/legal.html', (err, html) => {
       if (err) { logSendSE(res, err, 'could not load '+req.path+' (html)'); }
@@ -130,6 +130,7 @@ sessionMgmt.init(app).then(() => {
   app.post('/api/resetpassword', sessionRoutes.resetPassword)
   logger.info('server.js before setting up /api/verifyaccount');
   app.get('/api/verifyaccount/:token', sessionRoutes.verifyAccount)
+  app.post('/api/closeaccount', sessionRoutes.closeAccount)
   app.get('/*', (req, res) => res.redirect(301, '/'));
 
   app.listen(port, () => logger.info(`App listening on port ${port}!`));

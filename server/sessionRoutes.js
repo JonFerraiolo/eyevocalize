@@ -11,6 +11,7 @@ const logSendSE = logSend.logSendSE
 const USER_ALREADY_EXISTS = 'USER_ALREADY_EXISTS'
 const USER_ALREADY_LOGGED_IN = 'USER_ALREADY_LOGGED_IN'
 const EMAIL_NOT_REGISTERED = 'EMAIL_NOT_REGISTERED'
+const NOT_LOGGED_IN = 'NOT_LOGGED_IN'
 const EMAIL_NOT_VERIFIED = 'EMAIL_NOT_VERIFIED'
 const EMAIL_ALREADY_VERIFIED = 'EMAIL_ALREADY_VERIFIED'
 const INCORRECT_PASSWORD = 'INCORRECT_PASSWORD'
@@ -63,11 +64,11 @@ exports.signup = function(req, res, next) {
          } else if (results.length === 1) {
            let existing = results[0];
            logger.info('signup: login exists. existing='+JSON.stringify(existing));
-           if (existing.emailValidated) {
+           if (existing.emailValidated && !existing.accountClosedDateTime) {
              logSendCE(res, 401, USER_ALREADY_EXISTS, "signup account already exists: '" + account.email + "'");
            } else {
              logger.info('signup: login exists. account='+JSON.stringify(account));
-             connectionPool.query(`UPDATE ${accountTable} SET password = ?, modified = ? WHERE email = ?`, [account.password, now, account.email], function (error, results, fields) {
+             connectionPool.query(`UPDATE ${accountTable} SET password = ?, modified = ?, accountClosedDateTime = ? WHERE email = ?`, [account.password, now, null, account.email], function (error, results, fields) {
                if (error) {
                  logSendSE(res, error, "Insert new account update database failure for email '" + account.email + "'");
                } else {
@@ -113,7 +114,9 @@ exports.login = function(req, res, next) {
           logSendCE(res, 401, EMAIL_NOT_REGISTERED, "No account for '" + email + "'");
         } else {
           let account = results[0]
-          if (!account.emailValidated) {
+          if (account.accountClosedDateTime) {
+            logSendCE(res, 401, EMAIL_NOT_REGISTERED, "Account closed for '" + email + "'");
+          } else if (!account.emailValidated) {
             logSendCE(res, 401, EMAIL_NOT_VERIFIED, "Account for '" + email + "' has not been verified yet via email");
           } else {
             if (account.password === password) {
@@ -141,8 +144,8 @@ exports.login = function(req, res, next) {
 exports.logout = function(req, res, next) {
   logger.info('logout req.body='+req.body);
   logger.info(req.body);
-  logger.info('req.session.id='+req.session.id);
   if (req.session) {
+    logger.info('req.session.user='+req.session.user);
     req.session.user = null;
   }
   logSendOK(res, null, "Logout success");
@@ -281,7 +284,7 @@ exports.verifyAccount = function(req, res, next) {
     let token = req.params.token
     res.type('html')
     let loginUrl = global.config.BASE_URL + '/login';
-    connectionPool.query(`SELECT email, emailValidateTokenDateTime FROM ${accountTable} WHERE emailValidateToken = ?`, [token], function (error, results, fields) {
+    connectionPool.query(`SELECT * FROM ${accountTable} WHERE emailValidateToken = ?`, [token], function (error, results, fields) {
       if (error || results.length !== 1) {
         let msg = "verifyAccount failure for token '" + token + "'";
         logger.info(msg + ", error= ", error, 'results=', JSON.stringify(results));
@@ -296,7 +299,8 @@ exports.verifyAccount = function(req, res, next) {
         res.send(html)
       } else {
         logger.info("results= ", JSON.stringify(results));
-        let { email, emailValidateTokenDateTime } = results[0]
+        let account = results[0];
+        let { email, emailValidateTokenDateTime } = account;
         logger.info('typeof emailValidateTokenDateTime= ', typeof emailValidateTokenDateTime)
         let msg = "verifyAccount success for email '" + email + "'";
         let now = new Date();
@@ -324,6 +328,7 @@ exports.verifyAccount = function(req, res, next) {
               res.send(html)
             } else {
               logger.info('before setting html ')
+              req.session.user = account;
               let html = `<html><body>
     <h1>Account verified!</h1>
     <p> Now you can go to <a href="${global.appUrl}">${global.appUrl}</a> to start using EyeVocalize.com.</p>
@@ -341,12 +346,38 @@ exports.verifyAccount = function(req, res, next) {
   });
 }
 
+exports.closeAccount = function(req, res, next) {
+  dbconnection.dbReady().then(connectionPool => {
+    logger.info('closeAccount');
+    let now = new Date();
+    let email = req.session && req.session.user && req.session.user.email;
+    if (email) {
+      connectionPool.query(`UPDATE ${accountTable} SET accountClosedDateTime = ?, modified = ? WHERE email = ?`, [now, now, email], function (error, results, fields) {
+        logger.info('error='+error+", results= ", JSON.stringify(results));
+        if (error) {
+          logSendSE(res, error, "closeAccount database failure for email '" + email + "'");
+        } else {
+          let payload = { account: { email }};
+          logSendOK(res, payload, "closeAccount success for email '" + email + "'");
+        }
+      });
+    } else {
+      logSendCE(res, 401, NOT_LOGGED_IN, "No account for '" + email + "'");
+    }
+  }, () => {
+    logSendSE(res, null, "closeAccount: no database connection");
+  }).catch(e => {
+    logSendSE(res, e, "closeAccount: promise error");
+  });
+}
+
 exports.gotoResetPasswordPage = function(req, res, next) {
   dbconnection.dbReady().then(connectionPool => {
     logger.info('gotoResetPasswordPage req.params='+req.params);
     logger.info(req.params);
     let token = req.params.token
     res.type('html')
+    let loginUrl = global.config.BASE_URL + '/login';
     connectionPool.query(`SELECT email, resetPasswordTokenDateTime FROM ${accountTable} WHERE resetPasswordToken = ?`, [token], function (error, results, fields) {
       if (error || results.length !== 1) {
         let msg = "gotoResetPasswordPage failure for token '" + token + "'";
@@ -357,7 +388,7 @@ exports.gotoResetPasswordPage = function(req, res, next) {
       Only the most recent password reset email will work correctly.
       If you are unsure which email is the most recent,
       put all existing password reset emails into the Trash,
-      then go to <a href="${forgotPasswordUrl}">${forgotPasswordUrl}</a> to request a brand new password reset email.</p>
+      then go to <a href="${loginUrl}">${loginUrl}</a> to request a brand new password reset email.</p>
   </body></html>`
         res.send(html)
       } else {
@@ -372,7 +403,7 @@ exports.gotoResetPasswordPage = function(req, res, next) {
         if (tokenTime < twentyfourHoursAgo) {
           let html = `<html><body>
   <h1>Reset password expiration</h1>
-  <p>Please go to <a href="${forgotPasswordUrl}">${forgotPasswordUrl}</a> to request a new password reset email.</p>
+  <p>Please go to <a href="${loginUrl}">${loginUrl}</a> to request a new password reset email.</p>
   </body></html>`
           res.send(html)
         } else {

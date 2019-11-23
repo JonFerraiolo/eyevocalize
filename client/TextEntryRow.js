@@ -4,8 +4,9 @@ import { stash } from './Stash.js';
 import { slideInAddFavoriteScreen } from './Favorites.js';
 import { search, clear, getAppMinOrMax, setAppMinOrMax } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
-import { slideInAddSettingsScreen } from './Settings.js';
+import { slideInSettingsScreen } from './Settings.js';
 import { toggleHelp } from './help.js';
+import { showAccountMenu } from './account.js';
 import { html, render } from './lib/lit-html/lit-html.js';
 
 let css = `
@@ -153,7 +154,7 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onSettings = e => {
     e.preventDefault();
-    slideInAddSettingsScreen();
+    slideInSettingsScreen();
   }
   let onHelp = e => {
     e.preventDefault();
@@ -162,7 +163,9 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onUser = e => {
     e.preventDefault();
-    TextEntryRowSetFocus();
+    showAccountMenu(document.querySelector('.TextEntryUser'), () => {
+      TextEntryRowSetFocus();
+    });
   }
   let localUpdate = () => {
     render(html`

@@ -3,6 +3,10 @@
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
+:root {
+  --popupMenuBackgroundColor: #d8d8d8;
+  --popupMenuBackgroundColorHover: #9ab;
+}
 html, body, .appfullheight {
 	width: 100%;
   height: 100%;
@@ -246,4 +250,49 @@ button,input,textarea,select {
   font-size: 0.95em;
   font-style: italic;
   margin-bottom: 0.5em;
+}
+.popupMenu {
+	border: 1px solid black;
+	box-shadow: 1px 1px 1px #888;
+	background: var(--popupMenuBackgroundColor);
+	padding: 1px;
+}
+.popupMenu ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+.popupMenu li {
+	display: block;
+	margin: 1px 0;
+	white-space: nowrap;
+}
+.popupMenu a {
+	pointer: cursor;
+	display: inline-block;
+	padding: 2px 20px 2px 0;
+}
+.popupMenu a:link, .popupMenu a:visited {
+	text-decoration: none;
+	color: #222;
+}
+.popupMenu .popupMenuItem:hover {
+	background: var(--popupMenuBackgroundColorHover);
+	color: black;
+}
+.popupMenu .popupMenuItem.popupMenuItemInactive {
+	opacity: .5;
+}
+.popupMenuCheckbox {
+	display: inline-block;
+	text-align: center;
+	width: 1em;
+	margin: 0 .2em;
+}
+.popupMenuItem.popupMenuItemChecked .popupMenuCheckbox:after {
+	content: "\2713"
+}
+.popupMenuItem.popupMenuSeparator {
+	border-bottom: 1px solid #666;
+	margin: 3px 5px;
 }
