@@ -31,7 +31,7 @@ let css = `
   border: 1px solid #D9D9D9;
   overflow: hidden;
   resize: none;
-  min-width: 8em;
+  min-width: 5em;
 }
 .TextEntryRow button:hover, .TextEntryRow button:focus {
   cursor: pointer;

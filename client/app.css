@@ -235,6 +235,7 @@ button,input,textarea,select {
   padding: 0.25em 0.8em 0.45em 0.1em;
   margin-left: -1px;
   text-align: center;
+  white-space: nowrap;
 }
 .TabControlRadioButton * {
   vertical-align: middle;
