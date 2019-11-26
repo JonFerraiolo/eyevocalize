@@ -1,47 +1,12 @@
-account
 
-forgot password user interface and back end
 
-person icon contains popup with two items, logout and my account
+if trial version
 
-my account opens the settings dialog to the fourth new account pane
-which contains
-  checkbox, synchronize my data across all client devices and browsers, default
-  checkbox, allow EyeVocalize administrators to see and use my data, default off
-  explanation of second checkbox
-  link to privacy page
-  divider
-  close account and delete my data
-    are you sure confirmation that includes link to privacy page
+login/signup instead of account icon
+account settings have error message with everything disabled
+faint red trial version across the top
 
-ResendAccountVerification - don't do this
-/forgotpassword
-/resetpassword:token is where you go after clicking link in email
-/accountverified:token, after clicking link in Signup email, with button to go to /app
-
-/signup
-Sign up for EyeVocalize.com
-Email []
-Password [] Show password
-By clicking Sign Up below, you are agreeing to the [Terms of Use].
-[ Sign Up ]
-Already registered? Then [ Login ]
-
-======
-
-/login
-Email []
-Password [] Show password
-[ Login ]
-Not yet registered? Then [ Sign Up ]
-Forgot password
-
-======
-
-/forgotpassword
-Email []
-[ Reset password  ]
-Return to login
+how to tell whether user is logged in?
 
 ======
 

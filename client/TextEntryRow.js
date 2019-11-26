@@ -11,7 +11,7 @@ import { html, render } from './lib/lit-html/lit-html.js';
 
 let css = `
 .TextEntryRow {
-  padding: 0.25em;
+  padding: 0.15em 0.25em;
   display: flex;
   align-items: center;
   flex: 0;
@@ -119,6 +119,17 @@ let css = `
   border: none;
   margin-right: 0.15em;
 }
+.TextEntrySignupLogin {
+  width: auto;
+  font-size: 0.8em;
+  line-height: 0.6em;
+  color: darkblue;
+  text-align: center;
+  font-variant: all-small-caps;
+  border: none;
+  margin: 0 0.15em;
+  vertical-align: 110%;
+}
 `;
 
 export function updateTextEntryRow(parentElement, props) {
@@ -167,7 +178,19 @@ export function updateTextEntryRow(parentElement, props) {
       TextEntryRowSetFocus();
     });
   }
+  let onSignupLogin = e => {
+    e.preventDefault();
+    let userEmail = localStorage.getItem('userEmail');
+    window.location.href = userEmail  ? '/login' : '/signup';
+  }
   let localUpdate = () => {
+    let lastIcon = window.eyevocalizeUser ?
+      html`<button class="TextEntryIcon TextEntryUser" @click=${onUser}
+        title='Show user screen, includes logout'></button>` :
+      html`<a class="TextEntryIcon TextEntrySignupLogin" href="" @click=${onSignupLogin}
+        title='Sign up or login'>Signup/<br></br>Login</a>`;
+    let userIconClass = "" + (window.eyevocalizeUser ? '' : ' notloggedin');
+    let signupLoginClass =  + (window.eyevocalizeUser ? ' loggedin' : '');
     render(html`
     <style>${css}</style>
     <div class=TextEntryRow>
@@ -194,10 +217,8 @@ export function updateTextEntryRow(parentElement, props) {
             title='View and change application settings'></button
           ><button class="TextEntryIcon TextEntryHelp" @click=${onHelp}
             title='Get help with the user interface for this application'></button
-          ><button class="TextEntryIcon TextEntryUser" @click=${onUser}
-            title='Show user screen, includes logout'></button
-        ></span
-      ></span>
+          ></span>${lastIcon}
+      </span>
     </div>`, parentElement);
     resizeableTextarea(document.getElementById('TextEntryRowTextArea'));
   };

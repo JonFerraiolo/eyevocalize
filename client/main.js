@@ -39,9 +39,9 @@ export function getAppMinOrMax() {
 }
 export function setAppMinOrMax(minOrMax) {
 	appMinOrMax = minOrMax;
-	let appmaincontentpercent = minOrMax === 'Min' ? mainAppPercentWhenSmall()+'%' : '100%';
+	//let appmaincontentpercent = minOrMax === 'Min' ? mainAppPercentWhenSmall()+'%' : '100%';
 	let appinitiallyblankpercent = minOrMax === 'Min' ? (100-mainAppPercentWhenSmall())+'%' : '0%';
-	document.querySelector('.appmaincontent').style.height = appmaincontentpercent;
+	//document.querySelector('.appmaincontent').style.height = appmaincontentpercent;
 	document.querySelector('.appinitiallyblank').style.height = appinitiallyblankpercent;
 	document.querySelector('.appinitiallyblank').style.display = minOrMax === 'Min' ? 'flex' : 'none';
 	updateMain();
@@ -121,9 +121,13 @@ export function updateMain(searchString) {
 		e.preventDefault();
 		setAppMinOrMax('Max');
 	};
+	let trial = window.eyevocalizeUser ? '' :
+		html`<div class=TrialVersion>You are using the Trial Version.
+		Sign up and log in officially to the free app to remove this message. </div>`;
 	render(html`
 		<style>${css}</style>
 		<div class=appfullheight style=${styleMap({fontSize: appFontSize+'%'})}>
+			${trial}
 			<div class=appmaincontent>
 				<div class=main>
 		      <div class=mainleft>
@@ -162,6 +166,9 @@ function main() {
   initializeFavorites(initializationProps);
 
 	updateMain();
+	if (window.eyevocalizeUser) {
+		localStorage.setItem('userEmail', window.eyevocalizeUser);
+	}
 	/*FIXME change to quick tutorial
 	if (window.eyevocalizeUser === '') {
 		setTimeout(() => {

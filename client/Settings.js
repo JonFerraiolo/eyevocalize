@@ -311,6 +311,7 @@ export function editSettings(parentElement, params) {
     )
   }`;
   let title = 'Settings';
+  let trial = !(window.eyevocalizeUser);
   let localUpdate = () => {
     voiceIndex = voices.findIndex(v => v.name === voiceName );
     if (voiceIndex === -1) voiceIndex = 0;
@@ -407,6 +408,7 @@ export function editSettings(parentElement, params) {
       </div>
     `, parentElement);
     // lit-html mysteriously does not update the value of the select element
+    parentElement.querySelector('.SettingsRestoreDefaultsRow button').disabled = false;
     if (section === 'Voice') {
       document.getElementById('SettingsVoice').selectedIndex = voiceIndex;
       volumeCombo.update(document.querySelector('.SettingsVolumeCombo'), {
@@ -437,6 +439,10 @@ export function editSettings(parentElement, params) {
     } else if (section === 'Account') {
       document.getElementById('SettingsSyncData').checked = syncData;
       document.getElementById('SettingsOKUseMyData').checked = okUseMyData;
+      document.getElementById('SettingsSyncData').disabled = trial;
+      document.getElementById('SettingsOKUseMyData').disabled = trial;
+      parentElement.querySelector('.SettingsAccountCloseAccountDiv button').disabled = trial;
+      parentElement.querySelector('.SettingsRestoreDefaultsRow button').disabled = trial;
     }
   };
   localUpdate();
