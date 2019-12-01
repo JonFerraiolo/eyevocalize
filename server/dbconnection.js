@@ -104,49 +104,12 @@ function reconnect() {
           logger.info('Connection %d connected', connection.threadId);
         });
         pool.on('enqueue', function () {
-          logger.info('Waiting for connection');
+          //logger.info('Waiting for connection');
         });
         pool.on('release', function (connection) {
           //logger.info('Connection %d released', connection.threadId);
         });
         innerResolve(pool);
-
-/*FIXME get rid of this code
-        connection.on('error', function(err) {
-          logger.error('mysql error: '+err.code);
-          logger.error(JSON.stringify(err));
-          // if(err.code === 'PROTOCOL_CONNECTION_LOST') {
-          connection = null;
-        });
-
-        logger.info("before connect");
-        connection.connect(function(error){
-          if (!error) {
-            logger.info("Database connected");
-            innerResolve(connection);
-          } else {
-            logger.error("Database connection error");
-            logger.error(JSON.stringify(error));
-            connection = null;
-            logger.info("checking reconnectCounter. reconnectCounter="+reconnectCounter);
-            if (reconnectCounter >= 5) {
-              innerReject(true) ; // too many retries, give up
-            } else {
-              reconnectCounter++;
-              innerReject(false); // don't finish the outer promise yet, we will try again
-              setTimeout(() => {
-                inner().then(() => {
-                  outerResolve(connection);
-                }, finishOuter => {
-                  if (finishOuter) {
-                    outerReject();
-                  }
-                });
-              }, 3000);
-            }
-          }
-        });
-*/
       });
     }
     inner().then(() => {
@@ -187,7 +150,7 @@ exports.initialize = function() {
     resetPasswordTokenDateTime datetime DEFAULT NULL,
     modified datetime NOT NULL,
     PRIMARY KEY (id),
-    INDEX(email(100),emailValidateToken)
+    INDEX(email(100))
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
 
   getConnection().then(pool  => {

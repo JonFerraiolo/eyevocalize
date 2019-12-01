@@ -1,12 +1,67 @@
 
 
-if trial version
+syncing data
 
-login/signup instead of account icon
-account settings have error message with everything disabled
-faint red trial version across the top
+types of data
 
-how to tell whether user is logged in?
+history items ordered by timestamp - add, delete
+clipboard, an array every time it is changed - update
+favorites categories - update
+favorites items within categories - update
+settings - update
+
+where to store it
+
+MySQL
+history table indexed by email, timestamp. other fields are phrase fields
+same for clipboard, except multiple entries for the same id
+favorite categories indexed by same, multiple entries for same id, fields are column number and category name
+favorite items indexed by same, field for column number, category name, then phrase fields
+settings indexed by email, timestamp, then just json for settings
+
+with each utterance or other action,
+
+server post with delta, create, delete or update
+if create, server inserts into table, passes results to client with unique id's
+client updates localStorage
+but doesn't deal with multiple clients!!!
+
+each client holds timestamp of last server sync And some sort of secondary indication about size
+Server holds timestamp for each client with timestamp of last server sync
+with each new session, server sends timestamps to client,
+client sends timestamps and pending updates , server sends pending updates to cclient
+
+potential problems
+
+software bugs
+network problems
+server crashes
+browser cache cleared
+
+can't use software until complete
+at start, server downloads summary data for that user
+client sees if it has newer data, including deletions and updates, uploads it with its summary data
+server updates db as needed, downloads new data (client&server) to client with summary
+client acknowledges receipt
+
+each item in db gets an autoincrement id, which is indicator that server has a copy
+
+localStorage
+
+history, last sync timestamp, deleted timestamp, entries after last server sync removed only by auto delete
+client maintains an associative array of all deletions
+
+stash, full list with timestamp back to last server sync
+favorites, full list, saved history back to last server sync
+settings, same
+need to figure out built in favorites!!!
+
+server merge with client,
+returns either full set of new data or deltas at start of browser session
+
+
+
+
 
 ======
 

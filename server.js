@@ -1,4 +1,5 @@
 const express = require('express');
+const http = require('http');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
@@ -75,6 +76,9 @@ const port = global.config.PORT;
 
 dbconnection.initialize(); // kick off the connection to the db and any needed db inits
 const app = express();
+const httpServer = http.createServer(app);
+const io = require('socket.io')(httpServer);
+
 const authMiddleware = sessionMgmt.auth;
 // this call results in app.use with session middleware, which needs to be first in line
 sessionMgmt.init(app).then(() => {
@@ -133,7 +137,18 @@ sessionMgmt.init(app).then(() => {
   app.post('/api/closeaccount', sessionRoutes.closeAccount)
   app.get('/*', (req, res) => res.redirect(301, '/'));
 
-  app.listen(port, () => logger.info(`App listening on port ${port}!`));
+  io.on('connection', function(socket){
+    logger.info('user connected at '+(new Date()).toISOString());
+    socket.on('disconnect', function(){
+      logger.info('user disconnected at '+(new Date()).toISOString());
+    });
+    socket.on('client message', msg => {
+      logger.info('client message was: '+msg+' at '+(new Date()).toISOString());
+      socket.emit('server message','echoing '+msg);
+    });
+  });
+
+  httpServer.listen(port, () => logger.info(`App listening on port ${port}!`));
 
 }, () => {
   logger.error('serverjs sessionMgmt.init promise reject.');

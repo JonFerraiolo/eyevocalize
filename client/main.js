@@ -123,7 +123,7 @@ export function updateMain(searchString) {
 	};
 	let trial = window.eyevocalizeUser ? '' :
 		html`<div class=TrialVersion>You are using the Trial Version.
-		Sign up and log in officially to the free app to remove this message. </div>`;
+		To remove this message, sign up and log in. (Note: the app is free) </div>`;
 	render(html`
 		<style>${css}</style>
 		<div class=appfullheight style=${styleMap({fontSize: appFontSize+'%'})}>
@@ -220,6 +220,15 @@ function main() {
 
 
 };
+
+let socket;
+try {
+	socket = io();
+	socket.on('server message', msg => { console.log('server says: '+msg); } );
+	socket.emit('client message', 'client says hello');
+} catch(e) {
+	console.error('socket.io initialization failed. ');
+}
 
 startupChecks(() => {
 	main();

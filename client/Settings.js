@@ -69,6 +69,9 @@ let css = `
 #SettingsVoiceSampleText {
   font-size: 115%;
 }
+.SettingsAccountTrialVersion {
+  margin-bottom: 1.5em;
+}
 .SettingsAccountUseMyDataExplanation {
   font-size: 90%;
   margin: 0.5em 0 0.5em 2em;
@@ -341,7 +344,11 @@ export function editSettings(parentElement, params) {
         </div>
       `;
     } else if (section === 'Account') {
+      let trial = window.eyevocalizeUser ? '' : html`<div class="SettingsAccountTrialVersion TrialVersion">
+        Because you are using the Trial Version, the options below are inactive.
+      </div>`;
       SettingsData = html`
+        ${trial}
         <div class="gridlayout SettingsAccount">
           <input type=checkbox id=SettingsSyncData @change=${onChangeSyncData} class=chooseVoiceRow>
           </input>
