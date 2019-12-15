@@ -72,11 +72,64 @@ if (typeof logdir === 'string' && logdir.length > 0) {
   });
 }
 const logger = global.logger;
-const port = global.config.PORT;
+let port = global.config.PORT;
+let protocol = global.config.PROTOCOL;
+const hostname = global.config.HOSTNAME;
+let credentials;
+if (hostname === 'zeyevocalize.com' && protocol === 'https') {
+  // special shenanigans for eyevocalize.com on A2 hosting because certs change every 90 days
+  logger.info('https with eyevocalize.com');
+  const ssldb = global.config.SSL_DB; // this file contains pointers to keys and certs
+  const ssldir = global.config.SSL_DIR; // keys and certs are in this folder
+  logger.info('ssldb='+ssldb+', ssldir='+ssldir);
+  if (!fs.existsSync(ssldb)) {
+    protocol = 'http'; // revert to http server, which will actually use https under hood
+    port = '80';
+  } else {
+    logger.info('ssldb exists');
+    let ssldbcontent;
+    try {
+      ssldbcontent = fs.readFileSync(ssldb).toString();
+      logger.info('ssldb successful read');
+      let prefix = 'eyevocalize_com_';
+      let index1 = ssldbcontent.indexOf(prefix);
+      let index2 = index1 + prefix.length;
+      let index3 = ssldbcontent.substr(index2).indexOf(':');
+      logger.info('index1='+index1+', index2='+index2+', index3='+index3);
+      let id = ssldbcontent.Substr(index2, index3 - index2);
+      logger.info('id='+id);
+      let sslkey = ssldir + '/keys/' + id + '.key';
+      let sslcert = ssldir + '/certs/' + prefix + id + '.crt';
+      logger.info('ssldb='+ssldb+', ssldir='+ssldir);
+      if (!fs.existsSync(sslkey) || !fs.existsSync(sslcert)) {
+        protocol = 'http'; // revert to http server, which will actually use https under hood
+        port = '80';
+      } else {
+        credentials = { key: sslkey, cert: sslcert };
+        logger.info('credentials='+JSON.stringify(credentials));
+      }
+    } catch(e) {
+      protocol = 'http'; // revert to http server, which will actually use https under hood
+      port = '80';
+    }
+  }
+} else if (protocol === 'https') {
+  logger.info('https without eyevocalize.com');
+  let sslkey = global.config.SSL_KEY;
+  let sslcert = global.config.SSL_CERT;
+  logger.info('ssldb='+ssldb+', ssldir='+ssldir);
+  if (!fs.existsSync(sslkey) || !fs.existsSync(sslcert)) {
+    protocol = 'http'; // revert to http server, which will actually use https under hood
+    port = '80';
+  } else {
+    credentials = { key: sslkey, cert: sslcert };
+    logger.info('credentials='+JSON.stringify(credentials));
+  }
+}
 
 dbconnection.initialize(); // kick off the connection to the db and any needed db inits
 const app = express();
-const httpServer = http.createServer(app);
+const httpServer = protocol === 'https' ? https.createServer(credentials, app) : http.createServer(app);
 const io = require('socket.io')(httpServer);
 
 const authMiddleware = sessionMgmt.auth;
