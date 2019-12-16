@@ -85,6 +85,8 @@ if (hostname === 'zeyevocalize.com' && protocol === 'https') {
 if (protocol === 'https') {
   logger.info('temp2 https with eyevocalize.com');
 }
+protocol = 'http'; // revert to http server, which will actually use https under hood
+port = '80';
 let credentials;
 if (hostname === 'zeyevocalize.com' && protocol === 'https') {
   // special shenanigans for eyevocalize.com on A2 hosting because certs change every 90 days
@@ -135,8 +137,6 @@ if (hostname === 'zeyevocalize.com' && protocol === 'https') {
     credentials = { key: sslkey, cert: sslcert };
     logger.info('credentials='+JSON.stringify(credentials));
   }
-  protocol = 'http'; // revert to http server, which will actually use https under hood
-  port = '80';
 }
 logger.info('after https check. protocol='+protocol+', port='+port);
 
