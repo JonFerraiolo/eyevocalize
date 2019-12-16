@@ -133,8 +133,11 @@ logger.info('after https check. protocol='+protocol+', port='+port);
 
 dbconnection.initialize(); // kick off the connection to the db and any needed db inits
 const app = express();
-const httpServer = protocol === 'https' ? https.createServer(credentials, app) : http.createServer(app);
-const io = require('socket.io')(httpServer);
+logger.info('before calling createServer');
+let httpServer = protocol === 'https' ? https.createServer(credentials, app) : http.createServer(app);
+logger.info('after calling createServer');
+let io = require('socket.io')(httpServer);
+logger.info('after creating io');
 
 const authMiddleware = sessionMgmt.auth;
 // this call results in app.use with session middleware, which needs to be first in line
@@ -205,7 +208,9 @@ sessionMgmt.init(app).then(() => {
     });
   });
 
+  logger.info('before calling listen on port');
   httpServer.listen(port, () => logger.info(`App listening on port ${port}!`));
+  logger.info('after calling listen on port');
 
 }, () => {
   logger.error('serverjs sessionMgmt.init promise reject.');
