@@ -61,8 +61,9 @@ if (typeof logdir === 'string' && logdir.length > 0) {
   global.logger = createLogger({
     format: myFormat2,
     transports: [
-      new transports.File({ filename: logfile })
-    ]
+      new transports.File({ filename: logfile, handleExceptions: true })
+    ],
+    exitOnError: false
   });
 } else {
   global.logger = createLogger({
