@@ -133,8 +133,16 @@ logger.info('after https check. protocol='+protocol+', port='+port);
 
 dbconnection.initialize(); // kick off the connection to the db and any needed db inits
 const app = express();
+let httpServer;
 logger.info('before calling createServer');
-let httpServer = protocol === 'https' ? https.createServer(credentials, app) : http.createServer(app);
+try {
+  httpServer = protocol === 'https' ? https.createServer(credentials, app) : http.createServer(app);
+} catch(e) {
+  logger.info('exception when calling createServer. e='+e);
+  protocol = 'http'; // revert to http server, which will actually use https under hood
+  port = '80';
+  httpServer = http.createServer(app);
+}
 logger.info('after calling createServer');
 let io = require('socket.io')(httpServer);
 logger.info('after creating io');
