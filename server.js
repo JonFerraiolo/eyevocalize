@@ -74,6 +74,8 @@ if (typeof logdir === 'string' && logdir.length > 0) {
 }
 const logger = global.logger;
 let port = global.config.PORT;
+logger.info('before https check');
+process.exit(0);
 let protocol = global.config.PROTOCOL;
 const hostname = global.config.HOSTNAME;
 let credentials;
