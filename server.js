@@ -76,7 +76,7 @@ const logger = global.logger;
 let port = global.config.PORT;
 let protocol = global.config.PROTOCOL;
 const hostname = global.config.HOSTNAME;
-logger.info('before https check');
+logger.info('before https check. protocol='+protocol+', port='+port);
 protocol = 'http'; // revert to http server, which will actually use https under hood
 port = '80';
 let credentials;
