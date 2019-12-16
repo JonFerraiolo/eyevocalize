@@ -131,7 +131,7 @@ if (hostname === 'zeyevocalize.com' && protocol === 'https') {
   port = '80';
   let sslkey = global.config.SSL_KEY;
   let sslcert = global.config.SSL_CERT;
-  logger.info('ssldb='+ssldb+', ssldir='+ssldir);
+  logger.info('sslkey='+sslkey+', sslcert='+sslcert);
   /*
   if (!fs.existsSync(sslkey) || !fs.existsSync(sslcert)) {
     protocol = 'http'; // revert to http server, which will actually use https under hood
