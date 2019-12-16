@@ -127,12 +127,12 @@ if (hostname === 'zeyevocalize.com' && protocol === 'https') {
   */
 } else if (protocol === 'https') {
   logger.info('https without eyevocalize.com');
+  protocol = 'http'; // revert to http server, which will actually use https under hood
+  port = '80';
+  /*
   let sslkey = global.config.SSL_KEY;
   let sslcert = global.config.SSL_CERT;
   logger.info('ssldb='+ssldb+', ssldir='+ssldir);
-  protocol = 'http'; // revert to http server, which will actually use https under hood
-  port = '80';
-/*
   if (!fs.existsSync(sslkey) || !fs.existsSync(sslcert)) {
     protocol = 'http'; // revert to http server, which will actually use https under hood
     port = '80';
