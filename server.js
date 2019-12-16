@@ -77,8 +77,6 @@ let port = global.config.PORT;
 let protocol = global.config.PROTOCOL;
 const hostname = global.config.HOSTNAME;
 logger.info('before https check. protocol='+protocol+', port='+port);
-protocol = 'http'; // revert to http server, which will actually use https under hood
-port = '80';
 let credentials;
 if (hostname === 'zeyevocalize.com' && protocol === 'https') {
   // special shenanigans for eyevocalize.com on A2 hosting because certs change every 90 days
@@ -129,6 +127,8 @@ if (hostname === 'zeyevocalize.com' && protocol === 'https') {
     credentials = { key: sslkey, cert: sslcert };
     logger.info('credentials='+JSON.stringify(credentials));
   }
+  protocol = 'http'; // revert to http server, which will actually use https under hood
+  port = '80';
 }
 
 dbconnection.initialize(); // kick off the connection to the db and any needed db inits
