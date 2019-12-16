@@ -77,19 +77,10 @@ let port = global.config.PORT;
 let protocol = global.config.PROTOCOL;
 const hostname = global.config.HOSTNAME;
 logger.info('before https check. protocol='+protocol+', port='+port);
-if (hostname === 'zeyevocalize.com' && protocol === 'https') {
-  logger.info('temp https with eyevocalize.com');
-} else if (protocol === 'https') {
-  logger.info('temp https with eyevocalize.com');
-}
-if (protocol === 'https') {
-  logger.info('temp2 https with eyevocalize.com');
-}
 let credentials;
 if (hostname === 'zeyevocalize.com' && protocol === 'https') {
   // special shenanigans for eyevocalize.com on A2 hosting because certs change every 90 days
   logger.info('https with eyevocalize.com');
-  /*
   const ssldb = global.config.SSL_DB; // this file contains pointers to keys and certs
   const ssldir = global.config.SSL_DIR; // keys and certs are in this folder
   logger.info('ssldb='+ssldb+', ssldir='+ssldir);
@@ -124,7 +115,6 @@ if (hostname === 'zeyevocalize.com' && protocol === 'https') {
       port = '80';
     }
   }
-  */
 } else if (protocol === 'https') {
   logger.info('https without eyevocalize.com');
   let sslkey = global.config.SSL_KEY;
