@@ -74,10 +74,11 @@ if (typeof logdir === 'string' && logdir.length > 0) {
 }
 const logger = global.logger;
 let port = global.config.PORT;
-logger.info('before https check');
-process.exit(0);
 let protocol = global.config.PROTOCOL;
 const hostname = global.config.HOSTNAME;
+logger.info('before https check');
+protocol = 'http'; // revert to http server, which will actually use https under hood
+port = '80';
 let credentials;
 if (hostname === 'zeyevocalize.com' && protocol === 'https') {
   // special shenanigans for eyevocalize.com on A2 hosting because certs change every 90 days
