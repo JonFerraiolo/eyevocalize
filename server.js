@@ -118,15 +118,13 @@ if (hostname === 'zeyevocalize.com' && protocol === 'https') {
   }
 } else if (protocol === 'https') {
   logger.info('https without eyevocalize.com');
-  let sslkey = global.config.SSL_KEY;
-  let sslcert = global.config.SSL_CERT;
-  logger.info('sslkey='+sslkey+', sslcert='+sslcert);
-  if (!fs.existsSync(sslkey) || !fs.existsSync(sslcert)) {
+  try {
+    credentials = { key: fs.readFileSync(global.config.SSL_KEY), cert: fs.readFileSync(global.config.SSL_CERT) };
+    logger.info('credentials='+JSON.stringify(credentials));
+  } catch(e) {
+    logger.info('fs read file failure for https');
     protocol = 'http'; // revert to http server, which will actually use https under hood
     port = '80';
-  } else {
-    credentials = { key: sslkey, cert: sslcert };
-    logger.info('credentials='+JSON.stringify(credentials));
   }
 }
 logger.info('after https check. protocol='+protocol+', port='+port);
