@@ -2,6 +2,24 @@
 
 syncing data
 
+compose and speak logic
+  History: addToHistory
+  export function addToHistory(obj) {
+    obj = Object.assign({ timestamp: Date.now() }, obj);
+    //Phrases, not History, indexed by timestamp
+  	History.items.unshift(obj);//PendingPhrases, not History, indexed by timestamp
+    updateLocalStorage();
+  };
+
+
+new ideas
+  each new phrase saved forever, at least for now
+  each phrase gets an int index auto increment
+  each built in only saved once in database
+  each revision of history, stash, favorites has new phrases plus updated arrays with array of integers, which are phrase ids
+  Change the data structures on the client to match the server
+  Have server APIs that match client local storage options, such as addToHistory
+
 types of data
 
 history items ordered by timestamp - add, delete
