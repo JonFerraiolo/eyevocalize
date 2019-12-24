@@ -123,7 +123,7 @@ export function updateMain(searchString) {
 	};
 	let trial = window.eyevocalizeUser ? '' :
 		html`<div class=TrialVersion>You are using the Trial Version.
-		To remove this message, sign up and log in. (Note: the app is free) </div>`;
+		To remove this message, sign up and log in. (The app is free) </div>`;
 	render(html`
 		<style>${css}</style>
 		<div class=appfullheight style=${styleMap({fontSize: appFontSize+'%'})}>

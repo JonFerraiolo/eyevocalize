@@ -60,6 +60,9 @@ let css = `
   font-size: 80%;
   padding: 1em 0 0.5em;
 }
+.HistoryContent {
+  position: relative;
+}
 .editHistoryPhraseRows {
   flex: 1;
   overflow: auto;
@@ -321,6 +324,53 @@ export function editHistory(parentElement, props) {
     localUpdate();
     lastClickItemIndex = null;
   };
+  let onClickScrollTo = e => {
+    e.preventDefault();
+    let found = localHistory.items.find(item => item.selected);
+    let { timestamp } = found;
+    searchString = '';
+    searchTokens = [];
+    dateRange = 'none';
+    initializeLocalHistory();
+    scrollToIndex = localHistory.items.findIndex(item => item.timestamp === timestamp);
+    if (scrollToIndex !== -1) {
+      localHistory.items[scrollToIndex].selected = true;
+    }
+    localUpdate();
+  };
+  let onClickCopySelected = e => {
+    e.preventDefault();
+    let text = '', nItems = 0;
+    localHistory.items.forEach(item => {
+      if (item.selected) {
+        if (nItems > 0) {
+          text += '\n';
+        }
+        text += (item.text || item.label || '');
+        nItems++;
+      }
+    });
+    let div = document.createElement('div');
+    div.style.position = 'absolute';
+    div.style.left = '0px';
+    div.style.top = '0px';
+    div.style.width = '1px';
+    div.style.height = '1px';
+    div.style.opacity = 0;
+    div.textContent = text;
+    document.body.appendChild(div);
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(div);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    try {
+      document.execCommand('copy');
+    } catch(e) {
+      console.log('copy to clipboard failed');
+    }
+    document.body.removeChild(div);
+  };
   let onClickRemoveSelected = e => {
     e.preventDefault();
     History.items = History.items.filter(item => {
@@ -338,34 +388,33 @@ export function editHistory(parentElement, props) {
   };
   let localHistory;
   let historyElements;
+  let scrollToIndex;
   let initializeLocalHistory = () => {
     localHistory = JSON.parse(JSON.stringify(History));  // deep clone
-    if (searchTokens.length > 0 || dateRange != 'none') {
-      let now = Date.now();
-      let starttime, endtime;
-      if (dateRange === '<day') { starttime = now - day; endtime = now; }
-      else if (dateRange === '<week') { starttime = now - week; endtime = now; }
-      else if (dateRange === '<month') { starttime = now - month; endtime = now; }
-      else if (dateRange === '>day') { starttime = 0; endtime = now - day; }
-      else if (dateRange === '>week') { starttime = 0; endtime = now - week; }
-      else if (dateRange === '>month') { starttime = 0; endtime = now - month; }
-      else { starttime = 0; endtime = now; }
-      if (searchTokens.length > 0) {
-        localHistory.items = localHistory.items.filter(phrase => {
-          return searchTokens.some(token => {
-            return ((typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
-                    (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token))) &&
-                    phrase.timestamp >= starttime && phrase.timestamp <= endtime;
-          });
+    let now = Date.now();
+    let starttime, endtime;
+    if (dateRange === '<day') { starttime = now - day; endtime = now; }
+    else if (dateRange === '<week') { starttime = now - week; endtime = now; }
+    else if (dateRange === '<month') { starttime = now - month; endtime = now; }
+    else if (dateRange === '>day') { starttime = 0; endtime = now - day; }
+    else if (dateRange === '>week') { starttime = 0; endtime = now - week; }
+    else if (dateRange === '>month') { starttime = 0; endtime = now - month; }
+    else { starttime = 0; endtime = now; }
+    if (searchTokens.length > 0) {
+      localHistory.items = localHistory.items.filter(phrase => {
+        return searchTokens.some(token => {
+          return ((typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
+                  (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token))) &&
+                  phrase.timestamp >= starttime && phrase.timestamp <= endtime;
         });
-      } else {
-        localHistory.items = localHistory.items.filter(phrase => phrase.timestamp >= starttime && phrase.timestamp <= endtime);
-      }
+      });
     }
+    localHistory.items = localHistory.items.filter(phrase => phrase.timestamp >= starttime && phrase.timestamp <= endtime);
     localHistory.items.forEach((item, index) => {
       item.selected = false;
     });
     lastClickItemIndex = null;
+    scrollToIndex = -1;
   };
   let localUpdate = () => {
     localHistory.items.forEach(item => {
@@ -396,13 +445,13 @@ export function editHistory(parentElement, props) {
         </div>
       `);
     }
-    let enableAddToFavorites = localHistory.items.reduce((accumulator, item) => {
+    let exactlyOneSelected = localHistory.items.reduce((accumulator, item) => {
       if (item.selected) {
         accumulator++;
       }
       return accumulator;
     }, 0) === 1;
-    let enableRemoveSelected = localHistory.items.some(item => item.selected);
+    let atLeastOneSelected = localHistory.items.some(item => item.selected);
     render(html`
     <style>${css}</style>
     <div class="History editHistory skinnyScreenParent">
@@ -428,15 +477,29 @@ export function editHistory(parentElement, props) {
           <a href="" @click=${onClickDeselectAll}>Deselect All</a>
         </div>
         <div class=ButtonRow>
-          <button @click=${onClickRemoveSelected} ?disabled=${!enableRemoveSelected}
+          <button @click=${onClickScrollTo} ?disabled=${!exactlyOneSelected}
+            title="Scroll to selected item, as any filtering is canceled">Scroll to</button>
+          <button @click=${onClickCopySelected} ?disabled=${!atLeastOneSelected}
+            title="Copy text from selected items to system clipboard">Copy</button>
+          <button @click=${onClickRemoveSelected} ?disabled=${!atLeastOneSelected}
             title="Delete selected items">Delete</button>
-          <button @click=${onClickAddToFavorites} ?disabled=${!enableAddToFavorites}
+          <button @click=${onClickAddToFavorites} ?disabled=${!exactlyOneSelected}
             title="Make selected item into a favorite">
             <span class=editHistoryNewFavorite></span></button>
         </div>
       </div>
     </div>`, parentElement);
-    parentElement.querySelector('.editHistoryFilterRow select').value = dateRange;
+    parentElement.querySelector('select').selectedIndex = options.findIndex(option => option.value === dateRange);
+    if (scrollToIndex !== -1) {
+      let historyContent = parentElement.querySelector('.HistoryContent');
+      let buttons = Array.from(historyContent.querySelectorAll('button'));
+      let button = buttons[scrollToIndex];
+      setTimeout(() => {
+        let phraseRow  = button.parentElement;
+        historyContent.scrollTop += (phraseRow.offsetTop - (historyContent.clientHeight - phraseRow.offsetHeight)  / 2);
+        scrollToIndex = -1;
+      }, 0);
+    }
   };
   initializeLocalHistory();
   localUpdate();
