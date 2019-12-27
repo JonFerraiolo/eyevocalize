@@ -7,6 +7,7 @@ import { EditPhrase } from './EditPhrase.js';
 import { updateMain, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { slideInAddFavoriteScreen } from './Favorites.js';
+import { styleMap } from './lib/lit-html/directives/style-map.js';
 
 let css = `
 .History {
@@ -32,11 +33,25 @@ let css = `
   flex-direction: column;
 }
 .editHistory .editHistoryFilterRow {
-  text-align: center;
+  font-size: 85%;
+  white-space: nowrap;
+  padding: 0 0 0 2em;
+}
+#editHistoryTextSearch {
+  width: 10em;
 }
 .editHistory .editHistoryFilterRow Label {
-  font-size: 85%;
-  margin: 0 0.5em 0 2em;
+  font-size: 95%;
+  white-space: nowrap;
+}
+.editHistory .editHistoryFilterRow Label[for=editHistoryTextSearch] {
+  margin: 0 0.25em 0 0;
+}
+.editHistory .editHistoryFilterRow Label[for=EditHistoryPhraseSize] {
+  margin: 0 0.25em 0 0.75em;
+}
+.editHistory .HistoryContent button {
+  white-space: normal;
 }
 .editHistoryClear {
   display: inline-block;
@@ -52,7 +67,7 @@ let css = `
   padding: 0;
   margin-left: 0;
 }
-.editHistory .editHistoryFilterRow select {
+#EditHistoryDateRange {
   margin-left: 2.25em;
 }
 .editHistory .ScreenInstructions {
@@ -62,10 +77,6 @@ let css = `
 }
 .HistoryContent {
   position: relative;
-}
-.editHistoryPhraseRows {
-  flex: 1;
-  overflow: auto;
 }
 .editHistoryNewFavorite {
   display: inline-block;
@@ -240,10 +251,11 @@ export function editHistory(parentElement, props) {
   let searchString = '';
   let searchTokens = [];
   let dateRange = 'none';
+  let phraseSize = '1';
   const day = 1000*60*60*24;
   const week = day * 7;
   const month = day * 30;
-  const options = [
+  const rangeOptions = [
     { value: 'none', label: 'anytime'},
     { value: '<day', label: '0-24 hours ago'},
     { value: '<week', label: '0-7 days ago'},
@@ -252,7 +264,19 @@ export function editHistory(parentElement, props) {
     { value: '>week', label: '> 7 days ago'},
     { value: '>month', label: '> 30 days ago'},
   ];
-  const optionElements = options.map(option =>
+  const phraseSizeOptions = [
+    { value: '1', label: '1'},
+    { value: '2', label: '2'},
+    { value: '3', label: '3'},
+    { value: '4', label: '4'},
+    { value: '5', label: '5'},
+    { value: '10', label: '10'},
+    { value: 'none', label: 'none'},
+  ];
+  const rangeOptionElements = rangeOptions.map(option =>
+    html`<option .value=${option.value}>${option.label}</option>`
+  );
+  const phraseSizeOptionElements = phraseSizeOptions.map(option =>
     html`<option .value=${option.value}>${option.label}</option>`
   );
   let onInput = e => {
@@ -264,10 +288,15 @@ export function editHistory(parentElement, props) {
     initializeLocalHistory();
     localUpdate();
   };
-  let onChange = e => {
+  let onChangeRange = e => {
     e.preventDefault();
-    dateRange = options[e.target.selectedIndex].value;
+    dateRange = rangeOptions[e.target.selectedIndex].value;
     initializeLocalHistory();
+    localUpdate();
+  };
+  let onChangePhraseSize = e => {
+    e.preventDefault();
+    phraseSize = phraseSizeOptions[e.target.selectedIndex].value;
     localUpdate();
   };
   let onClear = e => {
@@ -424,6 +453,7 @@ export function editHistory(parentElement, props) {
     historyElements = [];
     let nextGroup = 0;
     let now = Date.now();
+    let buttonInlineStyle = styleMap({ maxHeight:(phraseSize==='none' ? 'max-content' : (0.2+parseInt(phraseSize)*1.2)+'em') });
     for(let i=0, n=localHistory.items.length; i<n; i++) {
       let index = i;
       let phrase = localHistory.items[i];
@@ -439,7 +469,7 @@ export function editHistory(parentElement, props) {
       }
       historyElements.push(html`
         <div class=PhraseRow>
-          <button @click=${onItemClick} .phraseObject=${phrase} .phraseIndex=${index} class=${phrase.cls}>
+          <button @click=${onItemClick} .phraseObject=${phrase} .phraseIndex=${index} class=${phrase.cls} style=${buttonInlineStyle}>
             ${phrase.checkmark}
             ${phrase.label || phrase.text}</button>
         </div>
@@ -462,8 +492,11 @@ export function editHistory(parentElement, props) {
           ><input id=editHistoryTextSearch .value=${searchString} placeholder="filter text" @input=${onInput}></input
           ><button class="editHistoryClear" @click=${onClear}
             title='Clear the filter text'></button
-          ><select @change=${onChange}>
-            ${optionElements}
+          ><select @change=${onChangeRange} id=EditHistoryDateRange>
+            ${rangeOptionElements}
+          </select><label for=EditHistoryPhraseSize>Max size:</label
+          ><select @change=${onChangePhraseSize} id=EditHistoryPhraseSize>
+            ${phraseSizeOptionElements}
           </select>
         </div>
         <div class=ScreenInstructions>
@@ -489,7 +522,8 @@ export function editHistory(parentElement, props) {
         </div>
       </div>
     </div>`, parentElement);
-    parentElement.querySelector('select').selectedIndex = options.findIndex(option => option.value === dateRange);
+    document.getElementById('EditHistoryDateRange').selectedIndex = rangeOptions.findIndex(option => option.value === dateRange);
+    document.getElementById('EditHistoryPhraseSize').selectedIndex = phraseSizeOptions.findIndex(option => option.value === phraseSize);
     if (scrollToIndex !== -1) {
       let historyContent = parentElement.querySelector('.HistoryContent');
       let buttons = Array.from(historyContent.querySelectorAll('button'));
