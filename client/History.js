@@ -525,14 +525,18 @@ export function editHistory(parentElement, props) {
     document.getElementById('EditHistoryDateRange').selectedIndex = rangeOptions.findIndex(option => option.value === dateRange);
     document.getElementById('EditHistoryPhraseSize').selectedIndex = phraseSizeOptions.findIndex(option => option.value === phraseSize);
     if (scrollToIndex !== -1) {
-      let historyContent = parentElement.querySelector('.HistoryContent');
-      let buttons = Array.from(historyContent.querySelectorAll('button'));
-      let button = buttons[scrollToIndex];
-      setTimeout(() => {
+      let buttonIndex = scrollToIndex;
+      scrollToIndex = -1;
+      function scrollIt() {
+        let historyContent = parentElement.querySelector('.HistoryContent');
+        let buttons = Array.from(historyContent.querySelectorAll('button'));
+        let button = buttons[buttonIndex];
         let phraseRow  = button.parentElement;
-        historyContent.scrollTop += (phraseRow.offsetTop - (historyContent.clientHeight - phraseRow.offsetHeight)  / 2);
-        scrollToIndex = -1;
-      }, 0);
+        historyContent.scrollTop = phraseRow.offsetTop - (historyContent.clientHeight - phraseRow.offsetHeight)  / 2;
+      }
+      // kludge do scroll twice in case there is a very large history 
+      setTimeout(scrollIt, 200);
+      setTimeout(scrollIt, 2000);
     }
   };
   initializeLocalHistory();
