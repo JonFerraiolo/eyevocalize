@@ -370,7 +370,8 @@ export function editHistory(parentElement, props) {
   let onClickCopySelected = e => {
     e.preventDefault();
     let text = '', nItems = 0;
-    localHistory.items.forEach(item => {
+    for (let i=localHistory.items.length-1; i>=0; i--) {
+      let item =  localHistory.items[i];
       if (item.selected) {
         if (nItems > 0) {
           text += '\n';
@@ -378,7 +379,7 @@ export function editHistory(parentElement, props) {
         text += (item.text || item.label || '');
         nItems++;
       }
-    });
+    }
     let div = document.createElement('div');
     div.style.position = 'absolute';
     div.style.left = '0px';
@@ -534,7 +535,7 @@ export function editHistory(parentElement, props) {
         let phraseRow  = button.parentElement;
         historyContent.scrollTop = phraseRow.offsetTop - (historyContent.clientHeight - phraseRow.offsetHeight)  / 2;
       }
-      // kludge do scroll twice in case there is a very large history 
+      // kludge do scroll twice in case there is a very large history
       setTimeout(scrollIt, 200);
       setTimeout(scrollIt, 2000);
     }
