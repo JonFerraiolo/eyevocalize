@@ -369,6 +369,9 @@ export function editHistory(parentElement, props) {
   };
   let onClickCopySelected = e => {
     e.preventDefault();
+    copySelected();
+  };
+  let copySelected = () => {
     let text = '', nItems = 0;
     for (let i=localHistory.items.length-1; i>=0; i--) {
       let item =  localHistory.items[i];
@@ -446,6 +449,20 @@ export function editHistory(parentElement, props) {
     lastClickItemIndex = null;
     scrollToIndex = -1;
   };
+  let keydownEvent = e => {
+    let shift = e.getModifierState("Shift");
+    let control = e.getModifierState("Control");
+    let meta = e.getModifierState("Meta");
+    if (e.key === 'c' && !shift && (control || meta)) {
+      e.preventDefault();
+      copySelected();
+    }
+  };
+  let onReturn = () => {
+    document.removeEventListener('keydown', keydownEvent, false);
+    onEditHistoryReturn();
+  };
+  document.addEventListener('keydown', keydownEvent, false);
   let localUpdate = () => {
     localHistory.items.forEach(item => {
       item.cls = item.selected ? 'selected' : '';
@@ -487,7 +504,7 @@ export function editHistory(parentElement, props) {
     <style>${css}</style>
     <div class="History editHistory skinnyScreenParent">
       <div class=skinnyScreenChild>
-        ${buildSlideRightTitle("Manage History", onEditHistoryReturn)}
+        ${buildSlideRightTitle("Manage History", onReturn)}
         <div class=editHistoryFilterRow>
           <label for=editHistoryTextSearch>Filter:</label
           ><input id=editHistoryTextSearch .value=${searchString} placeholder="filter text" @input=${onInput}></input
