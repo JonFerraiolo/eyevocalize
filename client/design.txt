@@ -2,6 +2,91 @@
 
 syncing data
 
+something new spoken
+client History.js: update ls, main/sync
+  two lists, deletions and additions since last sync, lists of phrases
+  deletions are removed from ls immediately, just like now
+  in fact, only changes are to add to pending lists all deletions and additions, plus call to main.js sync
+client favorites.js:
+  only changes are to add lastMod value and call sync after every change
+  pending just returns current favorites if date greater than lastSync
+client main.js sync(): collect all pending, send all pending to server
+client History.js (pending history=all pending)
+client main.js, lastSync in ls, getLastSync(), clientId from ls, initiated with timestamp
+socket msg: ClientUpdates, {clientId, clientLastSync, updates: {history:{deletions,additions}, favorites, settings, clipboard} }
+server clientSync.js:
+  select lastSync for all connected clients for this email
+  make timestamp which will be the new lastSync ???  Necessary?
+  distribute all pending (promises),
+  update lastSync client table,
+  send custom updates to client, history since this client previous lastSync
+server historySync.js:
+  mergeAndUpdate(minLastSyncConnected, minLastSyncAll, maxLastSync, updates:{deletions,additions})
+  history table delete: delete from table where created in (?), array
+  additions: INSERT INTO tbl_name (a,b,c) VALUES ?, array of arrays, where inner are phrases
+  return history since minLastSyncConnected
+Socket message to all connected clients: ServerUpdates, same values as ClientUpdates, custom updates for each client
+  who customizes? Server, but which file? historySync.js
+client main.js sync: receive all pending, distribute all pending, update lastSync in ls after everything finishes 
+client History.js: merge updates from server (ie, do deletions, replace everything after sync timestamp), update ls
+
+is it solid if error or disconnect?
+what about clients that go stale
+
+need logic for
+  client data change: update ls, add to pending, call main, if connected, send all pending to server
+  client (re) connects: send all pending to server
+  server gets updated data: merge into db, push updates to all connected clients same user
+  server gets new client connection: nothing else needed
+
+server files
+clientSync.js
+  manages corresponding table and sync apis
+  receives and sends socket.io messages from/to clients
+historySync.js manages corresponding table and sync & merge logic
+  historySync(email, clientId, clients array, updates)
+    clients array holds clientId and lastSync
+    select all items >= timestamp
+    mark all new deletions, insert all additions
+    send back clients array, clientId and updates array for that client
+    history table needs to keep all deletions after minimum timestamp for all clients for this user
+    that means delete all deletions up to minimum timestamp
+settingsSync.js manages corresponding table and sync & merge logic
+favoritesSync.js manages corresponding table and sync & merge logic
+chipboardSync.js manages corresponding table and sync & merge logic
+
+on client, new file sync.js
+gets push notifications and distributes
+gets update notifications from other files, collects all updates, sends to server
+stores clientId and last sync in localStorage
+synchronization via socket.io
+NewSyncFromClient: contains all updates of any data since last sync
+NewSyncFromServer: contains all updates of any data since last sync
+
+each client needs a unique id
+each save to local storage or server need needs a timestamp
+
+server merge
+if client timestamp > user last sync, then merge
+if any updates, push to all active clients
+history, clipboard, favorites merge adds all phrases (history: in timestamp order)
+take latest list, find items from other list that are missing,
+try to place unmatched items based on items before Or after
+
+MySQL
+each item in db gets an autoincrement id, which is indicator that server has a copy
+add data format version to each phrase or other row
+user table gets last sync
+client table, clientId, email, lastSync indexed by email
+history table indexed by email, timestamp, clientId, deleted, JSON for phrase, phrase has delete flag
+clipboard table indexed by email, timestamp, clientId, JSON for entire clipboard
+favorite table indexed by email, timestamp, clientId, JSON for entire favorites, each category and item has delete flag
+settings table indexed by email, timestamp, clientId, JSON for history settings (only voice, history, account)
+keep all old rows with timestamp > minimum client lastSync
+therefore, delete all rows with timestamp <= minimum client lastSync
+
+how to delete obsolete entries
+
 compose and speak logic
   History: addToHistory
   export function addToHistory(obj) {
@@ -30,13 +115,6 @@ settings - update
 
 where to store it
 
-MySQL
-history table indexed by email, timestamp. other fields are phrase fields
-same for clipboard, except multiple entries for the same id
-favorite categories indexed by same, multiple entries for same id, fields are column number and category name
-favorite items indexed by same, field for column number, category name, then phrase fields
-settings indexed by email, timestamp, then just json for settings
-
 with each utterance or other action,
 
 server post with delta, create, delete or update
@@ -61,8 +139,6 @@ at start, server downloads summary data for that user
 client sees if it has newer data, including deletions and updates, uploads it with its summary data
 server updates db as needed, downloads new data (client&server) to client with summary
 client acknowledges receipt
-
-each item in db gets an autoincrement id, which is indicator that server has a copy
 
 localStorage
 
