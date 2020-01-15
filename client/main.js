@@ -9,7 +9,7 @@ import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSi
 import { updatePhrases } from './Phrases.js';
 import { initializeStash, stash, editStash } from './Stash.js';
 import { initializeHistory, playLastHistoryItem } from './History.js';
-import { initializeFavorites, editFavorites } from './Favorites.js';
+import { initializeMyPhrases, editMyPhrases } from './MyPhrases.js';
 import { initializeBuiltins, editBuiltins } from './Builtins.js';
 import { fromRight, fromLeft } from './animSlide.js';
 import { speak, playAudio } from './vocalize.js';
@@ -164,7 +164,7 @@ function main() {
   initializeSettings(initializationProps);
   initializeStash(initializationProps);
   initializeHistory(initializationProps);
-	initializeFavorites(initializationProps);
+	initializeMyPhrases(initializationProps);
 	initializeBuiltins(initializationProps);
 
 	updateMain();

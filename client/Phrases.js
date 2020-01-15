@@ -3,7 +3,7 @@ import { html, render } from './lib/lit-html/lit-html.js';
 import { speak, playAudio, playYoutube } from './vocalize.js';
 import { updateStash } from './Stash.js';
 import { updateHistory } from './History.js';
-import { updateFavorites } from './Favorites.js';
+import { updateMyPhrases } from './MyPhrases.js';
 import { updateBuiltins } from './Builtins.js';
 import { updateMain } from './main.js';
 import { TextEntryRowSetText, TextEntryRowSetFocus } from './TextEntryRow.js';
@@ -14,12 +14,12 @@ let css = `
   display: flex;
   flex-direction: row;
 }
-.StashAndHistory, #FavoritesContainer {
+.StashAndHistory, #MyPhrasesContainer {
   min-height: 0px;
   height: 100%;
   display: inline-block;
 }
-#FavoritesContainer {
+#MyPhrasesContainer {
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -54,7 +54,7 @@ let css = `
 .HistoryContent {
   flex: 1 1;
 }
-#FavoritesContainer {
+#MyPhrasesContainer {
   flex: 2;
 }
 #BuiltinsContainer {
@@ -69,13 +69,13 @@ let css = `
   font-size: 0.9em;
 }
 .PhrasesSectionLabel .collapsearrow, .PhrasesSectionLabel .expandarrow,
-    .FavoritesCategoryLabel .collapsearrow, .FavoritesCategoryLabel .expandarrow,
+    .MyPhrasesCategoryLabel .collapsearrow, .MyPhrasesCategoryLabel .expandarrow,
     .BuiltinsCategoryLabel .collapsearrow, .BuiltinsCategoryLabel .expandarrow {
   padding: 0 0.5em;
   line-height: 50%;
   vertical-align: -50%;
 }
-.PhrasesSectionLabel .collapsearrow, .FavoritesCategoryLabel .collapsearrow {
+.PhrasesSectionLabel .collapsearrow, .MyPhrasesCategoryLabel .collapsearrow {
   vertical-align: 50%;
 }
 .PhrasesSectionLabel a, .PhrasesSectionLabel a:link, .PhrasesSectionLabel a:visited {
@@ -193,7 +193,7 @@ export function updatePhrases(parentElement, props) {
     [];
   let StashProps = { searchTokens };
   let HistoryProps = { searchTokens };
-  let FavoritesProps = { searchTokens };
+  let MyPhrasesProps = { searchTokens };
   render(html`
   <style>${css}</style>
   <div class=Phrases>
@@ -201,11 +201,11 @@ export function updatePhrases(parentElement, props) {
       <div id=StashContainer></div>
       <div id=HistoryContainer></div>
     </div>
-    <div id=FavoritesContainer></div>
+    <div id=MyPhrasesContainer></div>
     <div id=BuiltinsContainer></div>
   </div>`, parentElement);
   updateStash(document.getElementById('StashContainer'), StashProps);
   updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
-  updateFavorites(document.getElementById('FavoritesContainer'), FavoritesProps);
-  updateBuiltins(document.getElementById('BuiltinsContainer'), FavoritesProps);
+  updateMyPhrases(document.getElementById('MyPhrasesContainer'), MyPhrasesProps);
+  updateBuiltins(document.getElementById('BuiltinsContainer'), MyPhrasesProps);
 }

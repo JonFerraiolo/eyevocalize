@@ -27,7 +27,7 @@ server historySync.js:
   return history since minLastSyncConnected
 Socket message to all connected clients: ServerUpdates, same values as ClientUpdates, custom updates for each client
   who customizes? Server, but which file? historySync.js
-client main.js sync: receive all pending, distribute all pending, update lastSync in ls after everything finishes 
+client main.js sync: receive all pending, distribute all pending, update lastSync in ls after everything finishes
 client History.js: merge updates from server (ie, do deletions, replace everything after sync timestamp), update ls
 
 is it solid if error or disconnect?
@@ -170,7 +170,7 @@ drag bar with title, Quick tutorial, close icon on right
 [Help topics] [Prev] [Next] [dblleft] left right dblright dblup up down  dbldown
 * to say something, type text into the composition box at the top, then press Return or
 click the Speak icon (show icon)
-* to use one of the built-in Favorites, simply click on one and the computer will speak
+* to use one of the built-in MyPhrases, simply click on one and the computer will speak
 * to add your own favorite, type text into the composition box and press the add favorite icon
 (show icon)
 * to prepare some text to Vocalize later type text into the composition box and click the

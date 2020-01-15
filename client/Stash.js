@@ -6,7 +6,7 @@ import { EditPhrase } from './EditPhrase.js';
 import { updateMain, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } from './Phrases.js';
-import { slideInAddFavoriteScreen } from './Favorites.js';
+import { slideInAddMyPhraseScreen } from './MyPhrases.js';
 
 let css = `
 .StashTitleIcon {
@@ -31,7 +31,7 @@ let css = `
   flex: 1;
   overflow: auto;
 }
-.editStashNewFavorite {
+.editStashNewMyPhrase {
   display: inline-block;
   width: 1.4em;
   height: 1.4em;
@@ -274,11 +274,11 @@ export function editStash(parentElement, props) {
     localUpdate();
     lastClickItemIndex = null;
   };
-  let onClickAddToFavorites = e => {
+  let onClickAddToMyPhrases = e => {
     e.preventDefault();
     let index = localStash.items.findIndex(phrase => phrase.selected);
     let phrase = Stash.items[index];
-    slideInAddFavoriteScreen({ slideInLevel: 'third', phrase });
+    slideInAddMyPhraseScreen({ slideInLevel: 'third', phrase });
   };
   let onClickMoveUp = e => {
     e.preventDefault();
@@ -364,7 +364,7 @@ export function editStash(parentElement, props) {
       }
       return accumulator;
     }, 0) === 1;
-    let enableAddToFavorites = enableEditItem;
+    let enableAddToMyPhrases = enableEditItem;
     let enableRemoveSelected = localStash.items.some(item => item.selected);
     let enableMoveUp = localStash.items.some((item, index, arr) =>
       item.selected && (index > 0 && !arr[index-1].selected));
@@ -400,9 +400,9 @@ export function editStash(parentElement, props) {
           title="Edit the selected item">Edit</button>
           <button @click=${onClickRemoveSelected} ?disabled=${!enableRemoveSelected}
             title="Delete selected items">Delete</button>
-          <button @click=${onClickAddToFavorites} ?disabled=${!enableAddToFavorites}
+          <button @click=${onClickAddToMyPhrases} ?disabled=${!enableAddToMyPhrases}
             title="Make selected item into a favorite">
-            <span class=editStashNewFavorite></span></button>
+            <span class=editStashNewMyPhrase></span></button>
           <button @click=${onClickMoveUp} ?disabled=${!enableMoveUp}
             title="Move selected items up one position">
             <span class=arrowButton>&#x1f851;</span></button>

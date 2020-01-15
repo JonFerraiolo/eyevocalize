@@ -166,12 +166,12 @@ button,input,textarea,select {
 .SelectLinksRow a:hover {
   color: blue;
 }
-.skinnyScreenChild .ButtonRow, .EditFavoritesChild .ButtonRow {
+.skinnyScreenChild .ButtonRow, .EditMyPhrasesChild .ButtonRow {
   padding: 1em 1.5em;
   display: flex;
   justify-content: space-around;
 }
-.skinnyScreenChild .ButtonRow button, .EditFavoritesChild .ButtonRow button {
+.skinnyScreenChild .ButtonRow button, .EditMyPhrasesChild .ButtonRow button {
   display: inline-block;
   zoom: 1;
   padding: 0.1em 0.75em;
@@ -192,10 +192,10 @@ button,input,textarea,select {
   background-color: #2e9cca; /*23:https://visme.co/blog/website-color-schemes/,25274d,464866,aaabb8,29648a,*/
   border-color: #269CE9;
 }
-.skinnyScreenChild .ButtonRow button:hover, .EditFavoritesChild .ButtonRow button:hover {
+.skinnyScreenChild .ButtonRow button:hover, .EditMyPhrasesChild .ButtonRow button:hover {
   background: #29648a;
 }
-.skinnyScreenChild .ButtonRow button:active, .EditFavoritesChild .ButtonRow button:active{
+.skinnyScreenChild .ButtonRow button:active, .EditMyPhrasesChild .ButtonRow button:active{
   background: #269CE9;
   position: relative;
   top: 1px;
@@ -204,9 +204,9 @@ button,input,textarea,select {
 .skinnyScreenChild .ButtonRow button[disabled],
 .skinnyScreenChild .ButtonRow button[disabled]:hover,
 .skinnyScreenChild .ButtonRow button[disabled]:active,
-.EditFavoritesChild .ButtonRow button[disabled],
-.EditFavoritesChild .ButtonRow button[disabled]:hover,
-.EditFavoritesChild .ButtonRow button[disabled]:active {
+.EditMyPhrasesChild .ButtonRow button[disabled],
+.EditMyPhrasesChild .ButtonRow button[disabled]:hover,
+.EditMyPhrasesChild .ButtonRow button[disabled]:active {
   color: #ccc;
   opacity: 0.4;
 }

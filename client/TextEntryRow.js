@@ -1,7 +1,7 @@
 
 import { speak } from './vocalize.js';
 import { stash } from './Stash.js';
-import { slideInAddFavoriteScreen } from './Favorites.js';
+import { slideInAddMyPhraseScreen } from './MyPhrases.js';
 import { search, clear, getAppMinOrMax, setAppMinOrMax } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
 import { slideInSettingsScreen } from './Settings.js';
@@ -75,7 +75,7 @@ let css = `
   background-size: 2.5em 2.5em;
   background-position: 0.2em 0.5em;
 }
-.TextEntryAddFavorite {
+.TextEntryAddMyPhrase {
   background-image: url('./images/heart.svg');
   background-size: 1.75em 1.75em;
   background-position: 50% 55%;
@@ -151,9 +151,9 @@ export function updateTextEntryRow(parentElement, props) {
     clear();
     TextEntryRowSetFocus();
   }
-  let onAddFavorite = e => {
+  let onAddMyPhrase = e => {
     e.preventDefault();
-    slideInAddFavoriteScreen({ slideInLevel: 'second',
+    slideInAddMyPhraseScreen({ slideInLevel: 'second',
       phrase: { type:'text', text:document.getElementById('TextEntryRowTextArea').value}});
   }
   let onMinOrMax = e => {
@@ -202,7 +202,7 @@ export function updateTextEntryRow(parentElement, props) {
         ><span class=TextEntryIconBlock
           ><button class="TextEntryIcon TextEntrySpeak" @click=${onSpeak}
             title='Vocalize the words in the text entry box using speech synthesis'></button
-          ><button class="TextEntryIcon TextEntryAddFavorite" @click=${onAddFavorite}
+          ><button class="TextEntryIcon TextEntryAddMyPhrase" @click=${onAddMyPhrase}
             title='Save these words as a new favorite'></button
           ><button class="TextEntryIcon TextEntryStash" @click=${onStash}
             title='Save these words in the "Clipboard", the storage area for things you might need to say soon'></button

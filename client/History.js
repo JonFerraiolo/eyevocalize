@@ -6,7 +6,7 @@ import { getAutoDeleteHistory } from './Settings.js';
 import { EditPhrase } from './EditPhrase.js';
 import { updateMain, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
-import { slideInAddFavoriteScreen } from './Favorites.js';
+import { slideInAddMyPhraseScreen } from './MyPhrases.js';
 import { styleMap } from './lib/lit-html/directives/style-map.js';
 
 let css = `
@@ -78,7 +78,7 @@ let css = `
 .HistoryContent {
   position: relative;
 }
-.editHistoryNewFavorite {
+.editHistoryNewMyPhrase {
   display: inline-block;
   width: 1.4em;
   height: 1.4em;
@@ -413,11 +413,11 @@ export function editHistory(parentElement, props) {
     initializeLocalHistory();
     localUpdate();
   };
-  let onClickAddToFavorites = e => {
+  let onClickAddToMyPhrases = e => {
     e.preventDefault();
     let index = localHistory.items.findIndex(phrase => phrase.selected);
     let phrase = History.items.find(item => item.timestamp === localHistory.items[index].timestamp);
-    slideInAddFavoriteScreen({ slideInLevel: 'third', phrase });
+    slideInAddMyPhraseScreen({ slideInLevel: 'third', phrase });
   };
   let localHistory;
   let historyElements;
@@ -534,9 +534,9 @@ export function editHistory(parentElement, props) {
             title="Copy text from selected items to system clipboard">Copy</button>
           <button @click=${onClickRemoveSelected} ?disabled=${!atLeastOneSelected}
             title="Delete selected items">Delete</button>
-          <button @click=${onClickAddToFavorites} ?disabled=${!exactlyOneSelected}
+          <button @click=${onClickAddToMyPhrases} ?disabled=${!exactlyOneSelected}
             title="Make selected item into a favorite">
-            <span class=editHistoryNewFavorite></span></button>
+            <span class=editHistoryNewMyPhrase></span></button>
         </div>
       </div>
     </div>`, parentElement);
