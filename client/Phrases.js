@@ -4,6 +4,7 @@ import { speak, playAudio, playYoutube } from './vocalize.js';
 import { updateStash } from './Stash.js';
 import { updateHistory } from './History.js';
 import { updateFavorites } from './Favorites.js';
+import { updateBuiltins } from './Builtins.js';
 import { updateMain } from './main.js';
 import { TextEntryRowSetText, TextEntryRowSetFocus } from './TextEntryRow.js';
 
@@ -54,7 +55,10 @@ let css = `
   flex: 1 1;
 }
 #FavoritesContainer {
-  flex: 3;
+  flex: 2;
+}
+#BuiltinsContainer {
+  flex: 1;
 }
 .PhrasesSectionLabel {
   background: #eee;
@@ -65,7 +69,8 @@ let css = `
   font-size: 0.9em;
 }
 .PhrasesSectionLabel .collapsearrow, .PhrasesSectionLabel .expandarrow,
-    .FavoritesCategoryLabel .collapsearrow, .FavoritesCategoryLabel .expandarrow {
+    .FavoritesCategoryLabel .collapsearrow, .FavoritesCategoryLabel .expandarrow,
+    .BuiltinsCategoryLabel .collapsearrow, .BuiltinsCategoryLabel .expandarrow {
   padding: 0 0.5em;
   line-height: 50%;
   vertical-align: -50%;
@@ -197,8 +202,10 @@ export function updatePhrases(parentElement, props) {
       <div id=HistoryContainer></div>
     </div>
     <div id=FavoritesContainer></div>
+    <div id=BuiltinsContainer></div>
   </div>`, parentElement);
   updateStash(document.getElementById('StashContainer'), StashProps);
   updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
   updateFavorites(document.getElementById('FavoritesContainer'), FavoritesProps);
+  updateBuiltins(document.getElementById('BuiltinsContainer'), FavoritesProps);
 }

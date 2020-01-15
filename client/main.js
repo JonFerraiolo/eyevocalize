@@ -10,6 +10,7 @@ import { updatePhrases } from './Phrases.js';
 import { initializeStash, stash, editStash } from './Stash.js';
 import { initializeHistory, playLastHistoryItem } from './History.js';
 import { initializeFavorites, editFavorites } from './Favorites.js';
+import { initializeBuiltins, editBuiltins } from './Builtins.js';
 import { fromRight, fromLeft } from './animSlide.js';
 import { speak, playAudio } from './vocalize.js';
 import { html, render } from './lib/lit-html/lit-html.js';
@@ -163,7 +164,8 @@ function main() {
   initializeSettings(initializationProps);
   initializeStash(initializationProps);
   initializeHistory(initializationProps);
-  initializeFavorites(initializationProps);
+	initializeFavorites(initializationProps);
+	initializeBuiltins(initializationProps);
 
 	updateMain();
 	if (window.eyevocalizeUser) {
