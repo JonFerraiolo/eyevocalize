@@ -349,23 +349,6 @@ export function initializeFavorites(props) {
     ]
   };
   HiddenBuiltins = [];
-  HiddenBuiltins.forEach(item => {
-    let tokens = item.split('_');
-    if (tokens.length  < 2) return;
-    let [ col, cat, itm ] = tokens;
-    let columnIndex = parseInt(col);
-    if (isNaN(columnIndex) || columnIndex < 0 || columnIndex >= Builtins.columns.length) return;
-    let column = Builtins.columns[columnIndex];
-    let category = column.categories.find(category => category.label === cat);
-    if (!category) return;
-    if (tokens.length === 2) {
-      category.hidden = true;
-    } else {
-      let item = category.items.find(item => item.label === itm);
-      if (!item) return;
-      item.hidden = true;
-    }
-  });
 };
 
 export function initializeBuiltins(props) {
@@ -414,6 +397,45 @@ export function initializeBuiltins(props) {
   };
 };
 
+// transfer hidden flags HiddenBuiltins to from the given MyPhrases data structure
+function transferHiddenTo(aMyPhrases) {
+  HiddenBuiltins.forEach(item => {
+    let tokens = item.split('_');
+    if (tokens.length  < 2) return;
+    let [ col, cat, itm ] = tokens;
+    let columnIndex = parseInt(col);
+    if (isNaN(columnIndex) || columnIndex < 0 || columnIndex >= aMyPhrases.columns.length) return;
+    let column = aMyPhrases.columns[columnIndex];
+    let category = column.categories.find(category => category.label === cat);
+    if (!category) return;
+    if (tokens.length === 2) {
+      category.hidden = true;
+    } else {
+      let item = category.items.find(item => item.label === itm);
+      if (!item) return;
+      item.hidden = true;
+    }
+  });
+}
+
+// transfer hidden flags from the given MyPhrases data structure to HiddenBuiltins
+function transferHiddenFrom(aMyPhrases) {
+  HiddenBuiltins = [];
+  aMyPhrases.columns.forEach((column, colIndex) => {
+    column.categories.forEach((category, catIndex) => {
+      if (category.hidden) {
+        HiddenBuiltins.push(columnIndex+'_'+category.label);
+      }
+      category.items.forEach((item, itIndex) => {
+        if (item.hidden) {
+          HiddenBuiltins.push(columnIndex+'_'+category.label+'_'+item.label);
+        }
+      });
+    });
+  });
+  onBuiltinsChange();
+}
+
 // Add phrase to Favorites without speaking
 export function addToFavorites(phrase, columnIndex, categoryIndex) {
   Favorites.columns[columnIndex].categories[categoryIndex].items.push(phrase);
@@ -447,12 +469,12 @@ function traverseColumnsCategoriesItems(aMyPhrases, func) {
   });
 }
 
-function onFavoritesChange(newMyPhrases) {
-  // FIXME localStorage.setItem("Favorites", JSON.stringify(newMyPhrases));
+function onFavoritesChange() {
+  // FIXME localStorage.setItem("Favorites", JSON.stringify(Favorites));
 };
 
-function onBuiltinsChange(newMyPhrases) {
-  // FIXME localStorage.setItem("Builtins", JSON.stringify(newMyPhrases));
+function onBuiltinsChange() {
+  // FIXME localStorage.setItem("HiddenBuiltins", JSON.stringify(HiddenBuiltins));
 };
 
 export function slideInAddFavoriteScreen(props) {
@@ -718,7 +740,12 @@ function editMyPhrases(Section, parentElement, props) {
           let { columnIndex, categoryIndex } = customControlsData;
           // add phrase to MyPhrases, go back to parent screen
           addToFavorites(phrase, columnIndex, categoryIndex);
-          localMyPhrases = JSON.parse(JSON.stringify(Section === 'Favorites' ? Favorites : Builtins));  // deep clone
+          if (Section === 'Favorites') {
+            localMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
+          } else {
+            localMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
+            transferHiddenTo(localMyPhrases);
+          }
           initializeSelection();
           localUpdate();
           thirdLevelScreenHide();
@@ -759,7 +786,12 @@ function editMyPhrases(Section, parentElement, props) {
             // add phrase to MyPhrases, go back to parent screen
             // FIXME  wrong if user changes category
             replaceFavoritesEntry(columnIndex, categoryIndex, itemIndex, phrase);
-            localMyPhrases = JSON.parse(JSON.stringify(Section === 'Favorites' ? Favorites : Builtins));  // deep clone
+            if (Section === 'Favorites') {
+              localMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
+            } else {
+              localMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
+              transferHiddenTo(localMyPhrases);
+            }
             localMyPhrases.columns[columnIndex].categories[categoryIndex].items[itemIndex].selected = true;
             localUpdate();
             thirdLevelScreenHide();
@@ -962,7 +994,7 @@ function editMyPhrases(Section, parentElement, props) {
       });
       localMyPhrases.columns[columnIndex].categories.splice(categoryIndex, 1);
     }
-    makeLocalChangesPermanent();
+    transferHiddenFrom(localMyPhrases);
     lastClickItemIndex = null;
     editCategoryNameColumnIndex = editCategoryNameCategoryIndex = null;
   };
@@ -990,7 +1022,12 @@ function editMyPhrases(Section, parentElement, props) {
         categories[editCategoryNameCategoryIndex].label = name;
       }
     }
-    localMyPhrases = JSON.parse(JSON.stringify(Section === 'Favorites' ? Favorites : Builtins));  // deep clone
+    if (Section === 'Favorites') {
+      localMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
+    } else {
+      localMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
+      transferHiddenTo(localMyPhrases);
+    }
     initializeSelection();
     localUpdate();
   };
@@ -1210,7 +1247,13 @@ function editMyPhrases(Section, parentElement, props) {
       </div>
     </div>`, parentElement);
   };
-  let localMyPhrases = JSON.parse(JSON.stringify(Section === 'Favorites' ? Favorites : Builtins));  // deep clone
+  let localMyPhrases;
+  if (Section === 'Favorites') {
+    localMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
+  } else {
+    localMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
+    transferHiddenTo(localMyPhrases);
+  }
   initializeSelection();
   localUpdate();
 }
