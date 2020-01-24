@@ -256,11 +256,13 @@ let css = `
 }
 `;
 
-let MyPhrases;
+let Favorites;
+let Builtins;
+let HiddenBuiltins;
 
-export function initializeMyPhrases(props) {
+export function initializeFavorites(props) {
   let { currentVersion } = props;
-  MyPhrases = {
+  Favorites = {
     version: currentVersion,
     lastChooseCategory: { columnIndex: 0, categoryIndex: 0, categoryLabel: null },
     columns: [
@@ -346,17 +348,81 @@ export function initializeMyPhrases(props) {
       ]},
     ]
   };
+  HiddenBuiltins = [];
+  HiddenBuiltins.forEach(item => {
+    let tokens = item.split('_');
+    if (tokens.length  < 2) return;
+    let [ col, cat, itm ] = tokens;
+    let columnIndex = parseInt(col);
+    if (isNaN(columnIndex) || columnIndex < 0 || columnIndex >= Builtins.columns.length) return;
+    let column = Builtins.columns[columnIndex];
+    let category = column.categories.find(category => category.label === cat);
+    if (!category) return;
+    if (tokens.length === 2) {
+      category.hidden = true;
+    } else {
+      let item = category.items.find(item => item.label === itm);
+      if (!item) return;
+      item.hidden = true;
+    }
+  });
 };
 
-// Add phrase to MyPhrases without speaking
-export function addToMyPhrases(phrase, columnIndex, categoryIndex) {
-  MyPhrases.columns[columnIndex].categories[categoryIndex].items.push(phrase);
-  // FIXME localStorage.setItem("MyPhrases", JSON.stringify(MyPhrases));
+export function initializeBuiltins(props) {
+  let { currentVersion } = props;
+  Builtins = {
+    version: currentVersion,
+    lastChooseCategory: { columnIndex: 0, categoryIndex: 0, categoryLabel: null },
+    columns: [
+      { categories: [
+        { label: 'Basic', expanded: true, items: [
+          { type: 'text', label: 'nevermind', text: 'Sorry. Mistake. Ignore what I just said.'},
+          { type: 'text', label: 'help', text: 'Please come and help me'},
+          { type: 'text', label: 'yes', text: 'yes'},
+          { type: 'text', label: 'no', text: 'no'},
+          { type: 'text', label: 'OK', text: 'OK'},
+          { type: 'text', label: 'good', text: "good"},
+          { type: 'text', label: 'still', text: "still not right"},
+          { type: 'text', label: 'gaze trouble', text: "I am having trouble with my eye gaze at the moment, so I may not be able to answer questions. Maybe try asking me questions that have yes and no answers. "},
+        ]},
+        { label: 'Pleasantries', expanded: true, items: [
+          { type: 'text', label: 'please', text: 'Please.'},
+          { type: 'text', label: 'thankyou', text: 'Thank you.'},
+          { type: 'text', label: 'hello', text: 'hello'},
+          { type: 'text', label: 'goodbye', text: 'goodbye'},
+          { type: 'text', label: 'g-morn', text: 'good morning'},
+          { type: 'text', label: 'howRU', text: 'how are you'},
+        ]},
+        { label: 'Adjustments', expanded: true, items: [
+          { type: 'text', label: 'up', text: 'Please move it up. '},
+          { type: 'text', label: 'down', text: 'Please move it down. '},
+          { type: 'text', label: 'left', text: 'Please move it to my left. '},
+          { type: 'text', label: 'right', text: 'Please move it to my right. '},
+          { type: 'text', label: 'in', text: 'Please push it in. '},
+          { type: 'text', label: 'out', text: 'Please push it out. '},
+          { type: 'text', label: 'forward', text: 'Please move it forward. '},
+          { type: 'text', label: 'backward', text: 'Please move it Backward. '},
+          { type: 'text', label: 'tighter', text: 'Please make it tighter. '},
+          { type: 'text', label: 'looser', text: 'Please make it looser. '},
+          { type: 'text', label: 'little', text: 'Only a small amount. '},
+          { type: 'text', label: 'a lot', text: 'Quite a lot. '},
+          { type: 'text', label: 'hurry', text: 'Please hurry!'},
+          { type: 'text', label: 'no rush', text: 'Take your time. Not urgent'},
+        ]},
+      ]},
+    ]
+  };
 };
 
-function replaceMyPhrasesEntry(columnIndex, categoryIndex, itemIndex, phrase) {
-  MyPhrases.columns[columnIndex].categories[categoryIndex].items[itemIndex] = Object.assign({}, phrase);
-  // FIXME localStorage.setItem("MyPhrases", JSON.stringify(MyPhrases));
+// Add phrase to Favorites without speaking
+export function addToFavorites(phrase, columnIndex, categoryIndex) {
+  Favorites.columns[columnIndex].categories[categoryIndex].items.push(phrase);
+  // FIXME localStorage.setItem("Favorites", JSON.stringify(Favorites));
+};
+
+function replaceFavoritesEntry(columnIndex, categoryIndex, itemIndex, phrase) {
+  Favorites.columns[columnIndex].categories[categoryIndex].items[itemIndex] = Object.assign({}, phrase);
+  // FIXME localStorage.setItem("Favorites", JSON.stringify(Favorites));
 };
 
 // invoke a function for each category stored in a MyPhrases data structure
@@ -381,23 +447,27 @@ function traverseColumnsCategoriesItems(aMyPhrases, func) {
   });
 }
 
-function onMyPhrasesChange(newMyPhrases) {
-  // FIXME localStorage.setItem("MyPhrases", JSON.stringify(MyPhrases));
+function onFavoritesChange(newMyPhrases) {
+  // FIXME localStorage.setItem("Favorites", JSON.stringify(newMyPhrases));
 };
 
-export function slideInAddMyPhraseScreen(props) {
+function onBuiltinsChange(newMyPhrases) {
+  // FIXME localStorage.setItem("Builtins", JSON.stringify(newMyPhrases));
+};
+
+export function slideInAddFavoriteScreen(props) {
   props = props || {};
   let { phrase, slideInLevel } = props;
   let customControlsData = {};
   let params = {
     renderFunc: EditPhrase,
     renderFuncParams: {
-      title: 'Add New MyPhrase',
-      doItButtonLabel: 'Add MyPhrase',
+      title: 'Add New Favorite',
+      doItButtonLabel: 'Add Favorite',
       doItCallback: function(phrase) {
         let { columnIndex, categoryIndex } = customControlsData;
         // add phrase to MyPhrases, go back to parent screen
-        addToMyPhrases(phrase, columnIndex, categoryIndex);
+        addToFavorites(phrase, columnIndex, categoryIndex);
         updateMain();
         if (slideInLevel === 'third') {
           thirdLevelScreenHide();
@@ -426,18 +496,28 @@ export function slideInAddMyPhraseScreen(props) {
   }
 };
 
-export function updateMyPhrases(parentElement, props) {
+export function updateFavorites(parentElement, props) {
+  updateMyPhrases('Favorites', parentElement, props);
+}
+export function updateBuiltins(parentElement, props) {
+  updateMyPhrases('Builtins', parentElement, props);
+}
+function updateMyPhrases(Section, parentElement, props) {
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
-    slideInAddMyPhraseScreen();
+    slideInAddFavoriteScreen();
   };
   let onClickEdit = e => {
     e.preventDefault();
-    onEditMyPhrases();
+    if (Section === 'Favorites') {
+      onEditFavorites();
+    } else if (Section === 'Builtins') {
+      onEditBuiltins();
+    }
   };
   let localUpdate = () => {
-    let filteredMyPhrases = JSON.parse(JSON.stringify(MyPhrases));  // deep clone
+    let filteredMyPhrases = JSON.parse(JSON.stringify(Section === 'Favorites' ? Favorites : Builtins));  // deep clone
     filteredMyPhrases.columns.forEach(column => {
       column.categories.forEach((category, index) => {
         category.categoryIndex = index;
@@ -454,6 +534,7 @@ export function updateMyPhrases(parentElement, props) {
       });
     });
     filteredMyPhrases.columns.forEach((column, cIndex) => {
+      let MyPhrases = Section === 'Favorites' ? Favorites : Builtins;
       column.categories.forEach(category => {
         let originalDataCategory = MyPhrases.columns[cIndex].categories[category.categoryIndex];
         category.titleContent = buildTitleWithCollapseExpandArrows(originalDataCategory, category.label);
@@ -462,7 +543,8 @@ export function updateMyPhrases(parentElement, props) {
     render(html`
     <style>${css}</style>
     <div class=MyPhrases>
-      <div class=PhrasesSectionLabel><span class=MyPhrasesTitleIcon></span>MyPhrases${rightSideIcons({ onClickAdd, onClickEdit })}</div>
+      <div class=PhrasesSectionLabel><span class=MyPhrasesTitleIcon
+        ></span>${Section}${rightSideIcons({ onClickAdd: Section === 'Favorites' ? onClickAdd : null, onClickEdit } )}</div>
       <div class=MyPhrasesColumns>
         ${filteredMyPhrases.columns.map(column => html`
           <div class=MyPhrasesColumn>
@@ -485,24 +567,44 @@ export function updateMyPhrases(parentElement, props) {
   localUpdate();
 }
 
-function onEditMyPhrases() {
+function onEditFavorites() {
   let renderFuncParams = { };
-  secondLevelScreenShow({ renderFunc: editMyPhrases, renderFuncParams });
+  secondLevelScreenShow({ renderFunc: editFavorites, renderFuncParams });
 }
 
-function onEditMyPhrasesReturn() {
+function onEditBuiltins() {
+  let renderFuncParams = { };
+  secondLevelScreenShow({ renderFunc: editBuiltins, renderFuncParams });
+}
+
+function onEditFavoritesReturn() {
   updateMain();
   secondLevelScreenHide();
 }
 
-export function editMyPhrases(parentElement, props) {
+function onEditBuiltinsReturn() {
+  updateMain();
+  secondLevelScreenHide();
+}
+
+export function editFavorites(parentElement, props) {
+  editMyPhrases('Favorites', parentElement, props);
+}
+export function editBuiltins(parentElement, props) {
+  editMyPhrases('Builtins', parentElement, props);
+}
+function editMyPhrases(Section, parentElement, props) {
   let editWhat = 'items';
   let lastClickItemIndex = null, lastClickCategoryIndex = null, lastClickColumnIndex = null;
   let editCategoryNameColumnIndex = null, editCategoryNameCategoryIndex = null;
   let makeLocalChangesPermanent = (() => {
-    MyPhrases = JSON.parse(JSON.stringify(localMyPhrases)); // deep clone
-    traverseColumnsCategoriesItems(MyPhrases, deleteTemporaryProperties);
-    onMyPhrasesChange();
+    if (Section === 'Favorites') {
+      Favorites = JSON.parse(JSON.stringify(localMyPhrases)); // deep clone
+      traverseColumnsCategoriesItems(Favorites, deleteTemporaryProperties);
+      onFavoritesChange();
+    } else {
+      // FIXME
+    }
     localUpdate();
   });
   let onClickTab = e => {
@@ -512,14 +614,14 @@ export function editMyPhrases(parentElement, props) {
   };
   let onItemClick = e => {
     e.preventDefault();
-    let objType = e.currentTarget.favoritesFlavor;
-    let obj = e.currentTarget.favoritesObject;
+    let objType = e.currentTarget.myphrasesFlavor;
+    let obj = e.currentTarget.myphrasesObject;
     if (objType === editWhat) {
       if (editWhat === 'items') {
-        let phrase = e.currentTarget.favoritesObject;
-        let colIndex = e.currentTarget.favoritesColumnIndex;
-        let catIndex = e.currentTarget.favoritesCategoryIndex;
-        let itIndex = e.currentTarget.favoritesItemIndex;
+        let phrase = e.currentTarget.myphrasesObject;
+        let colIndex = e.currentTarget.myphrasesColumnIndex;
+        let catIndex = e.currentTarget.myphrasesCategoryIndex;
+        let itIndex = e.currentTarget.myphrasesItemIndex;
         let shift = e.getModifierState("Shift");
         let control = e.getModifierState("Control");
         let meta = e.getModifierState("Meta");
@@ -553,9 +655,9 @@ export function editMyPhrases(parentElement, props) {
         }
         localUpdate();
       } else {
-        let category = e.currentTarget.favoritesObject;
-        let colIndex = e.currentTarget.favoritesColumnIndex;
-        let catIndex = e.currentTarget.favoritesCategoryIndex;
+        let category = e.currentTarget.myphrasesObject;
+        let colIndex = e.currentTarget.myphrasesColumnIndex;
+        let catIndex = e.currentTarget.myphrasesCategoryIndex;
         let shift = e.getModifierState("Shift");
         let control = e.getModifierState("Control");
         let meta = e.getModifierState("Meta");
@@ -610,13 +712,13 @@ export function editMyPhrases(parentElement, props) {
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
-        title: 'Add New Entry To MyPhrases',
-        doItButtonLabel: 'Add to MyPhrases',
+        title: 'Add New Entry To Favorites',
+        doItButtonLabel: 'Add to Favorites',
         doItCallback: function(phrase) {
           let { columnIndex, categoryIndex } = customControlsData;
           // add phrase to MyPhrases, go back to parent screen
-          addToMyPhrases(phrase, columnIndex, categoryIndex);
-          localMyPhrases = JSON.parse(JSON.stringify(MyPhrases));  // deep clone
+          addToFavorites(phrase, columnIndex, categoryIndex);
+          localMyPhrases = JSON.parse(JSON.stringify(Section === 'Favorites' ? Favorites : Builtins));  // deep clone
           initializeSelection();
           localUpdate();
           thirdLevelScreenHide();
@@ -651,13 +753,13 @@ export function editMyPhrases(parentElement, props) {
         renderFunc: EditPhrase,
         renderFuncParams: {
           phrase,
-          title: 'Edit Entry From MyPhrases',
+          title: 'Edit Entry From Favorites',
           doItButtonLabel: 'Update Entry',
           doItCallback: function(phrase) {
             // add phrase to MyPhrases, go back to parent screen
             // FIXME  wrong if user changes category
-            replaceMyPhrasesEntry(columnIndex, categoryIndex, itemIndex, phrase);
-            localMyPhrases = JSON.parse(JSON.stringify(MyPhrases));  // deep clone
+            replaceFavoritesEntry(columnIndex, categoryIndex, itemIndex, phrase);
+            localMyPhrases = JSON.parse(JSON.stringify(Section === 'Favorites' ? Favorites : Builtins));  // deep clone
             localMyPhrases.columns[columnIndex].categories[categoryIndex].items[itemIndex].selected = true;
             localUpdate();
             thirdLevelScreenHide();
@@ -685,7 +787,7 @@ export function editMyPhrases(parentElement, props) {
       localUpdate();
       setTimeout(() => {
         let elem = document.getElementById('EditMyPhrasesEditCategoryName');
-        elem.value = MyPhrases.columns[columnIndex].categories[categoryIndex].label;
+        elem.value = Favorites.columns[columnIndex].categories[categoryIndex].label;
         elem.focus();
         elem.setSelectionRange(0, elem.value.length);
       }, 0);
@@ -840,12 +942,34 @@ export function editMyPhrases(parentElement, props) {
     makeLocalChangesPermanent();
     lastClickItemIndex = null;
     editCategoryNameColumnIndex = editCategoryNameCategoryIndex = null;
-
+  };
+  let onClickShowSelected = e => {
+    e.preventDefault();
+    return;
+    if (editWhat === 'items') {
+      traverseColumnsCategories(localMyPhrases, category => {
+        category.items = category.items.filter(item => !item.selected);
+      });
+    } else {
+      // should only be here if a single empty category is selected and
+      // and the column has more than one category
+      let columnIndex, categoryIndex;
+      traverseColumnsCategories(localMyPhrases, (category, origObj, colIndex, catIndex) => {
+        if (category.selected) {
+          columnIndex = colIndex;
+          categoryIndex = catIndex;
+        }
+      });
+      localMyPhrases.columns[columnIndex].categories.splice(categoryIndex, 1);
+    }
+    makeLocalChangesPermanent();
+    lastClickItemIndex = null;
+    editCategoryNameColumnIndex = editCategoryNameCategoryIndex = null;
   };
   let onClickNewCategory = e => {
     e.preventDefault();
-    editCategoryNameColumnIndex = e.currentTarget.favoritesColumnIndex;
-    editCategoryNameCategoryIndex = e.currentTarget.favoritesCategoryIndex;
+    editCategoryNameColumnIndex = e.currentTarget.myphrasesColumnIndex;
+    editCategoryNameCategoryIndex = e.currentTarget.myphrasesCategoryIndex;
     localMyPhrases.columns[editCategoryNameColumnIndex].categories.push(
       { label:  '', expanded: false, selected: false, items:[] });
     localUpdate();
@@ -858,7 +982,7 @@ export function editMyPhrases(parentElement, props) {
     if (editCategoryNameColumnIndex === null) return;
     let elem = document.getElementById('EditMyPhrasesEditCategoryName');
     let name = elem.value.trim();
-    let categories = MyPhrases.columns[editCategoryNameColumnIndex].categories;
+    let categories = Favorites.columns[editCategoryNameColumnIndex].categories;
     if (name.length > 0) {
       if (editCategoryNameCategoryIndex >= categories.length) {
         categories.push({ label: name, expanded: true, items: [] });
@@ -866,9 +990,13 @@ export function editMyPhrases(parentElement, props) {
         categories[editCategoryNameCategoryIndex].label = name;
       }
     }
-    localMyPhrases = JSON.parse(JSON.stringify(MyPhrases));  // deep clone
+    localMyPhrases = JSON.parse(JSON.stringify(Section === 'Favorites' ? Favorites : Builtins));  // deep clone
     initializeSelection();
     localUpdate();
+  };
+  let onClickHideSelected = e => {
+    e.preventDefault();
+    return;
   };
   let onCategoryNameKeyDown = e => {
     if (e.key === 'Enter') {
@@ -985,66 +1113,9 @@ export function editMyPhrases(parentElement, props) {
           category.selected && (index < arr.length-1 && !arr[index+1].selected));
       });
     }
-    // FIXME css might be added multiple times
-    render(html`
-    <style>${css}</style>
-    <div class="MyPhrases EditMyPhrases">
-      <div class=EditMyPhrasesChild>
-        ${buildSlideRightTitle("Manage MyPhrases", onEditMyPhrasesReturn)}
-        <div class=TabControlRadioButtons>
-          <label>Edit what:</label>
-          ${buildEditWhatRadioButton('EditMyPhrasesEditWhatItems', 'items', 'Individual MyPhrases')}
-          ${buildEditWhatRadioButton('EditMyPhrasesEditWhatCategories', 'categories', 'Categories')}
-        </div>
-        <div class="EditMyPhrasesData ${editWhat === 'items' ? 'EditWhatItems' : 'EditWhatCategories' }">
-          <div class=ScreenInstructions>
-            ${editWhat === 'items' ? '(Click individual favorites below to select.)' :
-              '(Click individual categories to select.)'}
-          </div>
-          <div class=MyPhrasesColumns>
-            ${localMyPhrases.columns.map((column, colIndex) => html`
-              <div class=MyPhrasesColumn>
-                ${column.categories.map((category, catIndex) => html`
-                  ${editWhat === 'categories' && editCategoryNameColumnIndex === colIndex &&
-                    editCategoryNameCategoryIndex === catIndex ? html`
-                    <div class=EditMyPhrasesEditCategoryNameDiv>
-                      <input id=EditMyPhrasesEditCategoryName class=CategoryName placeholder="Enter category name"
-                        @keydown=${onCategoryNameKeyDown} @blur=${onCategoryNameBlur}></input>
-                    </div>` : html`
-                    <div @click=${onItemClick} .favoritesFlavor=${'categories'} .favoritesObject=${category}
-                      .favoritesColumnIndex=${colIndex} .favoritesCategoryIndex=${catIndex}
-                      class="MyPhrasesCategoryLabel ${editWhat === 'categories' && category.selected ? 'selected' : ''}">
-                      ${category.checkmark}
-                      ${category.label}
-                    </div>`}
-                  <div class=MyPhrasesCategoryItems>
-                    ${html`${category.items.map((phrase,itIndex) =>
-                      html`
-                        <div class=MyPhraseContainer>
-                          <button @click=${onItemClick} .favoritesFlavor=${'items'} .favoritesObject=${phrase}
-                              .favoritesColumnIndex=${colIndex} .favoritesCategoryIndex=${catIndex} .favoritesItemIndex=${itIndex}
-                              class=${phrase.cls}>
-                            ${phrase.checkmark}
-                            ${phrase.label || phrase.text}</button>
-                        </div>
-                      `
-                    )}`}
-                    </div>
-                `)}
-                ${editWhat === 'categories' && editCategoryNameColumnIndex === null ? html`
-                  <div class=spacer>&nbsp;</div>
-                  <div class="EditMyPhrasesNewCategoryRow">
-                    <button @click=${onClickNewCategory} .favoritesColumnIndex=${colIndex}
-                      .favoritesCategoryIndex=${MyPhrases.columns[colIndex].categories.length}>New Category ...</button>
-                  </div>` : '' }
-              </div>
-            `)}
-          </div>
-        </div >
-        <div class=SelectLinksRow>
-          <a href="" @click=${onClickSelectAll} class=${EditMyPhrasesSelectAllClass}>Select All</a>
-          <a href="" @click=${onClickDeselectAll} class=${EditMyPhrasesDeselectAllClass}>Deselect All</a>
-        </div>
+    let buttonRowHtml;
+    if (Section === 'Favorites') {
+      buttonRowHtml = html`
         <div class=ButtonRow>
           ${editWhat === 'items' ? html`<button @click=${onClickAddItem}
             title="Add a new item to the bottom of the list">New</button>` : '' }
@@ -1065,11 +1136,81 @@ export function editMyPhrases(parentElement, props) {
               title="Move selected items to the end of the list">
               <span class=arrowButton>&#x2b73;</span></button>
           </div>
+      `;
+    } else {
+      buttonRowHtml = html`
+        <div class=ButtonRow>
+          <button @click=${onClickShowSelected} ?disabled=${!enableRemoveSelected} title="Show selected builtin items">Show</button>
+          <button @click=${onClickHideSelected} ?disabled=${!enableRemoveSelected} title="Hide selected builtin items">Hide</button>
+        </div>
+      `;
+    }
+    // FIXME css might be added multiple times
+    render(html`
+    <style>${css}</style>
+    <div class="MyPhrases EditMyPhrases">
+      <div class=EditMyPhrasesChild>
+        ${buildSlideRightTitle("Manage Favorites", onEditFavoritesReturn)}
+        <div class=TabControlRadioButtons>
+          <label>Edit what:</label>
+          ${buildEditWhatRadioButton('EditMyPhrasesEditWhatItems', 'items', 'Individual Favorites')}
+          ${buildEditWhatRadioButton('EditMyPhrasesEditWhatCategories', 'categories', 'Categories')}
+        </div>
+        <div class="EditMyPhrasesData ${editWhat === 'items' ? 'EditWhatItems' : 'EditWhatCategories' }">
+          <div class=ScreenInstructions>
+            ${editWhat === 'items' ? '(Click individual favorites below to select.)' :
+              '(Click individual categories to select.)'}
+          </div>
+          <div class=MyPhrasesColumns>
+            ${localMyPhrases.columns.map((column, colIndex) => html`
+              <div class=MyPhrasesColumn>
+                ${column.categories.map((category, catIndex) => html`
+                  ${editWhat === 'categories' && editCategoryNameColumnIndex === colIndex &&
+                    editCategoryNameCategoryIndex === catIndex ? html`
+                    <div class=EditMyPhrasesEditCategoryNameDiv>
+                      <input id=EditMyPhrasesEditCategoryName class=CategoryName placeholder="Enter category name"
+                        @keydown=${onCategoryNameKeyDown} @blur=${onCategoryNameBlur}></input>
+                    </div>` : html`
+                    <div @click=${onItemClick} .myphrasesFlavor=${'categories'} .myphrasesObject=${category}
+                      .myphrasesColumnIndex=${colIndex} .myphrasesCategoryIndex=${catIndex}
+                      class="MyPhrasesCategoryLabel ${editWhat === 'categories' && category.selected ? 'selected' : ''}">
+                      ${category.checkmark}
+                      ${category.label}
+                    </div>`}
+                  <div class=MyPhrasesCategoryItems>
+                    ${html`${category.items.map((phrase,itIndex) =>
+                      html`
+                        <div class=MyPhraseContainer>
+                          <button @click=${onItemClick} .myphrasesFlavor=${'items'} .myphrasesObject=${phrase}
+                              .myphrasesColumnIndex=${colIndex} .myphrasesCategoryIndex=${catIndex} .myphrasesItemIndex=${itIndex}
+                              class=${phrase.cls}>
+                            ${phrase.checkmark}
+                            ${phrase.label || phrase.text}</button>
+                        </div>
+                      `
+                    )}`}
+                    </div>
+                `)}
+                ${editWhat === 'categories' && editCategoryNameColumnIndex === null ? html`
+                  <div class=spacer>&nbsp;</div>
+                  <div class="EditMyPhrasesNewCategoryRow">
+                    <button @click=${onClickNewCategory} .myphrasesColumnIndex=${colIndex}
+                      .myphrasesCategoryIndex=${Favorites.columns[colIndex].categories.length}>New Category ...</button>
+                  </div>` : '' }
+              </div>
+            `)}
+          </div>
+        </div >
+        <div class=SelectLinksRow>
+          <a href="" @click=${onClickSelectAll} class=${EditMyPhrasesSelectAllClass}>Select All</a>
+          <a href="" @click=${onClickDeselectAll} class=${EditMyPhrasesDeselectAllClass}>Deselect All</a>
+        </div>
+        ${buttonRowHtml}
         </div>
       </div>
     </div>`, parentElement);
   };
-  let localMyPhrases = JSON.parse(JSON.stringify(MyPhrases));  // deep clone
+  let localMyPhrases = JSON.parse(JSON.stringify(Section === 'Favorites' ? Favorites : Builtins));  // deep clone
   initializeSelection();
   localUpdate();
 }
@@ -1083,31 +1224,31 @@ let buildChooseCategoryControl = (parentElement, customControlsData) => {
   if (typeof columnIndex != 'number' || typeof categoryIndex != 'number') {
     columnIndex = categoryIndex = 0;
   } else {
-    columnIndex = MyPhrases.lastChooseCategory.columnIndex;
-    categoryIndex = MyPhrases.lastChooseCategory.categoryIndex;
+    columnIndex = Favorites.lastChooseCategory.columnIndex;
+    categoryIndex = Favorites.lastChooseCategory.categoryIndex;
   }
-  if (columnIndex < 0 || columnIndex >= MyPhrases.columns.length ||
-    categoryIndex < 0 || categoryIndex >= MyPhrases.columns[columnIndex].categories.length ||
-    MyPhrases.lastChooseCategory.categoryLabel != MyPhrases.columns[columnIndex].categories[categoryIndex].label) {
+  if (columnIndex < 0 || columnIndex >= Favorites.columns.length ||
+    categoryIndex < 0 || categoryIndex >= Favorites.columns[columnIndex].categories.length ||
+    Favorites.lastChooseCategory.categoryLabel != Favorites.columns[columnIndex].categories[categoryIndex].label) {
     columnIndex = categoryIndex = 0;
-    MyPhrases.lastChooseCategory.categoryLabel = MyPhrases.columns[columnIndex].categories[categoryIndex].label;
+    Favorites.lastChooseCategory.categoryLabel = Favorites.columns[columnIndex].categories[categoryIndex].label;
   }
   customControlsData.parentElement = parentElement;
   customControlsData.columnIndex = columnIndex;
   customControlsData.categoryIndex = categoryIndex;
   render(html`
     <div class=MyPhrasesEditPhraseChooseCategory>
-      <label>MyPhrases category:</label
+      <label>Favorites category:</label
       ><span class=MyPhrasesEditPhraseColumnCategory
         ><span class=MyPhrasesEditPhraseColumn>[${columnIndex+1}]</span
-        ><span class=MyPhrasesEditPhraseCategory>${MyPhrases.columns[columnIndex].categories[categoryIndex].label}</span
+        ><span class=MyPhrasesEditPhraseCategory>${Favorites.columns[columnIndex].categories[categoryIndex].label}</span
       ></span
       ><button class=MyPhrasesAddItemCategoryButton @click=${onClickChangeCategory}>Change ...</button>
     </div>
   `, parentElement);
 };
 
-let MyPhrasesChooseCategoryDialog = (parentElement, customControlsData) => {
+let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
   let newCategoryJustCreated = null;
   let onClickExistingCategory = e => {
     e.preventDefault();
@@ -1127,9 +1268,9 @@ let MyPhrasesChooseCategoryDialog = (parentElement, customControlsData) => {
   };
   let onClickDoit = e => {
     e.preventDefault();
-    MyPhrases.lastChooseCategory.columnIndex = selCol;
-    MyPhrases.lastChooseCategory.categoryIndex = selCat;
-    MyPhrases.lastChooseCategory.categoryLabel = MyPhrases.columns[selCol].categories[selCat].label;
+    Favorites.lastChooseCategory.columnIndex = selCol;
+    Favorites.lastChooseCategory.categoryIndex = selCat;
+    Favorites.lastChooseCategory.categoryLabel = Favorites.columns[selCol].categories[selCat].label;
     customControlsData.columnIndex = selCol;
     customControlsData.categoryIndex = selCat;
     hidePopup(customControlsData);
@@ -1142,9 +1283,9 @@ let MyPhrasesChooseCategoryDialog = (parentElement, customControlsData) => {
     let elem = document.getElementById('MyPhrasesChooseCategoryNewCategory');
     let name = elem.value.trim();
     if (name.length > 0) {
-      MyPhrases.columns[newCategoryJustCreated].categories.push({ label: name, expanded: true, items: [] });
+      Favorites.columns[newCategoryJustCreated].categories.push({ label: name, expanded: true, items: [] });
       selCol = newCategoryJustCreated;
-      selCat = MyPhrases.columns[newCategoryJustCreated].categories.length - 1;
+      selCat = Favorites.columns[newCategoryJustCreated].categories.length - 1;
     }
     newCategoryJustCreated = null;
     localUpdate();
@@ -1159,14 +1300,14 @@ let MyPhrasesChooseCategoryDialog = (parentElement, customControlsData) => {
       doneWithNewCategoryName();
     }
   };
-  let selCol = MyPhrases.lastChooseCategory.columnIndex;
-  let selCat = MyPhrases.lastChooseCategory.categoryIndex;
+  let selCol = Favorites.lastChooseCategory.columnIndex;
+  let selCat = Favorites.lastChooseCategory.categoryIndex;
   let localUpdate = () => {
     render(html`<div class=MyPhrasesChooseCategory>
-      <div class=MyPhrasesChooseCategoryTitle>Choose a MyPhrases Category</div>
+      <div class=MyPhrasesChooseCategoryTitle>Choose a Favorites Category</div>
       <div class=MyPhrasesChooseCategoryChooser>
         <div class=MyPhrasesChooseCategoryList>
-          ${MyPhrases.columns.map((column, columnIndex) => html`
+          ${Favorites.columns.map((column, columnIndex) => html`
             <span class=MyPhrasesChooseCategoryColumn>
               ${column.categories.map((category, categoryIndex) => html`
                 <div @click=${onClickExistingCategory} .MyPhrasesCategory=${categoryIndex} .MyPhrasesColumn=${columnIndex}
@@ -1204,7 +1345,7 @@ let MyPhrasesChooseCategoryDialog = (parentElement, customControlsData) => {
 
 export function MyPhrasesChooseCategoryPopupShow(hideCallbackParams) {
   let params = {
-    content: MyPhrasesChooseCategoryDialog,
+    content: FavoritesChooseCategoryDialog,
     contentFuncParams: hideCallbackParams,
     refNode: document.querySelector('.EditPhraseCustomControls'),
     refY: 'top',

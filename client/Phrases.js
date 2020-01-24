@@ -3,8 +3,8 @@ import { html, render } from './lib/lit-html/lit-html.js';
 import { speak, playAudio, playYoutube } from './vocalize.js';
 import { updateStash } from './Stash.js';
 import { updateHistory } from './History.js';
-import { updateMyPhrases } from './MyPhrases.js';
-import { updateBuiltins } from './Builtins.js';
+import { updateFavorites } from './MyPhrases.js';
+import { updateBuiltins } from './MyPhrases.js';
 import { updateMain } from './main.js';
 import { TextEntryRowSetText, TextEntryRowSetFocus } from './TextEntryRow.js';
 
@@ -206,6 +206,6 @@ export function updatePhrases(parentElement, props) {
   </div>`, parentElement);
   updateStash(document.getElementById('StashContainer'), StashProps);
   updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
-  updateMyPhrases(document.getElementById('MyPhrasesContainer'), MyPhrasesProps);
+  updateFavorites(document.getElementById('MyPhrasesContainer'), MyPhrasesProps);
   updateBuiltins(document.getElementById('BuiltinsContainer'), MyPhrasesProps);
 }

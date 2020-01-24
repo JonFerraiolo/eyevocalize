@@ -6,7 +6,7 @@ import { EditPhrase } from './EditPhrase.js';
 import { updateMain, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } from './Phrases.js';
-import { slideInAddMyPhraseScreen } from './MyPhrases.js';
+import { slideInAddFavoriteScreen } from './MyPhrases.js';
 
 let css = `
 .StashTitleIcon {
@@ -278,7 +278,7 @@ export function editStash(parentElement, props) {
     e.preventDefault();
     let index = localStash.items.findIndex(phrase => phrase.selected);
     let phrase = Stash.items[index];
-    slideInAddMyPhraseScreen({ slideInLevel: 'third', phrase });
+    slideInAddFavoriteScreen({ slideInLevel: 'third', phrase });
   };
   let onClickMoveUp = e => {
     e.preventDefault();

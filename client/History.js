@@ -6,7 +6,7 @@ import { getAutoDeleteHistory } from './Settings.js';
 import { EditPhrase } from './EditPhrase.js';
 import { updateMain, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
-import { slideInAddMyPhraseScreen } from './MyPhrases.js';
+import { slideInAddFavoriteScreen } from './MyPhrases.js';
 import { styleMap } from './lib/lit-html/directives/style-map.js';
 
 let css = `
@@ -417,7 +417,7 @@ export function editHistory(parentElement, props) {
     e.preventDefault();
     let index = localHistory.items.findIndex(phrase => phrase.selected);
     let phrase = History.items.find(item => item.timestamp === localHistory.items[index].timestamp);
-    slideInAddMyPhraseScreen({ slideInLevel: 'third', phrase });
+    slideInAddFavoriteScreen({ slideInLevel: 'third', phrase });
   };
   let localHistory;
   let historyElements;

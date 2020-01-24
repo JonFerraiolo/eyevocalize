@@ -6,6 +6,7 @@ import { updateMain, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { EditPhrase } from './EditPhrase.js';
 import { showPopup, hidePopup } from './popup.js';
+import { Builtins } from './MyPhrases.js';
 
 let css = `
 .Builtins {
@@ -255,8 +256,6 @@ let css = `
   justify-content: space-around;
 }
 `;
-
-let Builtins;
 
 export function initializeBuiltins(props) {
   let { currentVersion } = props;

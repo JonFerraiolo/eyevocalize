@@ -1,7 +1,7 @@
 
 import { speak } from './vocalize.js';
 import { stash } from './Stash.js';
-import { slideInAddMyPhraseScreen } from './MyPhrases.js';
+import { slideInAddFavoriteScreen } from './MyPhrases.js';
 import { search, clear, getAppMinOrMax, setAppMinOrMax } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
 import { slideInSettingsScreen } from './Settings.js';
@@ -153,7 +153,7 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onAddMyPhrase = e => {
     e.preventDefault();
-    slideInAddMyPhraseScreen({ slideInLevel: 'second',
+    slideInAddFavoriteScreen({ slideInLevel: 'second',
       phrase: { type:'text', text:document.getElementById('TextEntryRowTextArea').value}});
   }
   let onMinOrMax = e => {
