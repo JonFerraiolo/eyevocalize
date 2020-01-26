@@ -152,6 +152,11 @@ let css = `
   background: #ddf;
   color: #004;
 }
+.EditWhatCategories .MyPhrasesCategoryLabel.hidden {
+  opacity: 0.4;
+  background: #999;
+  color: #004;
+}
 .EditWhatCategories .MyPhrasesCategoryLabel a, .EditWhatCategories .MyPhrasesCategoryLabel a:link, .EditWhatCategories .MyPhrasesCategoryLabel a:visited {
   color: black;
 }
@@ -424,11 +429,11 @@ function transferHiddenFrom(aMyPhrases) {
   aMyPhrases.columns.forEach((column, colIndex) => {
     column.categories.forEach((category, catIndex) => {
       if (category.hidden) {
-        HiddenBuiltins.push(columnIndex+'_'+category.label);
+        HiddenBuiltins.push(colIndex+'_'+category.label);
       }
       category.items.forEach((item, itIndex) => {
         if (item.hidden) {
-          HiddenBuiltins.push(columnIndex+'_'+category.label+'_'+item.label);
+          HiddenBuiltins.push(colIndex+'_'+category.label+'_'+item.label);
         }
       });
     });
@@ -539,7 +544,13 @@ function updateMyPhrases(Section, parentElement, props) {
     }
   };
   let localUpdate = () => {
-    let filteredMyPhrases = JSON.parse(JSON.stringify(Section === 'Favorites' ? Favorites : Builtins));  // deep clone
+    let filteredMyPhrases;
+    if (Section === 'Favorites') {
+      filteredMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
+    } else {
+      filteredMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
+      transferHiddenTo(filteredMyPhrases);
+    }
     filteredMyPhrases.columns.forEach(column => {
       column.categories.forEach((category, index) => {
         category.categoryIndex = index;
@@ -571,15 +582,16 @@ function updateMyPhrases(Section, parentElement, props) {
         ${filteredMyPhrases.columns.map(column => html`
           <div class=MyPhrasesColumn>
             ${column.categories.map(category => html`
-              <div class=MyPhrasesCategoryLabel>${category.titleContent}</div>
-              ${category.expanded ?
-                html`${category.items.map(phrase =>
-                  html`
+              ${!category.hidden ? html`<div class=MyPhrasesCategoryLabel>${category.titleContent}</div>` : ''}
+              ${(category.expanded && !category.hidden) ? html`
+                ${category.items.map(phrase => html`
+                  ${(!phrase.hidden) ? html`
                     <div class=MyPhraseContainer>
                       <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
                     </div>
-                  `
-                )}` : ''}
+                  ` : '' }
+                `)}
+              ` : '' }
             `)}
           </div>
         `)}
@@ -625,7 +637,7 @@ function editMyPhrases(Section, parentElement, props) {
       traverseColumnsCategoriesItems(Favorites, deleteTemporaryProperties);
       onFavoritesChange();
     } else {
-      // FIXME
+      onBuiltinsChange();
     }
     localUpdate();
   });
@@ -977,10 +989,11 @@ function editMyPhrases(Section, parentElement, props) {
   };
   let onClickShowSelected = e => {
     e.preventDefault();
-    return;
     if (editWhat === 'items') {
-      traverseColumnsCategories(localMyPhrases, category => {
-        category.items = category.items.filter(item => !item.selected);
+      traverseColumnsCategoriesItems(localMyPhrases, item => {
+        if (item.selected) {
+          delete item.hidden;
+        }
       });
     } else {
       // should only be here if a single empty category is selected and
@@ -988,15 +1001,33 @@ function editMyPhrases(Section, parentElement, props) {
       let columnIndex, categoryIndex;
       traverseColumnsCategories(localMyPhrases, (category, origObj, colIndex, catIndex) => {
         if (category.selected) {
-          columnIndex = colIndex;
-          categoryIndex = catIndex;
+          delete category.hidden;
         }
       });
-      localMyPhrases.columns[columnIndex].categories.splice(categoryIndex, 1);
     }
     transferHiddenFrom(localMyPhrases);
-    lastClickItemIndex = null;
-    editCategoryNameColumnIndex = editCategoryNameCategoryIndex = null;
+    localUpdate();
+  };
+  let onClickHideSelected = e => {
+    e.preventDefault();
+    if (editWhat === 'items') {
+      traverseColumnsCategoriesItems(localMyPhrases, item => {
+        if (item.selected) {
+          item.hidden = true;
+        }
+      });
+    } else {
+      // should only be here if a single empty category is selected and
+      // and the column has more than one category
+      let columnIndex, categoryIndex;
+      traverseColumnsCategories(localMyPhrases, (category, origObj, colIndex, catIndex) => {
+        if (category.selected) {
+          category.hidden = true;
+        }
+      });
+    }
+    transferHiddenFrom(localMyPhrases);
+    localUpdate();
   };
   let onClickNewCategory = e => {
     e.preventDefault();
@@ -1030,10 +1061,6 @@ function editMyPhrases(Section, parentElement, props) {
     }
     initializeSelection();
     localUpdate();
-  };
-  let onClickHideSelected = e => {
-    e.preventDefault();
-    return;
   };
   let onCategoryNameKeyDown = e => {
     if (e.key === 'Enter') {
@@ -1071,9 +1098,11 @@ function editMyPhrases(Section, parentElement, props) {
     localMyPhrases.columns.forEach(column => {
       column.categories.forEach(category => {
         category.cls = (editWhat === 'categories' && category.selected) ? 'selected' : '';
+        category.cls = category.cls + (category.hidden ? '  hidden' : '') ;
         category.checkmark = (editWhat === 'categories' && category.selected) ? html`<span class=checkmark>&#x2714;</span>` : '';
         category.items.forEach(item => {
           item.cls = (editWhat === 'items' && item.selected) ? 'selected' : '';
+          item.cls = item.cls + ((category.hidden || item.hidden) ? '  hidden' : '') ;
           item.checkmark = (editWhat === 'items' && item.selected) ? html`<span class=checkmark>&#x2714;</span>` : '';
         });
       });
@@ -1098,6 +1127,8 @@ function editMyPhrases(Section, parentElement, props) {
     // enableSelectAll is true only if editWhat==items and at least one item is selected
     let enableRemoveSelected = false;
     let enableSelectAll = false;
+    let enableShow = false;
+    let enableHide = false;
     localMyPhrases.columns.forEach(column => {
       if (editWhat === 'items') {
         column.categories.forEach(category => {
@@ -1105,12 +1136,25 @@ function editMyPhrases(Section, parentElement, props) {
             enableRemoveSelected = true;
             enableSelectAll = true;
           }
+          if (category.items.some(item => (item.selected && item.hidden))) {
+            enableShow = true;
+          }
+          if (category.items.some(item => (item.selected && !item.hidden))) {
+            enableHide = true;
+          }
         });
       } else if (editWhat === 'categories') {
-        let category = column.categories.find(category => category.selected);
-        if (column.categories.length > 1 && category && category.items.length === 0)  {
-          enableRemoveSelected = true;
-        }
+        column.categories.forEach(category => {
+          if (category.selected && column.categories.length > 1 && category.items.length === 0) {
+            enableRemoveSelected = true;
+          }
+          if (category.selected && category.hidden) {
+            enableShow = true;
+          }
+          if (category.selected && !category.hidden) {
+            enableHide = true;
+          }
+        });
       }
     });
     let EditMyPhrasesSelectAllClass = !enableSelectAll ? 'EditMyPhrasesSelectDisabled' : '';
@@ -1177,8 +1221,8 @@ function editMyPhrases(Section, parentElement, props) {
     } else {
       buttonRowHtml = html`
         <div class=ButtonRow>
-          <button @click=${onClickShowSelected} ?disabled=${!enableRemoveSelected} title="Show selected builtin items">Show</button>
-          <button @click=${onClickHideSelected} ?disabled=${!enableRemoveSelected} title="Hide selected builtin items">Hide</button>
+          <button @click=${onClickShowSelected} ?disabled=${!enableShow} title="Show selected builtin items">Show</button>
+          <button @click=${onClickHideSelected} ?disabled=${!enableHide} title="Hide selected builtin items">Hide</button>
         </div>
       `;
     }
@@ -1210,7 +1254,7 @@ function editMyPhrases(Section, parentElement, props) {
                     </div>` : html`
                     <div @click=${onItemClick} .myphrasesFlavor=${'categories'} .myphrasesObject=${category}
                       .myphrasesColumnIndex=${colIndex} .myphrasesCategoryIndex=${catIndex}
-                      class="MyPhrasesCategoryLabel ${editWhat === 'categories' && category.selected ? 'selected' : ''}">
+                      class="MyPhrasesCategoryLabel ${editWhat === 'categories' && category.selected ? 'selected' : ''} ${editWhat === 'categories' && category.hidden ? 'hidden' : ''}">
                       ${category.checkmark}
                       ${category.label}
                     </div>`}

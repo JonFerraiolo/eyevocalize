@@ -214,9 +214,14 @@ button,input,textarea,select {
   font-size: 200%;
   font-weight:bold
 }
-.PhraseRow button.selected {
+.PhraseRow button.selected, .MyPhrases .MyPhraseContainer button.selected {
   color: black;
   background-color: #ddd;
+  border-color: #29648a;
+}
+.PhraseRow button.hidden, .MyPhrases .MyPhraseContainer button.hidden {
+  opacity: 0.4;
+  background-color: #999;
   border-color: #29648a;
 }
 .PhraseRow button.selected .checkmark {
