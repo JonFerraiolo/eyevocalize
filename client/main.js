@@ -160,7 +160,6 @@ export function updateMain(searchString) {
 
 function main() {
 	console.log(window.eyevocalizeUserEmail+'/'+window.eyevocalizeUserChecksum);
-	window.eyevocalizeUserEmail=null;
   let currentVersion = 4;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
