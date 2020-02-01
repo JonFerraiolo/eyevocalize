@@ -184,13 +184,13 @@ export function updateTextEntryRow(parentElement, props) {
     window.location.href = userEmail  ? '/login' : '/signup';
   }
   let localUpdate = () => {
-    let lastIcon = window.eyevocalizeUser ?
+    let lastIcon = window.eyevocalizeUserEmail ?
       html`<button class="TextEntryIcon TextEntryUser" @click=${onUser}
         title='Show user screen, includes logout'></button>` :
       html`<a class="TextEntryIcon TextEntrySignupLogin" href="" @click=${onSignupLogin}
         title='Sign up or login'>Signup/<br></br>Login</a>`;
-    let userIconClass = "" + (window.eyevocalizeUser ? '' : ' notloggedin');
-    let signupLoginClass =  + (window.eyevocalizeUser ? ' loggedin' : '');
+    let userIconClass = "" + (window.eyevocalizeUserEmail ? '' : ' notloggedin');
+    let signupLoginClass =  + (window.eyevocalizeUserEmail ? ' loggedin' : '');
     render(html`
     <style>${css}</style>
     <div class=TextEntryRow>

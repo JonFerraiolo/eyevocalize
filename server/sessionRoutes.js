@@ -17,20 +17,34 @@ const EMAIL_ALREADY_VERIFIED = 'EMAIL_ALREADY_VERIFIED'
 const INCORRECT_PASSWORD = 'INCORRECT_PASSWORD'
 const TOKEN_NOT_FOUND = 'TOKEN_NOT_FOUND'
 const TOKEN_EXPIRED = 'TOKEN_EXPIRED'
+const UNSPECIFIED_CLIENT_ERROR = 'UNSPECIFIED_CLIENT_ERROR'
 const UNSPECIFIED_SYSTEM_ERROR = 'UNSPECIFIED_SYSTEM_ERROR'
 
 //FIXME don't put credentials into log files
 exports.signup = function(req, res, next) {
+  const logger = global.logger;
   logger.info('signup req.session='+req.session);
+  logger.info('signup req.body='+req.body);
+  try {
+    logger.info(JSON.stringify(req.body));
+  } catch(e) {
+    logSendSE(res, e, 'signup body stringify error');
+    return;
+  }
+  if (!req.body.email || !req.body.password) {
+    logSendCE(res, 400, UNSPECIFIED_CLIENT_ERROR, "signup missing required data");
+    return;
+  }
   dbconnection.dbReady().then(connectionPool => {
-    const logger = global.logger;
     const accountTable = global.accountTable;
-    logger.info('signup req.body='+req.body);
-    try { logger.info(JSON.stringify(req.body)); } catch(e) { logger.error('stringify error'); }
     let now = new Date();
+    let pwKey = crypto.createCipher('aes-128-cbc', global.config.HASH_SECRET1);
+    let encryptedPW = pwKey.update(req.body.password, 'utf8', 'hex');
+    encryptedPW += pwKey.final('hex');
+    logger.info('signup encryptedPW='+encryptedPW);
     let account = {
        email: req.body.email,
-       password: req.body.password,
+       password: encryptedPW,
        emailValidateToken: null,
        emailValidateTokenDateTime: now,
        created: now,
@@ -96,14 +110,54 @@ exports.signup = function(req, res, next) {
 }
 
 exports.login = function(req, res, next) {
+  const logger = global.logger;
+  logger.info('login req.session='+req.session);
+  logger.info('login req.body='+req.body);
+  try {
+    logger.info(JSON.stringify(req.body));
+  } catch(e) {
+    logSendSE(res, e, 'login body stringify error');
+    return;
+  }
+  if (!req.body.email || !req.body.password) {
+    logSendCE(res, 400, UNSPECIFIED_CLIENT_ERROR, "login missing required data");
+    return;
+  }
+  const password = req.body.password;
+  let pwKey = crypto.createCipher('aes-128-cbc', global.config.HASH_SECRET1);
+  let encryptedPW = pwKey.update(password, 'utf8', 'hex');
+  encryptedPW += pwKey.final('hex');
+  logger.info('login encryptedPW='+encryptedPW);
+  doLogin(req, res, req.body.email, encryptedPW);
+}
+
+exports.autologin = function(req, res, next) {
+  const logger = global.logger;
+  logger.info('autologin req.session='+req.session);
+  logger.info('autologin req.body='+req.body);
+  try {
+    logger.info(JSON.stringify(req.body));
+  } catch(e) {
+    logSendSE(res, e, 'autologin body stringify error');
+    return;
+  }
+  if (!req.body.email || !req.body.checksum) {
+    logSendCE(res, 400, UNSPECIFIED_CLIENT_ERROR, "autologin missing required data");
+    return;
+  }
+  const checksum = req.body.checksum;
+  let pwKey = crypto.createDecipher('aes-128-cbc', global.config.HASH_SECRET2);
+  let encryptedPW = pwKey.update(checksum, 'hex', 'utf8')
+  encryptedPW += pwKey.final('utf8');
+  logger.info('autologin encryptedPW='+encryptedPW);
+  doLogin(req, res, req.body.email, encryptedPW);
+}
+
+function doLogin(req, res, email, encryptedPW) {
+  const logger = global.logger;
+  logger.info('doLogin email='+email+', encryptedPW='+encryptedPW);
   dbconnection.dbReady().then(connectionPool => {
-    const logger = global.logger;
     const accountTable = global.accountTable;
-    logger.info('login req.body='+req.body);
-    try { logger.info(JSON.stringify(req.body)); } catch(e) { logger.error('stringify error'); }
-    const email = req.body.email;
-    const password = req.body.password;
-    logger.info('email='+email);
     connectionPool.query(`SELECT * FROM ${accountTable} WHERE email = ?`, [email], function (error, results, fields) {
       if (error) {
         logSendSE(res, error, "Select account failure for email '" + email + "'");
@@ -119,10 +173,10 @@ exports.login = function(req, res, next) {
           } else if (!account.emailValidated) {
             logSendCE(res, 401, EMAIL_NOT_VERIFIED, "Account for '" + email + "' has not been verified yet via email");
           } else {
-            if (account.password === password) {
+            if (account.password === encryptedPW && req.session) {
               logger.info('Before calling session login.  User='+account);
-              logger.info(account);
-              logger.info('req.session.id='+req.session.id);
+              logger.info(JSON.stringify(account));
+              logger.info('req.session.id='+((req.session && req.session.id) || 'none'));
               req.session.user = account;
               logger.info('login after regenerate req.session.id='+req.session.id);
               let payload = { account: { email: account.email, modified: account.modified }};
@@ -142,6 +196,7 @@ exports.login = function(req, res, next) {
 }
 
 exports.logout = function(req, res, next) {
+  const logger = global.logger;
   logger.info('logout req.body='+req.body);
   logger.info(req.body);
   if (req.session) {
@@ -177,6 +232,7 @@ exports.loginexists = function(req, res, next) {
 */
 
 exports.resendVerificationEmail = function(req, res, next) {
+  const logger = global.logger;
   dbconnection.dbReady().then(connectionPool => {
     logger.info('resendVerificationEmail req.body='+req.body);
     logger.info(req.body);
@@ -230,6 +286,7 @@ exports.resendVerificationEmail = function(req, res, next) {
 }
 
 exports.sendResetPasswordEmail = function(req, res, next) {
+  const logger = global.logger;
   dbconnection.dbReady().then(connectionPool => {
     logger.info('sendResetPasswordEmail req.body='+req.body);
     logger.info(req.body);
@@ -278,6 +335,7 @@ exports.sendResetPasswordEmail = function(req, res, next) {
 }
 
 exports.verifyAccount = function(req, res, next) {
+  const logger = global.logger;
   dbconnection.dbReady().then(connectionPool => {
     logger.info('verifyAccount req.params='+req.params);
     logger.info(req.params);
@@ -347,6 +405,7 @@ exports.verifyAccount = function(req, res, next) {
 }
 
 exports.closeAccount = function(req, res, next) {
+  const logger = global.logger;
   dbconnection.dbReady().then(connectionPool => {
     logger.info('closeAccount');
     let now = new Date();
@@ -372,6 +431,7 @@ exports.closeAccount = function(req, res, next) {
 }
 
 exports.gotoResetPasswordPage = function(req, res, next) {
+  const logger = global.logger;
   dbconnection.dbReady().then(connectionPool => {
     logger.info('gotoResetPasswordPage req.params='+req.params);
     logger.info(req.params);
@@ -421,11 +481,15 @@ exports.gotoResetPasswordPage = function(req, res, next) {
 }
 
 exports.resetPassword = function(req, res, next) {
+  const logger = global.logger;
   dbconnection.dbReady().then(connectionPool => {
     logger.info('resetpassword req.body='+req.body);
     logger.info(req.body);
     const password = req.body.password;
     const token = req.body.token;
+    let pwKey = crypto.createCipher('aes-128-cbc', global.config.HASH_SECRET1);
+    let encryptedPW = pwKey.update(password, 'utf8', 'hex');
+    encryptedPW += pwKey.final('hex');
     logger.info('req.session.id='+req.session.id);
     connectionPool.query(`SELECT email, resetPasswordTokenDateTime FROM ${accountTable} WHERE resetPasswordToken = ?`, [token], function (error, results, fields) {
       if (error || results.length !== 1) {
@@ -443,7 +507,7 @@ exports.resetPassword = function(req, res, next) {
           logSendCE(res, 400, TOKEN_EXPIRED, "resetPassword expired token for email '" + email + "'");
         } else {
           logger.info('now='+now+', email='+email)
-          connectionPool.query(`UPDATE ${accountTable} SET password = ?, resetPasswordToken = NULL, resetPasswordTokenDateTime = NULL, modified = ? WHERE email = ?`, [password, now, email], function (error, results, fields) {
+          connectionPool.query(`UPDATE ${accountTable} SET password = ?, resetPasswordToken = NULL, resetPasswordTokenDateTime = NULL, modified = ? WHERE email = ?`, [encryptedPW, now, email], function (error, results, fields) {
             logger.info('error='+error+", results= ", JSON.stringify(results));
             if (error) {
               logSendSE(res, error, "resetPassword update resetPasswordToken database failure for email '" + account.email + "'");
@@ -462,6 +526,7 @@ exports.resetPassword = function(req, res, next) {
 }
 
 function sendAccountVerificationEmailToUser(account, callback) {
+  const logger = global.logger;
   const url = global.config.BASE_URL + global.apiBasePath + '/verifyaccount/' + account.emailValidateToken
   const params = {
     html: `<p>Welcome to EyeVocalize.com!</p>
@@ -483,6 +548,7 @@ function sendAccountVerificationEmailToUser(account, callback) {
 }
 
 function sendResetPasswordEmailToUser(account, callback) {
+  const logger = global.logger;
   const url = global.config.BASE_URL + global.apiBasePath + '/gotoresetpasswordpage/' + account.resetPasswordToken
   const params = {
     html: `<p>Reset your ${global.SITENAME} password</p>
@@ -506,4 +572,36 @@ function makeToken(account) {
   const buf = crypto.randomBytes(8);
   let token = buf.toString('hex')
   return token
+}
+
+exports.initSocketMessages = function(socket) {
+  /* FIXME remove this function
+  const logger = global.logger;
+  socket.on('AutoLogin', (msg, fn) => {
+    logger.info('AutoLogin message was: '+msg+' at '+(new Date()).toISOString());
+    let o;
+    try {
+      o = JSON.parse(msg);
+      let { email, checksum } = o;
+      if (!email || !checksum) {
+        fn(JSON.stringify({ success: false, error: 'incomplete data'}));
+        return;
+      }
+      let pwKey = crypto.createDecipher('aes-128-cbc', global.config.HASH_SECRET2);
+      let encryptedPW = pwKey.update(checksum, 'hex', 'utf8')
+      encryptedPW += pwKey.final('utf8');
+      logger.info('AutoLogin encryptedPW='+encryptedPW);
+      doLogin(email, encryptedPW, (clientData, clientMsg) => {
+        fn(JSON.stringify({ success: true }));
+      }, (status, clientErrorString, clientMessage, clientData) => {
+        fn(JSON.stringify({ success: false, error: clientMessage}));
+      }, (error, clientMessage) => {
+        fn(JSON.stringify({ success: false, error: clientMessage}));
+      });
+    } catch(e) {
+      logger.error('AutoLogin exception. e='+e);
+      fn(JSON.stringify({ success: false, error: 'unexpected server exception'}));
+    }
+  });
+  */
 }

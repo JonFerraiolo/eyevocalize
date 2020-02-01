@@ -314,7 +314,7 @@ export function editSettings(parentElement, params) {
     )
   }`;
   let title = 'Settings';
-  let trial = !(window.eyevocalizeUser);
+  let trial = !(window.eyevocalizeUserEmail);
   let localUpdate = () => {
     voiceIndex = voices.findIndex(v => v.name === voiceName );
     if (voiceIndex === -1) voiceIndex = 0;
@@ -344,7 +344,7 @@ export function editSettings(parentElement, params) {
         </div>
       `;
     } else if (section === 'Account') {
-      let trial = window.eyevocalizeUser ? '' : html`<div class="SettingsAccountTrialVersion TrialVersion">
+      let trial = window.eyevocalizeUserEmail ? '' : html`<div class="SettingsAccountTrialVersion TrialVersion">
         Because you are using the Trial Version, the options below are inactive.
       </div>`;
       SettingsData = html`

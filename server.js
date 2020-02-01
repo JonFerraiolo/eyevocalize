@@ -1,3 +1,5 @@
+
+const crypto = require('crypto');
 const express = require('express');
 const http = require('http');
 const https = require('https');
@@ -182,7 +184,11 @@ sessionMgmt.init(app).then(() => {
       if (err) { logSendSE(res, err, 'app.html'); }
       else {
         const email = (req.session && req.session.user && req.session.user.email) || '';
-        const s = data.toString().replace('((EVUSER))', email);
+        const encryptedPW = (req.session && req.session.user && req.session.user.password) || '';
+        let pwKey = crypto.createCipher('aes-128-cbc', global.config.HASH_SECRET2);
+        let checksum = pwKey.update(encryptedPW, 'utf8', 'hex')
+        checksum += pwKey.final('hex');
+        const s = data.toString().replace('((EVUSER))', email).replace('((EVCHECKSUM))', checksum);
         res.send(s);
       }
     });
@@ -193,6 +199,7 @@ sessionMgmt.init(app).then(() => {
   logger.info('server.js before setting up /signup');
   app.post('/api/signup', sessionRoutes.signup)
   app.post('/api/login', sessionRoutes.login)
+  app.post('/api/autologin', sessionRoutes.autologin)
   app.post('/api/logout', sessionRoutes.logout)
   app.post('/api/resendverification', sessionRoutes.resendVerificationEmail)
   app.post('/api/sendresetpassword', sessionRoutes.sendResetPasswordEmail)
@@ -208,10 +215,11 @@ sessionMgmt.init(app).then(() => {
     socket.on('disconnect', function(){
       logger.info('user disconnected at '+(new Date()).toISOString());
     });
-    socket.on('client message', msg => {
-      logger.info('client message was: '+msg+' at '+(new Date()).toISOString());
-      socket.emit('server message','echoing '+msg);
+    socket.on('ClientStartup', (msg, fn) => {
+      logger.info('ClientStartup message was: '+msg+' at '+(new Date()).toISOString());
+      fn('server echoing '+msg);
     });
+    sessionRoutes.initSocketMessages(socket);
   });
 
   logger.info('before calling listen on port');

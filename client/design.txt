@@ -1,5 +1,10 @@
 
 
+client DB_TABLE_PREFIX
+on connection, initialize socket handshake, get clientId (current time) 
+
+
+
 syncing data
 
 something new spoken
@@ -159,7 +164,7 @@ returns either full set of new data or deltas at start of browser session
 
 ======
 
-/app when window.eyevocalizeUser==''
+/app when window.eyevocalizeUserEmail==''
 Try it experience
 
 Application always comes up with draggable popup in top middle that says:

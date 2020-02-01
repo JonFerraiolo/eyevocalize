@@ -266,12 +266,12 @@ const Login = () => {
         });
         localUpdate();
       } else {
-        console.error('signup fetch bad status='+resp.status);
+        console.error('login fetch bad status='+resp.status);
         errorMessage = `Very sorry. Something unexpected went wrong (login). Perhaps try again. `;
         localUpdate();
       }
     }).catch(e => {
-      console.error('signup fetch error e='+e);
+      console.error('login fetch error e='+e);
     });
   };
   let onClickShowPassword = e => {

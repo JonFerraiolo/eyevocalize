@@ -122,7 +122,7 @@ export function updateMain(searchString) {
 		e.preventDefault();
 		setAppMinOrMax('Max');
 	};
-	let trial = window.eyevocalizeUser ? '' :
+	let trial = window.eyevocalizeUserEmail ? '' :
 		html`<div class=TrialVersion>You are using the Trial Version.
 		To remove this message, sign up and log in. (The app is free) </div>`;
 	render(html`
@@ -159,6 +159,8 @@ export function updateMain(searchString) {
 };
 
 function main() {
+	console.log(window.eyevocalizeUserEmail+'/'+window.eyevocalizeUserChecksum);
+	window.eyevocalizeUserEmail=null;
   let currentVersion = 4;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
@@ -168,11 +170,98 @@ function main() {
 	initializeBuiltins(initializationProps);
 
 	updateMain();
-	if (window.eyevocalizeUser) {
-		localStorage.setItem('userEmail', window.eyevocalizeUser);
+	if (window.eyevocalizeUserEmail && window.eyevocalizeUserChecksum) {
+		localStorage.setItem('userEmail', window.eyevocalizeUserEmail);
+		localStorage.setItem('userChecksum', window.eyevocalizeUserChecksum);
+	} else {
+		socketPromise.then(() => {
+			let lsEmail = localStorage.getItem('userEmail');
+			let lsChecksum = localStorage.getItem('userChecksum');
+			if (lsEmail && lsChecksum) {
+				let fetchPostOptions = {
+				  method: 'POST',
+				  mode: 'same-origin',
+				  headers: { "Content-type": "application/json" },
+				  credentials: 'include',
+				};
+				let credentials = {
+					email: lsEmail,
+					checksum: lsChecksum,
+				};
+				fetchPostOptions.body = JSON.stringify(credentials);
+				fetch('/api/autologin', fetchPostOptions).then(resp => {
+					console.log('status='+resp.status);
+		      if (resp.status === 200) {
+		        resp.json().then(data => {
+		          console.log('autologin fetch success return data=');
+		          console.dir(data);
+							window.eyevocalizeUserEmail = lsEmail;
+							window.eyevocalizeUserChecksum = lsChecksum;
+							localStorage.setItem('userEmail', window.eyevocalizeUserEmail);
+							localStorage.setItem('userChecksum', window.eyevocalizeUserChecksum);
+							updateMain();
+		        });
+		      } else if (resp.status === 401) {
+		        resp.json().then(data => {
+		          console.log('autologin fetch 401 return data=');
+		          console.dir(data);
+							let errorMessage;
+		          if (data.error === 'EMAIL_NOT_REGISTERED') {
+		            errorMessage = `*** Error: '${lsEmail}' not registered ***`;
+		          } else if (data.error === 'EMAIL_NOT_VERIFIED') {
+								errorMessage = `*** Error: '${lsEmail}' not verified ***`;
+		          } else if (data.error === 'INCORRECT_PASSWORD') {
+		            errorMessage = `*** Error: incorrect password for '${lsEmail}' ***`;
+		          } else {
+		            errorMessage = `Very sorry. Something unexpected went wrong(autologin 401-1). `;
+		          }
+							console.error(errorMessage);
+		        }).catch(e => {
+		          console.error(`Very sorry. Something unexpected went wrong (autologin 401-2). `);
+		        });
+		      } else {
+		        console.error('autologin fetch bad status='+resp.status);
+		      }
+				}).catch(e => {
+					console.error('autologin fetch error e='+e);
+				});
+
+/*
+				socket.emit('AutoLogin', JSON.stringify({ email: lsEmail, checksum: lsChecksum, }), msg => {
+					console.log('AutoLogin response msg: '+msg);
+					try {
+						let o = JSON.parse(msg);
+						if (o.success) {
+							window.eyevocalizeUserEmail = lsEmail;
+							window.eyevocalizeUserChecksum = lsChecksum;
+							localStorage.setItem('userEmail', window.eyevocalizeUserEmail);
+							localStorage.setItem('userChecksum', window.eyevocalizeUserChecksum);
+							updateMain();
+						} else {
+							console.error('AutoLogin error msg: '+msg);
+							window.eyevocalizeUserEmail = null;
+							window.eyevocalizeUserChecksum = null;
+						}
+					} catch(e) {
+						console.error('AutoLogin response JSON.parse error'+e);
+						window.eyevocalizeUserEmail = null;
+						window.eyevocalizeUserChecksum = null;
+					}
+				});
+				*/
+			}
+		}, () => {
+		  console.error('socket promise reject.');
+			window.eyevocalizeUserEmail = null;
+			window.eyevocalizeUserChecksum = null;
+		}).catch(e => {
+		  console.error('socket promise error'+e);
+			window.eyevocalizeUserEmail = null;
+			window.eyevocalizeUserChecksum = null;
+		});
 	}
 	/*FIXME change to quick tutorial
-	if (window.eyevocalizeUser === '') {
+	if (window.eyevocalizeUserEmail === '') {
 		setTimeout(() => {
 			let props = { refNodeSelector: '.main' };
 			showLoginSignupPopup(props);
@@ -219,18 +308,22 @@ function main() {
 			}
 		}
 	}, false);
-
-
 };
 
 let socket;
-try {
-	socket = io();
-	socket.on('server message', msg => { console.log('server says: '+msg); } );
-	socket.emit('client message', 'client says hello');
-} catch(e) {
-	console.error('socket.io initialization failed. ');
-}
+let socketPromise = new Promise((resolve, reject) => {
+	try {
+		socket = io();
+		//socket.on('push', msg => {  });
+		socket.emit('ClientStartup', 'client says hello', msg => {
+			console.log('server says: '+msg);
+			resolve();
+		});
+	} catch(e) {
+		console.error('socket.io initialization failed. ');
+		reject();
+	}
+});
 
 startupChecks(() => {
 	main();

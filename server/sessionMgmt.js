@@ -25,7 +25,7 @@ module.exports = {
           app.use(session({
               cookie: { secure: false , maxAge:24*60*60*1000 }, // FIXME secure:true once https
               proxy: true,
-              secret: global.config.SESSION_SECRET,
+              secret: global.config.HASH_SECRET1,
               store: sessionStore,
               resave: false,
               saveUninitialized: false
