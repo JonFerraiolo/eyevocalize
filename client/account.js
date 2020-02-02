@@ -74,6 +74,7 @@ let AccountMenu = (parentElement, customControlsData) => {
 				resp.json().then(data => {
 					console.log('logout fetch return data=');
 					console.dir(data);
+					localStorage.setItem('userChecksum', ''); // to prevent autologin if user goes to /app without logging in 
 					window.location.href = '/login';
 				});
 			} else {

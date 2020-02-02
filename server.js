@@ -183,13 +183,20 @@ sessionMgmt.init(app).then(() => {
     fs.readFile(rootDir+'/app.html', (err, data) => {
       if (err) { logSendSE(res, err, 'app.html'); }
       else {
-        const email = (req.session && req.session.user && req.session.user.email) || '';
+        let email = (req.session && req.session.user && req.session.user.email) || '';
         const encryptedPW = (req.session && req.session.user && req.session.user.password) || '';
-        let pwKey = crypto.createCipher('aes-128-cbc', global.config.HASH_SECRET2);
-        let checksum = pwKey.update(encryptedPW, 'utf8', 'hex')
-        checksum += pwKey.final('hex');
-        const s = data.toString().replace('((EVUSER))', email).replace('((EVCHECKSUM))', checksum);
-        res.send(s);
+        sessionRoutes.doLoginValidate(req, res, email, encryptedPW, validLogin => {
+          let checksum;
+          if (validLogin) {
+            let pwKey = crypto.createCipher('aes-128-cbc', global.config.HASH_SECRET2);
+            checksum = pwKey.update(encryptedPW, 'utf8', 'hex')
+            checksum += pwKey.final('hex');
+          } else {
+            email = checksum = '';
+          }
+          const s = data.toString().replace('((EVUSER))', email).replace('((EVCHECKSUM))', checksum);
+          res.send(s);
+        });
       }
     });
   });

@@ -128,7 +128,7 @@ exports.login = function(req, res, next) {
   let encryptedPW = pwKey.update(password, 'utf8', 'hex');
   encryptedPW += pwKey.final('hex');
   logger.info('login encryptedPW='+encryptedPW);
-  doLogin(req, res, req.body.email, encryptedPW);
+  doLoginLogSend(req, res, req.body.email, encryptedPW);
 }
 
 exports.autologin = function(req, res, next) {
@@ -150,28 +150,48 @@ exports.autologin = function(req, res, next) {
   let encryptedPW = pwKey.update(checksum, 'hex', 'utf8')
   encryptedPW += pwKey.final('utf8');
   logger.info('autologin encryptedPW='+encryptedPW);
-  doLogin(req, res, req.body.email, encryptedPW);
+  doLoginLogSend(req, res, req.body.email, encryptedPW);
 }
 
-function doLogin(req, res, email, encryptedPW) {
+exports.doLoginValidate = function(req, res, email, encryptedPW, cb) {
+  doLogin(req, res, email, encryptedPW, (res, clientData, clientMsg) => {
+    cb(true);
+  }, (res, status, clientErrorString, clientMessage, clientData) => {
+    cb(false);
+  }, (res, error, clientMessage) => {
+    cb(false);
+  });
+}
+
+let doLoginLogSend = function(req, res, email, encryptedPW) {
+  doLogin(req, res, email, encryptedPW, (res, clientData, clientMsg) => {
+    logSendOK(res, clientData, clientMsg);
+  }, (res, status, clientErrorString, clientMessage, clientData) => {
+    logSendCE(res, status, clientErrorString, clientMessage, clientData);
+  }, (res, error, clientMessage) => {
+    logSendSE(res, error, clientMessage);
+  });
+}
+
+let doLogin = function(req, res, email, encryptedPW, callbackOK, callbackCE, callbackSE) {
   const logger = global.logger;
   logger.info('doLogin email='+email+', encryptedPW='+encryptedPW);
   dbconnection.dbReady().then(connectionPool => {
     const accountTable = global.accountTable;
     connectionPool.query(`SELECT * FROM ${accountTable} WHERE email = ?`, [email], function (error, results, fields) {
       if (error) {
-        logSendSE(res, error, "Select account failure for email '" + email + "'");
+        callbackSE(res, error, "Select account failure for email '" + email + "'");
       } else {
         let msg = "Select account success for email '" + email + "'";
         logger.info(msg + ", results= ", results);
         if (results.length < 1) {
-          logSendCE(res, 401, EMAIL_NOT_REGISTERED, "No account for '" + email + "'");
+          callbackCE(res, 401, EMAIL_NOT_REGISTERED, "No account for '" + email + "'");
         } else {
           let account = results[0]
           if (account.accountClosedDateTime) {
-            logSendCE(res, 401, EMAIL_NOT_REGISTERED, "Account closed for '" + email + "'");
+            callbackCE(res, 401, EMAIL_NOT_REGISTERED, "Account closed for '" + email + "'");
           } else if (!account.emailValidated) {
-            logSendCE(res, 401, EMAIL_NOT_VERIFIED, "Account for '" + email + "' has not been verified yet via email");
+            callbackCE(res, 401, EMAIL_NOT_VERIFIED, "Account for '" + email + "' has not been verified yet via email");
           } else {
             if (account.password === encryptedPW && req.session) {
               logger.info('Before calling session login.  User='+account);
@@ -180,18 +200,18 @@ function doLogin(req, res, email, encryptedPW) {
               req.session.user = account;
               logger.info('login after regenerate req.session.id='+req.session.id);
               let payload = { account: { email: account.email, modified: account.modified }};
-              logSendOK(res, payload, "Login success for email '" + email + "'");
+              callbackOK(res, payload, "Login success for email '" + email + "'");
             } else {
-              logSendCE(res, 401, INCORRECT_PASSWORD, "Login failure for email '" + email + "'");
+              callbackCE(res, 401, INCORRECT_PASSWORD, "Login failure for email '" + email + "'");
             }
           }
         }
       }
     });
   }, () => {
-    logSendSE(res, null, "login: no database connection");
+    callbackSE(res, null, "login: no database connection");
   }).catch(e => {
-    logSendSE(res, e, "login: promise error");
+    callbackSE(res, e, "login: promise error");
   });
 }
 
