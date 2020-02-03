@@ -24,10 +24,15 @@ let css = `
   width: 1em;
   height: 1em;
   margin-right: 0.4em;
-  background-image: url('./images/heart.svg');
   background-size: 1.1em 1.1em;
   background-position: 0px 1px;
   background-repeat: no-repeat;
+}
+#FavoritesContainer .MyPhrasesTitleIcon {
+  background-image: url('./images/heart.svg');
+}
+#BuiltinsContainer .MyPhrasesTitleIcon {
+  background-image: url('./images/diamond.svg');
 }
 .MyPhrasesCategoryLabel {
   font-size: 90%;
@@ -1229,17 +1234,17 @@ function editMyPhrases(Section, parentElement, props) {
     // FIXME css might be added multiple times
     render(html`
     <style>${css}</style>
-    <div class="MyPhrases EditMyPhrases">
-      <div class=EditMyPhrasesChild>
-        ${buildSlideRightTitle("Manage Favorites", onEditFavoritesReturn)}
+    <div class="MyPhrases EditMyPhrases skinnyScreenParent">
+      <div class="EditMyPhrasesChild skinnyScreenChild">
+        ${buildSlideRightTitle("Manage "+(Section === 'Favorites' ? 'Favorites' : 'Builtins'), onEditFavoritesReturn)}
         <div class=TabControlRadioButtons>
           <label>Edit what:</label>
-          ${buildEditWhatRadioButton('EditMyPhrasesEditWhatItems', 'items', 'Individual Favorites')}
+          ${buildEditWhatRadioButton('EditMyPhrasesEditWhatItems', 'items', "Individual "+(Section === 'Favorites' ? 'Favorites' : 'Builtins'))}
           ${buildEditWhatRadioButton('EditMyPhrasesEditWhatCategories', 'categories', 'Categories')}
         </div>
         <div class="EditMyPhrasesData ${editWhat === 'items' ? 'EditWhatItems' : 'EditWhatCategories' }">
           <div class=ScreenInstructions>
-            ${editWhat === 'items' ? '(Click individual favorites below to select.)' :
+            ${editWhat === 'items' ? '(Click individual '+(Section === 'Favorites' ? 'Favorites' : 'Builtins')+' below to select.)' :
               '(Click individual categories to select.)'}
           </div>
           <div class=MyPhrasesColumns>

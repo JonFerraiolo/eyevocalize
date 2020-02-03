@@ -14,12 +14,12 @@ let css = `
   display: flex;
   flex-direction: row;
 }
-.StashAndHistory, #MyPhrasesContainer {
+.StashAndHistory, #FavoritesContainer, #BuiltinsContainer {
   min-height: 0px;
   height: 100%;
   display: inline-block;
 }
-#MyPhrasesContainer {
+#FavoritesContainer, #BuiltinsContainer {
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -54,7 +54,7 @@ let css = `
 .HistoryContent {
   flex: 1 1;
 }
-#MyPhrasesContainer {
+#FavoritesContainer {
   flex: 2;
 }
 #BuiltinsContainer {
@@ -201,11 +201,11 @@ export function updatePhrases(parentElement, props) {
       <div id=StashContainer></div>
       <div id=HistoryContainer></div>
     </div>
-    <div id=MyPhrasesContainer></div>
+    <div id=FavoritesContainer></div>
     <div id=BuiltinsContainer></div>
   </div>`, parentElement);
   updateStash(document.getElementById('StashContainer'), StashProps);
   updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
-  updateFavorites(document.getElementById('MyPhrasesContainer'), MyPhrasesProps);
+  updateFavorites(document.getElementById('FavoritesContainer'), MyPhrasesProps);
   updateBuiltins(document.getElementById('BuiltinsContainer'), MyPhrasesProps);
 }
