@@ -44,7 +44,7 @@ let css = `
   color: #888;
 }
 .MyPhrasesColumns {
-  height: 100%;
+  flex: 1 1 0;
   display: flex;
   width: 100%;
 }
