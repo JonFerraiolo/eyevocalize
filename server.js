@@ -218,12 +218,12 @@ sessionMgmt.init(app).then(() => {
   app.get('/*', (req, res) => res.redirect(301, '/'));
 
   io.on('connection', function(socket){
-    logger.info('user connected at '+(new Date()).toISOString());
+    logger.info('user connected socket.id='+socket.id);
     socket.on('disconnect', function(){
-      logger.info('user disconnected at '+(new Date()).toISOString());
+      logger.info('user disconnected socket.id='+socket.id);
     });
     socket.on('ClientStartup', (msg, fn) => {
-      logger.info('ClientStartup message was: '+msg+' at '+(new Date()).toISOString());
+      logger.info('ClientStartup message was: '+msg);
       fn('server echoing '+msg);
     });
     sessionRoutes.initSocketMessages(socket);

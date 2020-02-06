@@ -287,7 +287,8 @@ function main() {
 
 window.eyevocalizeClientId = localStorage.getItem('clientId');
 if (!window.eyevocalizeClientId) {
-	window.eyevocalizeClientId = Date.now();
+	window.eyevocalizeClientId = (Date.now().toString());
+	localStorage.setItem('clientId', window.eyevocalizeClientId);
 }
 
 let socket;
