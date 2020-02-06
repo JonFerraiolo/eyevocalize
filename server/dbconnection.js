@@ -19,15 +19,15 @@ const dbReady = function() {
           logger.info('dbconnection.init initialize promise resolved');
           resolve();
         } else {
-          if (initializeCounter >= 5) {
-            logger.error('dbconnection.init initialize promise rejected after 5 tries');
+          if (initializeCounter >= 10) {
+            logger.error('dbconnection.init initialize promise rejected after 10 tries');
             reject();
           } else {
             logger.info('dbconnection.init initialize promise incrementing counter');
             initializeCounter++;
             setTimeout(() => {
               check();
-            }, 3000);
+            }, initializeCounter* 500);
           }
         }
       });
@@ -71,12 +71,9 @@ const getConnection = function() {
 };
 
 //FIXME no reason to kill application if we cannot connect to database
-//FIXME add pooled connections?
-let reconnectCounter;
 function reconnect() {
   const logger = global.logger;
   logger.info("enter reconnect");
-  reconnectCounter = 0;
   return new Promise((outerResolve, outerReject) => {
     function inner() {
       logger.info("enter reconnect/inner");
@@ -134,8 +131,8 @@ exports.initialize = function() {
   // sql commands to check if database is empty
   // and to create tables if necessary.
   const accountTable = global.accountTable = global.config.DB_TABLE_PREFIX + 'account';
+  const clientTable = global.accountTable = global.config.DB_TABLE_PREFIX + 'client';
   const showTables = `show tables;`;
-  const dropAccount = `DROP TABLE  IF EXISTS ${accountTable};`;
   const createAccount = `CREATE TABLE ${accountTable} (
     id int(11) unsigned NOT NULL AUTO_INCREMENT,
     email varchar(100) COLLATE utf8_unicode_ci UNIQUE NOT NULL,
@@ -149,6 +146,13 @@ exports.initialize = function() {
     resetPasswordToken varchar(20) DEFAULT NULL,
     resetPasswordTokenDateTime datetime DEFAULT NULL,
     modified datetime NOT NULL,
+    PRIMARY KEY (id),
+    INDEX(email(100))
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
+  const createClient = `CREATE TABLE ${clientTable} (
+    id bigint unsigned NOT NULL,
+    email varchar(100) COLLATE utf8_unicode_ci UNIQUE NOT NULL,
+    lastSync datetime NOT NULL,
     PRIMARY KEY (id),
     INDEX(email(100))
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
@@ -189,29 +193,47 @@ exports.initialize = function() {
 
   let dropAndMakeTables = (() => {
     logger.info("dropAndMakeTables entered");
-    pool.query(dropAccount, function (error, results, fields) {
-      if (error) {
-        logger.error("drop account table error");
-        logger.error(JSON.stringify(error));
-      } else {
-        logger.info("drop account table success");
-        logger.info(JSON.stringify(results));
-        makeTables();
-      }
+    let dropAndMakeTable = (tableName, createTable) => {
+      return new Promise((resolve, reject) => {
+        const dropTable = `DROP TABLE IF EXISTS ${tableName};`;
+        pool.query(dropTable, function (error, results, fields) {
+          if (error) {
+            logger.error(`drop ${tableName} table error`);
+            logger.error(JSON.stringify(error));
+            reject();
+          } else {
+            logger.info(`drop ${tableName} table success`);
+            logger.info(JSON.stringify(results));
+            pool.query(createTable, function (error, results, fields) {
+              if (error) {
+                logger.error(`create ${tableName} table error`);
+                logger.error(JSON.stringify(error));
+                reject();
+              } else {
+                logger.info(`create ${tableName} table success`);
+                logger.info(JSON.stringify(results));
+                resolve();
+              }
+            });
+          }
+        });
+      });
+    };
+    let accountPromise = dropAndMakeTable(accountTable, createAccount);
+    let clientPromise = dropAndMakeTable(clientTable, createClient);
+    Promise.all([accountPromise, clientPromise]).then(values => {
+      dbInitialized = true;
+    }, () => {
+      logger.error('dropAndMakeTables promise rejected');
+    }).catch(e => {
+      logger.error('dropAndMakeTables promise catch. e='+JSON.stringify(e));
     });
   });
 
   let makeTables = (() => {
     logger.info("makeTables entered");
-    pool.query(createAccount, function (error, results, fields) {
-      if (error) {
-        logger.error("create account table error");
-        logger.error(JSON.stringify(error));
-      } else {
-        logger.info("create account table success");
-        logger.info(JSON.stringify(results));
-        dbInitialized = true;
-      }
+    let accountPromise = new Promise((resolve, reject) =>{
+
     });
   });
 };
