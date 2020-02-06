@@ -224,30 +224,6 @@ function main() {
 				}).catch(e => {
 					console.error('autologin fetch error e='+e);
 				});
-
-/*
-				socket.emit('AutoLogin', JSON.stringify({ email: lsEmail, checksum: lsChecksum, }), msg => {
-					console.log('AutoLogin response msg: '+msg);
-					try {
-						let o = JSON.parse(msg);
-						if (o.success) {
-							window.eyevocalizeUserEmail = lsEmail;
-							window.eyevocalizeUserChecksum = lsChecksum;
-							localStorage.setItem('userEmail', window.eyevocalizeUserEmail);
-							localStorage.setItem('userChecksum', window.eyevocalizeUserChecksum);
-							updateMain();
-						} else {
-							console.error('AutoLogin error msg: '+msg);
-							window.eyevocalizeUserEmail = null;
-							window.eyevocalizeUserChecksum = null;
-						}
-					} catch(e) {
-						console.error('AutoLogin response JSON.parse error'+e);
-						window.eyevocalizeUserEmail = null;
-						window.eyevocalizeUserChecksum = null;
-					}
-				});
-				*/
 			}
 		}, () => {
 		  console.error('socket promise reject.');
@@ -309,12 +285,17 @@ function main() {
 	}, false);
 };
 
+window.eyevocalizeClientId = localStorage.getItem('clientId');
+if (!window.eyevocalizeClientId) {
+	window.eyevocalizeClientId = Date.now();
+}
+
 let socket;
 let socketPromise = new Promise((resolve, reject) => {
 	try {
 		socket = io();
 		//socket.on('push', msg => {  });
-		socket.emit('ClientStartup', 'client says hello', msg => {
+		socket.emit('ClientStartup', JSON.stringify({ clientId: window.eyevocalizeClientId }), msg => {
 			console.log('server says: '+msg);
 			resolve();
 		});
