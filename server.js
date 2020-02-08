@@ -9,6 +9,7 @@ const fs = require('fs');
 const dbconnection = require('./server/dbconnection');
 const sessionMgmt = require('./server/sessionMgmt');
 const sessionRoutes = require('./server/sessionRoutes');
+const clientSocket = require('./server/clientSocket');
 
 global.SITENAME = 'EyeVocalize';
 
@@ -218,15 +219,12 @@ sessionMgmt.init(app).then(() => {
   app.get('/*', (req, res) => res.redirect(301, '/'));
 
   io.on('connection', function(socket){
-    logger.info('user connected at '+(new Date()).toISOString());
+    logger.info('user connected');
+    clientSocket.onConnect(socket);
     socket.on('disconnect', function(){
-      logger.info('user disconnected at '+(new Date()).toISOString());
+      logger.info('user disconnected');
+      clientSocket.onDisconnect(socket);
     });
-    socket.on('ClientStartup', (msg, fn) => {
-      logger.info('ClientStartup message was: '+msg+' at '+(new Date()).toISOString());
-      fn('server echoing '+msg);
-    });
-    sessionRoutes.initSocketMessages(socket);
   });
 
   logger.info('before calling listen on port');

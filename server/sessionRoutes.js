@@ -591,37 +591,5 @@ function sendResetPasswordEmailToUser(account, callback) {
 function makeToken(account) {
   const buf = crypto.randomBytes(8);
   let token = buf.toString('hex')
-  return token
-}
-
-exports.initSocketMessages = function(socket) {
-  /* FIXME remove this function
-  const logger = global.logger;
-  socket.on('AutoLogin', (msg, fn) => {
-    logger.info('AutoLogin message was: '+msg+' at '+(new Date()).toISOString());
-    let o;
-    try {
-      o = JSON.parse(msg);
-      let { email, checksum } = o;
-      if (!email || !checksum) {
-        fn(JSON.stringify({ success: false, error: 'incomplete data'}));
-        return;
-      }
-      let pwKey = crypto.createDecipher('aes-128-cbc', global.config.HASH_SECRET2);
-      let encryptedPW = pwKey.update(checksum, 'hex', 'utf8')
-      encryptedPW += pwKey.final('utf8');
-      logger.info('AutoLogin encryptedPW='+encryptedPW);
-      doLogin(email, encryptedPW, (clientData, clientMsg) => {
-        fn(JSON.stringify({ success: true }));
-      }, (status, clientErrorString, clientMessage, clientData) => {
-        fn(JSON.stringify({ success: false, error: clientMessage}));
-      }, (error, clientMessage) => {
-        fn(JSON.stringify({ success: false, error: clientMessage}));
-      });
-    } catch(e) {
-      logger.error('AutoLogin exception. e='+e);
-      fn(JSON.stringify({ success: false, error: 'unexpected server exception'}));
-    }
-  });
-  */
+  return token;
 }

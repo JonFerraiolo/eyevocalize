@@ -287,15 +287,25 @@ function main() {
 
 window.eyevocalizeClientId = localStorage.getItem('clientId');
 if (!window.eyevocalizeClientId) {
-	window.eyevocalizeClientId = Date.now();
+	window.eyevocalizeClientId = Date.now().toString();
+	localStorage.setItem('clientId', window.eyevocalizeClientId);
 }
 
 let socket;
 let socketPromise = new Promise((resolve, reject) => {
 	try {
 		socket = io();
+		socket.on('disconnect', msg => {
+			console.log ('socket.io disconnect. msg='+msg);
+		});
+		socket.on('reconnect', msg => {
+			console.log ('socket.io reconnect. msg='+msg);
+			socket.emit('ClientId', JSON.stringify({ clientId: window.eyevocalizeClientId }), msg => {
+				console.log('server says: '+msg);
+			});
+		});
 		//socket.on('push', msg => {  });
-		socket.emit('ClientStartup', JSON.stringify({ clientId: window.eyevocalizeClientId }), msg => {
+		socket.emit('ClientId', JSON.stringify({ clientId: window.eyevocalizeClientId }), msg => {
 			console.log('server says: '+msg);
 			resolve();
 		});
