@@ -4,7 +4,7 @@ import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows, play
 import { deleteTemporaryProperties } from './Phrases.js';
 import { getAutoDeleteHistory } from './Settings.js';
 import { EditPhrase } from './EditPhrase.js';
-import { updateMain, buildSlideRightTitle,
+import { updateMain, sync, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { slideInAddFavoriteScreen } from './MyPhrases.js';
 import { styleMap } from './lib/lit-html/directives/style-map.js';
@@ -90,6 +90,8 @@ let css = `
 `;
 
 let History;
+let HistoryPendingAdditions = [];
+let HistoryPendingDeletions = [];
 let interval = null;
 let timeGroups = [
   { delta: 1000*60*15, label: '1-15 minutes ago' },
@@ -111,24 +113,38 @@ export function initializeHistory(props) {
   let { currentVersion } = props;
   let initialHistory = { version: currentVersion, expanded: true, items: [] };
   let HistoryString = localStorage.getItem("History");
+  let AdditionsString = localStorage.getItem("HistoryPendingAdditions");
+  let DeletionsString = localStorage.getItem("HistoryPendingDeletions");
   try {
     History = (typeof HistoryString === 'string') ? JSON.parse(HistoryString) : initialHistory;
+    HistoryPendingAdditions = (typeof AdditionsString === 'string') ? JSON.parse(AdditionsString) : [];
+    HistoryPendingDeletions = (typeof DeletionsString === 'string') ? JSON.parse(DeletionsString) : [];
   } catch(e) {
     History = initialHistory;
+    HistoryPendingAdditions = HistoryPendingDeletions = [];
   }
   if (typeof History.version != 'number'|| History.version < currentVersion) {
     History = initialHistory;
+    HistoryPendingAdditions = HistoryPendingDeletions = [];
   }
 }
 
-function updateLocalStorage()  {
+export function HistoryGetPending() {
+  return { HistoryPendingAdditions, HistoryPendingDeletions };
+}
+
+function updateStorage()  {
   localStorage.setItem("History", JSON.stringify(History));
+  localStorage.setItem("HistoryPendingAdditions", JSON.stringify(HistoryPendingAdditions));
+  localStorage.setItem("HistoryPendingDeletions", JSON.stringify(HistoryPendingDeletions));
+  sync();
 }
 
 export function addToHistory(obj) {
   obj = Object.assign({ timestamp: Date.now() }, obj);
 	History.items.unshift(obj);
-  updateLocalStorage();
+  HistoryPendingAdditions.unshift(JSON.parse(JSON.stringify(obj)));
+  updateStorage();
 };
 
 function traverseItems(aHistory, func) {
@@ -407,13 +423,18 @@ export function editHistory(parentElement, props) {
   let onClickRemoveSelected = e => {
     e.preventDefault();
     History.items = History.items.filter(item => {
-      return !localHistory.items.some(it => it.selected && item.timestamp === it.timestamp);
+      return !localHistory.items.some(it => {
+        if (it.selected && item.timestamp === it.timestamp) {
+          HistoryPendingDeletions.unshift(item);
+          return true;
+        }
+      });
     });
-    updateLocalStorage();
+    updateStorage();
     initializeLocalHistory();
     localUpdate();
   };
-  let onClickAddToMyPhrases = e => {
+  let onClickAddToFavorites = e => {
     e.preventDefault();
     let index = localHistory.items.findIndex(phrase => phrase.selected);
     let phrase = History.items.find(item => item.timestamp === localHistory.items[index].timestamp);
@@ -534,7 +555,7 @@ export function editHistory(parentElement, props) {
             title="Copy text from selected items to system clipboard">Copy</button>
           <button @click=${onClickRemoveSelected} ?disabled=${!atLeastOneSelected}
             title="Delete selected items">Delete</button>
-          <button @click=${onClickAddToMyPhrases} ?disabled=${!exactlyOneSelected}
+          <button @click=${onClickAddToFavorites} ?disabled=${!exactlyOneSelected}
             title="Make selected item into a favorite">
             <span class=editHistoryNewMyPhrase></span></button>
         </div>

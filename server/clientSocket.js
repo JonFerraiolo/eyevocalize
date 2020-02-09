@@ -21,6 +21,15 @@ exports.onConnect = function(socket) {
       fn(JSON.stringify({ success: false, error: 'server exception, perhaps unparseable  JSON' }));
     }
   });
+  socket.on('ClientInitiatedSync', (msg, fn) => {
+    logger.info('ClientInitiatedSync socket.id='+socket.id+', message was: '+msg);
+    try {
+      let o = JSON.parse(msg);
+      fn(JSON.stringify({ success: true }));
+    } catch(e) {
+      fn(JSON.stringify({ success: false, error: 'server exception, perhaps unparseable  JSON' }));
+    }
+  });
 }
 
 exports.onDisconnect = function(socket) {

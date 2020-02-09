@@ -8,7 +8,7 @@ import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntr
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
 import { initializeStash, stash, editStash } from './Stash.js';
-import { initializeHistory, playLastHistoryItem } from './History.js';
+import { initializeHistory, HistoryGetPending, playLastHistoryItem } from './History.js';
 import { initializeFavorites, editFavorites } from './MyPhrases.js';
 import { initializeBuiltins, editBuiltins } from './MyPhrases.js';
 import { fromRight, fromLeft } from './animSlide.js';
@@ -289,6 +289,25 @@ window.eyevocalizeClientId = localStorage.getItem('clientId');
 if (!window.eyevocalizeClientId) {
 	window.eyevocalizeClientId = Date.now().toString();
 	localStorage.setItem('clientId', window.eyevocalizeClientId);
+}
+
+export function sync() {
+	let syncData = {
+		updates: {
+			History: HistoryGetPending()
+		}
+	};
+	console.log('sync entered. syncData=');
+	console.dir(syncData);
+	if (socket) {
+		console.log('socket.connected=');
+		console.dir(socket.connected);
+	}
+	if (socket && socket.connected) {
+		socket.emit('ClientInitiatedSync', JSON.stringify(syncData), msg => {
+			console.log('server says: '+msg);
+		});
+	}
 }
 
 let socket;
