@@ -1,7 +1,34 @@
 
 
+startup sequence elements
+  email and checksum ls
+  clientId ls
+  clientId to server
+  autologin if necessary
+  socket connection
+  resolve socket promise
+  startupChecks
+  call main
+
+server sends email
+
+server does not send email
+  startupChecks
+  call main
+  clientId ls ()
+  email and checksum ls
+  socket connection
+  clientId to server
+  resolve socket promise 
+  autologin if necessary
+
+what about history, etc for multiple emails?
+  prefix all localStorage with email prefix
+  maintain list of emails in localStorage
+  first time with email, migrate trialversion_* to <email>_*
+
 client DB_TABLE_PREFIX
-on connection, initialize socket handshake, get clientId (current time) 
+on connection, initialize socket handshake, get clientId (current time)
 
 
 

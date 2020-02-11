@@ -158,8 +158,49 @@ export function updateMain(searchString) {
 	updateMainInProcess = false;
 };
 
+let socket;
+
 function main() {
 	console.log(window.eyevocalizeUserEmail+'/'+window.eyevocalizeUserChecksum);
+	window.eyevocalizeClientId = localStorage.getItem('clientId');
+	if (window.eyevocalizeClientId) {
+		window.eyevocalizeLastSync = parseInt(localStorage.getItem('lastSync'));
+		if (isNaN(window.eyevocalizeLastSync)) {
+			window.eyevocalizeLastSync = 0;
+			localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
+		}
+	} else {
+		window.eyevocalizeClientId = Date.now();
+		localStorage.setItem('clientId', window.eyevocalizeClientId);
+		window.eyevocalizeLastSync = 0;
+		localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
+	}
+
+	let socketPromise = new Promise((resolve, reject) => {
+		try {
+			socket = io();
+			socket.on('disconnect', msg => {
+				console.log ('socket.io disconnect. msg='+msg);
+			});
+			socket.on('reconnect', msg => {
+				console.log ('socket.io reconnect. msg='+msg);
+				let o = { clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
+				socket.emit('ClientId', JSON.stringify(o), msg => {
+					console.log('server says: '+msg);
+				});
+			});
+			//socket.on('push', msg => {  });
+			let o = { clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
+			socket.emit('ClientId', JSON.stringify(o), msg => {
+				console.log('server says: '+msg);
+				resolve();
+			});
+		} catch(e) {
+			console.error('socket.io initialization failed. ');
+			reject();
+		}
+	});
+
   let currentVersion = 4;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
@@ -285,14 +326,10 @@ function main() {
 	}, false);
 };
 
-window.eyevocalizeClientId = localStorage.getItem('clientId');
-if (!window.eyevocalizeClientId) {
-	window.eyevocalizeClientId = Date.now().toString();
-	localStorage.setItem('clientId', window.eyevocalizeClientId);
-}
-
 export function sync() {
 	let syncData = {
+		clientId: window.eyevocalizeClientId,
+		lastSync: window.eyevocalizeLastSync,
 		updates: {
 			History: HistoryGetPending()
 		}
@@ -309,30 +346,6 @@ export function sync() {
 		});
 	}
 }
-
-let socket;
-let socketPromise = new Promise((resolve, reject) => {
-	try {
-		socket = io();
-		socket.on('disconnect', msg => {
-			console.log ('socket.io disconnect. msg='+msg);
-		});
-		socket.on('reconnect', msg => {
-			console.log ('socket.io reconnect. msg='+msg);
-			socket.emit('ClientId', JSON.stringify({ clientId: window.eyevocalizeClientId }), msg => {
-				console.log('server says: '+msg);
-			});
-		});
-		//socket.on('push', msg => {  });
-		socket.emit('ClientId', JSON.stringify({ clientId: window.eyevocalizeClientId }), msg => {
-			console.log('server says: '+msg);
-			resolve();
-		});
-	} catch(e) {
-		console.error('socket.io initialization failed. ');
-		reject();
-	}
-});
 
 startupChecks(() => {
 	main();
