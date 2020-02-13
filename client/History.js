@@ -133,6 +133,9 @@ export function HistoryGetPending() {
   return { HistoryPendingAdditions, HistoryPendingDeletions };
 }
 
+export function HistorySync(serverSyncData) {
+}
+
 function updateStorage()  {
   localStorage.setItem("History", JSON.stringify(History));
   localStorage.setItem("HistoryPendingAdditions", JSON.stringify(HistoryPendingAdditions));

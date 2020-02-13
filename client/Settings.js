@@ -114,8 +114,8 @@ let autoDeleteHistoryOptions = [
   { value: 'never',  label: 'never' },
 ];
 let autoDeleteHistoryIndex = autoDeleteHistoryOptions.length -  1;
-let defaultSyncData = true;
-let syncData = defaultSyncData;
+let defaultSyncMyData = true;
+let syncMyData = defaultSyncMyData;
 let defaultOKUseMyData = false;
 let okUseMyData = defaultOKUseMyData;
 
@@ -133,7 +133,7 @@ export function initializeSettings(props) {
     voices = speechSynthesis.getVoices();
   };
   let initialSettings = { voiceName, volume, rate, pitch, sampleText, appFontSize,
-    minScreenPercent, autoDeleteHistory, syncData, okUseMyData };
+    minScreenPercent, autoDeleteHistory, syncMyData, okUseMyData };
   let Settings;
   let SettingsString = localStorage.getItem("Settings");
   try {
@@ -153,14 +153,14 @@ export function initializeSettings(props) {
   appFontSize = Settings.appFontSize;
   minScreenPercent = Settings.minScreenPercent;
   autoDeleteHistory = Settings.autoDeleteHistory;
-  syncData = Settings.syncData;
+  syncMyData = Settings.syncMyData;
   okUseMyData = Settings.okUseMyData;
 };
 
 let updateLocalStorage = () => {
   let Settings = { version: currentVersion, section,
     voiceName, volume, rate, pitch, sampleText,
-    appFontSize, minScreenPercent, autoDeleteHistory, syncData, okUseMyData };
+    appFontSize, minScreenPercent, autoDeleteHistory, syncMyData, okUseMyData };
   localStorage.setItem("Settings", JSON.stringify(Settings));
 };
 
@@ -266,7 +266,7 @@ export function editSettings(parentElement, params) {
   };
   let onChangeSyncData = e => {
     e.preventDefault();
-    syncData = e.target.checked;
+    syncMyData = e.target.checked;
     updateMain();
     updateLocalStorage();
   };
@@ -294,7 +294,7 @@ export function editSettings(parentElement, params) {
       pitch = defaultPitch;
       sampleText = defaultSampleText;
     } else if (section === 'Account') {
-      syncData = defaultSyncData;
+      syncMyData = defaultSyncMyData;
       okUseMyData = defaultOKUseMyData;
     }
     localUpdate();
@@ -444,7 +444,7 @@ export function editSettings(parentElement, params) {
     } else if (section === 'History') {
       document.getElementById('SettingsAutoDeleteHistory').selectedIndex = autoDeleteHistoryIndex;
     } else if (section === 'Account') {
-      document.getElementById('SettingsSyncData').checked = syncData;
+      document.getElementById('SettingsSyncData').checked = syncMyData;
       document.getElementById('SettingsOKUseMyData').checked = okUseMyData;
       document.getElementById('SettingsSyncData').disabled = trial;
       document.getElementById('SettingsOKUseMyData').disabled = trial;
@@ -484,8 +484,8 @@ export function getAutoDeleteHistory() {
   return autoDeleteHistory;
 }
 
-export function getSyncData() {
-  return syncData;
+export function getSyncMyData() {
+  return syncMyData;
 }
 
 export function getOKUseMyData() {

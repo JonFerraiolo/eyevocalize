@@ -49,7 +49,7 @@ exports.signup = function(req, res, next) {
        emailValidateTokenDateTime: now,
        created: now,
        modified: now
-     }
+     };
      const token = makeToken(account)
      account.emailValidateToken = token;
      function verify(account) {
@@ -72,7 +72,6 @@ exports.signup = function(req, res, next) {
        if (error) {
          logSendSE(res, error, "signup select account database failure for email '" + account.email + "'");
        } else {
-         logger.info('signup: login exists. results='+JSON.stringify(results));
          if (results.length > 1) {
            logSendSE(res, null, "signup select account database failure for email '" + account.email + "', multiple entries");
          } else if (results.length === 1) {
@@ -91,6 +90,8 @@ exports.signup = function(req, res, next) {
              });
            }
          } else {
+           logger.info('accountTable='+accountTable);
+           logger.info('account='+JSON.stringify(account));
            connectionPool.query(`INSERT INTO ${accountTable} SET ?`, account, function (error, results, fields) {
              if (error) {
                logSendSE(res, error, "Insert new account insert database failure for email '" + account.email + "'");

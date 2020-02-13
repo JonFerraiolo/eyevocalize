@@ -131,7 +131,7 @@ exports.initialize = function() {
   // sql commands to check if database is empty
   // and to create tables if necessary.
   const accountTable = global.accountTable = global.config.DB_TABLE_PREFIX + 'account';
-  const clientTable = global.accountTable = global.config.DB_TABLE_PREFIX + 'client';
+  const clientTable = global.clientTable = global.config.DB_TABLE_PREFIX + 'client';
   const showTables = `show tables;`;
   const createAccount = `CREATE TABLE ${accountTable} (
     id int(11) unsigned NOT NULL AUTO_INCREMENT,

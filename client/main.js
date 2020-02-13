@@ -1,14 +1,13 @@
 
-// FIXME rename to app.js
 
 import { startupChecks } from './startupChecks.js';
 import { helpShowing } from './help.js';
 import { popupShowing } from './popup.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
-import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize } from './Settings.js';
+import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize, getSyncMyData } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
 import { initializeStash, stash, editStash } from './Stash.js';
-import { initializeHistory, HistoryGetPending, playLastHistoryItem } from './History.js';
+import { initializeHistory, HistoryGetPending, HistorySync, playLastHistoryItem } from './History.js';
 import { initializeFavorites, editFavorites } from './MyPhrases.js';
 import { initializeBuiltins, editBuiltins } from './MyPhrases.js';
 import { fromRight, fromLeft } from './animSlide.js';
@@ -40,9 +39,7 @@ export function getAppMinOrMax() {
 }
 export function setAppMinOrMax(minOrMax) {
 	appMinOrMax = minOrMax;
-	//let appmaincontentpercent = minOrMax === 'Min' ? mainAppPercentWhenSmall()+'%' : '100%';
 	let appinitiallyblankpercent = minOrMax === 'Min' ? (100-mainAppPercentWhenSmall())+'%' : '0%';
-	//document.querySelector('.appmaincontent').style.height = appmaincontentpercent;
 	document.querySelector('.appinitiallyblank').style.height = appinitiallyblankpercent;
 	document.querySelector('.appinitiallyblank').style.display = minOrMax === 'Min' ? 'flex' : 'none';
 	updateMain();
@@ -170,13 +167,86 @@ function main() {
 			localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
 		}
 	} else {
-		window.eyevocalizeClientId = Date.now();
+		window.eyevocalizeClientId = Date.now().toString();
 		localStorage.setItem('clientId', window.eyevocalizeClientId);
 		window.eyevocalizeLastSync = 0;
 		localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
 	}
 
-	let socketPromise = new Promise((resolve, reject) => {
+  let currentVersion = 4;
+  let initializationProps = { currentVersion };
+  initializeSettings(initializationProps);
+  initializeStash(initializationProps);
+  initializeHistory(initializationProps);
+	initializeFavorites(initializationProps);
+	initializeBuiltins(initializationProps);
+
+	updateMain();
+	let autoLoginPromise = new Promise((resolve, reject) => {
+		if (window.eyevocalizeUserEmail && window.eyevocalizeUserChecksum) {
+			localStorage.setItem('userEmail', window.eyevocalizeUserEmail);
+			localStorage.setItem('userChecksum', window.eyevocalizeUserChecksum);
+			resolve();
+		} else {
+			let lsEmail = localStorage.getItem('userEmail');
+			let lsChecksum = localStorage.getItem('userChecksum');
+			if (lsEmail && lsChecksum) {
+				let fetchPostOptions = {
+					method: 'POST',
+					mode: 'same-origin',
+					headers: { "Content-type": "application/json" },
+					credentials: 'include',
+				};
+				let credentials = {
+					email: lsEmail,
+					checksum: lsChecksum,
+				};
+				fetchPostOptions.body = JSON.stringify(credentials);
+				fetch('/api/autologin', fetchPostOptions).then(resp => {
+					console.log('status='+resp.status);
+					if (resp.status === 200) {
+						resp.json().then(data => {
+							console.log('autologin fetch success return data=');
+							console.dir(data);
+							window.eyevocalizeUserEmail = lsEmail;
+							window.eyevocalizeUserChecksum = lsChecksum;
+							localStorage.setItem('userEmail', window.eyevocalizeUserEmail);
+							localStorage.setItem('userChecksum', window.eyevocalizeUserChecksum);
+							updateMain();
+							resolve();
+						});
+					} else if (resp.status === 401) {
+						resp.json().then(data => {
+							console.log('autologin fetch 401 return data=');
+							console.dir(data);
+							let errorMessage;
+							if (data.error === 'EMAIL_NOT_REGISTERED') {
+								errorMessage = `*** Error: '${lsEmail}' not registered ***`;
+							} else if (data.error === 'EMAIL_NOT_VERIFIED') {
+								errorMessage = `*** Error: '${lsEmail}' not verified ***`;
+							} else if (data.error === 'INCORRECT_PASSWORD') {
+								errorMessage = `*** Error: incorrect password for '${lsEmail}' ***`;
+							} else {
+								errorMessage = `Very sorry. Something unexpected went wrong(autologin 401-1). `;
+							}
+							console.error(errorMessage);
+							reject();
+						}).catch(e => {
+							console.error(`Very sorry. Something unexpected went wrong (autologin 401-2). `);
+							reject();
+						});
+					} else {
+						console.error('autologin fetch bad status='+resp.status);
+						reject();
+					}
+				}).catch(e => {
+					console.error('autologin fetch error e='+e);
+					reject();
+				});
+			}
+		}
+	});
+	autoLoginPromise.then(() => {
 		try {
 			socket = io();
 			socket.on('disconnect', msg => {
@@ -190,92 +260,22 @@ function main() {
 				});
 			});
 			//socket.on('push', msg => {  });
-			let o = { clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
+			let o = { email: window.eyevocalizeUserEmail, clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
 			socket.emit('ClientId', JSON.stringify(o), msg => {
 				console.log('server says: '+msg);
-				resolve();
 			});
 		} catch(e) {
 			console.error('socket.io initialization failed. ');
-			reject();
 		}
+	}, () => {
+	  console.error('autoLoginPromise reject.');
+		window.eyevocalizeUserEmail = null;
+		window.eyevocalizeUserChecksum = null;
+	}).catch(e => {
+	  console.error('autoLoginPromise error'+e);
+		window.eyevocalizeUserEmail = null;
+		window.eyevocalizeUserChecksum = null;
 	});
-
-  let currentVersion = 4;
-  let initializationProps = { currentVersion };
-  initializeSettings(initializationProps);
-  initializeStash(initializationProps);
-  initializeHistory(initializationProps);
-	initializeFavorites(initializationProps);
-	initializeBuiltins(initializationProps);
-
-	updateMain();
-	if (window.eyevocalizeUserEmail && window.eyevocalizeUserChecksum) {
-		localStorage.setItem('userEmail', window.eyevocalizeUserEmail);
-		localStorage.setItem('userChecksum', window.eyevocalizeUserChecksum);
-	} else {
-		socketPromise.then(() => {
-			let lsEmail = localStorage.getItem('userEmail');
-			let lsChecksum = localStorage.getItem('userChecksum');
-			if (lsEmail && lsChecksum) {
-				let fetchPostOptions = {
-				  method: 'POST',
-				  mode: 'same-origin',
-				  headers: { "Content-type": "application/json" },
-				  credentials: 'include',
-				};
-				let credentials = {
-					email: lsEmail,
-					checksum: lsChecksum,
-				};
-				fetchPostOptions.body = JSON.stringify(credentials);
-				fetch('/api/autologin', fetchPostOptions).then(resp => {
-					console.log('status='+resp.status);
-		      if (resp.status === 200) {
-		        resp.json().then(data => {
-		          console.log('autologin fetch success return data=');
-		          console.dir(data);
-							window.eyevocalizeUserEmail = lsEmail;
-							window.eyevocalizeUserChecksum = lsChecksum;
-							localStorage.setItem('userEmail', window.eyevocalizeUserEmail);
-							localStorage.setItem('userChecksum', window.eyevocalizeUserChecksum);
-							updateMain();
-		        });
-		      } else if (resp.status === 401) {
-		        resp.json().then(data => {
-		          console.log('autologin fetch 401 return data=');
-		          console.dir(data);
-							let errorMessage;
-		          if (data.error === 'EMAIL_NOT_REGISTERED') {
-		            errorMessage = `*** Error: '${lsEmail}' not registered ***`;
-		          } else if (data.error === 'EMAIL_NOT_VERIFIED') {
-								errorMessage = `*** Error: '${lsEmail}' not verified ***`;
-		          } else if (data.error === 'INCORRECT_PASSWORD') {
-		            errorMessage = `*** Error: incorrect password for '${lsEmail}' ***`;
-		          } else {
-		            errorMessage = `Very sorry. Something unexpected went wrong(autologin 401-1). `;
-		          }
-							console.error(errorMessage);
-		        }).catch(e => {
-		          console.error(`Very sorry. Something unexpected went wrong (autologin 401-2). `);
-		        });
-		      } else {
-		        console.error('autologin fetch bad status='+resp.status);
-		      }
-				}).catch(e => {
-					console.error('autologin fetch error e='+e);
-				});
-			}
-		}, () => {
-		  console.error('socket promise reject.');
-			window.eyevocalizeUserEmail = null;
-			window.eyevocalizeUserChecksum = null;
-		}).catch(e => {
-		  console.error('socket promise error'+e);
-			window.eyevocalizeUserEmail = null;
-			window.eyevocalizeUserChecksum = null;
-		});
-	}
 	/*FIXME change to quick tutorial
 	if (window.eyevocalizeUserEmail === '') {
 		setTimeout(() => {
@@ -328,6 +328,7 @@ function main() {
 
 export function sync() {
 	let syncData = {
+		email: window.eyevocalizeUserEmail,
 		clientId: window.eyevocalizeClientId,
 		lastSync: window.eyevocalizeLastSync,
 		updates: {
@@ -340,9 +341,18 @@ export function sync() {
 		console.log('socket.connected=');
 		console.dir(socket.connected);
 	}
-	if (socket && socket.connected) {
-		socket.emit('ClientInitiatedSync', JSON.stringify(syncData), msg => {
-			console.log('server says: '+msg);
+	if (socket && socket.connected && window.eyevocalizeUserEmail && getSyncMyData()) {
+		socket.emit('ClientInitiatedSync', JSON.stringify(syncData), serverSyncDataJson => {
+			console.log('server says: '+serverSyncDataJson);
+			try {
+				let serverSyncData = JSON.parse(serverSyncDataJson);
+				HistorySync(serverSyncData);
+				window.eyevocalizeLastSync = Date.now();
+				// localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
+			} catch(e) {
+				console.error('sync exception, possibly bad JSON. e=');
+				console.dir(e);
+			}
 		});
 	}
 }
