@@ -60,7 +60,7 @@ if (typeof logdir === 'string' && logdir.length > 0) {
     console.error(err);
     process.exit(1);
   }
-  const logfile = logdir + '/' + (new Date()).toISOString();
+  const logfile = logdir + '/' + (new Date()).toISOString().substr(0,10);
   global.logger = createLogger({
     format: myFormat2,
     transports: [
