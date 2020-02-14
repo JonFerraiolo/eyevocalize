@@ -35,7 +35,7 @@ exports.onConnect = function(socket) {
         logger.info('f');
         if (!connectionsByEmail[email]) connectionsByEmail[email] = {};
         logger.info('g');
-        connectionsByEmail[email][clientId] = socket.id;
+        connectionsByEmail[email][clientId] = { socketId: socket.id, lastSync };
         logger.info('h');
         logger.info('socket='+socket);
         logger.info('socket.id='+socket.id);
@@ -63,10 +63,15 @@ exports.onConnect = function(socket) {
       if (typeof email !=='string' || !regex_email.test(email) || isNaN(clientIdInt) || isNaN(lastSync)) {
         fn(JSON.stringify({ success: false, error: 'invalid email, clientId or lastSync' }));
       } else {
-        //  missing logic
-        let HistoryPromise = syncHistory(connectedClients, minLastSyncConnected, thisSyncTimestamp, clientInitiatedSyncData);
+        let minLastSyncConnected = Number.MAX_SAFE_INTEGER;
+        for (const client in connectionsByEmail[email]) {
+          if (client.lastSync < minLastSyncConnected) minLastSyncConnected = client.lastSync;
+        }
+        let thisSyncTimestamp = Date.now();
+        let HistoryPromise = syncHistory(connectionsByEmail[email], minLastSyncConnected, thisSyncTimestamp, clientInitiatedSyncData);
         Promise.all([HistoryPromise]).then(values => {
           // missing logic
+          // where does the client table get updated 
           fn(JSON.stringify({ success: true }));
           // for each connected client, push data, and
           // acknowledge function updates lastSync for that client,
@@ -109,6 +114,8 @@ history table delete: delete from table where created in (?), array
 additions: INSERT INTO tbl_name (a,b,c) VALUES ?, array of arrays, where inner are phrases
 return history since minLastSyncConnected
 connectedClients[{clientId, lastSync}],
+  @param connectedClients {object} associative array of all currently connected clients
+      for the given email, whichere each entry is clientId:{socketId, clientId}
 */
 let syncHistory = (connectedClients, minLastSyncConnected, thisSyncTimestamp, clientInitiatedSyncData) => {
   return new Promise((resolve, reject) => {
