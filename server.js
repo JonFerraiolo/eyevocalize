@@ -80,7 +80,9 @@ const logger = global.logger;
 let port = global.config.PORT;
 let protocol = global.config.PROTOCOL;
 const hostname = global.config.HOSTNAME;
-logger.info('================================= New process =======================================');
+logger.info('');
+logger.info('');
+logger.info('===== New process =====');
 logger.info('before https check. protocol='+protocol+', port='+port);
 let credentials;
 if (hostname === 'zeyevocalize.com' && protocol === 'https') {

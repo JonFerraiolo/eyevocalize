@@ -259,10 +259,14 @@ function main() {
 					console.log('server says: '+msg);
 				});
 			});
-			//socket.on('push', msg => {  });
+			socket.on('ServerInitiatedSync', (msg, fn) => {
+				console.log('ServerInitiatedSync msg='+msg);
+				fn(JSON.stringify({ success: false, error: 'not yet implemented' }));
+			});
 			let o = { email: window.eyevocalizeUserEmail, clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
 			socket.emit('ClientId', JSON.stringify(o), msg => {
-				console.log('server says: '+msg);
+				console.log('Dp the server says: '+msg);
+				sync();
 			});
 		} catch(e) {
 			console.error('socket.io initialization failed. ');
@@ -331,6 +335,7 @@ export function sync() {
 		email: window.eyevocalizeUserEmail,
 		clientId: window.eyevocalizeClientId,
 		lastSync: window.eyevocalizeLastSync,
+		thisSyncClientTimestamp: Date.now(),
 		updates: {
 			History: HistoryGetPending()
 		}
@@ -346,7 +351,7 @@ export function sync() {
 			console.log('server says: '+serverSyncDataJson);
 			try {
 				let serverSyncData = JSON.parse(serverSyncDataJson);
-				HistorySync(serverSyncData);
+				HistorySync(serverSyncData.History);
 				window.eyevocalizeLastSync = Date.now();
 				// localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
 			} catch(e) {

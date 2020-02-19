@@ -129,6 +129,7 @@ export function initializeSettings(props) {
   currentVersion = props.currentVersion;
   voices = speechSynthesis.getVoices();
   // Chrome loads voices asynchronously.
+  // FIXME add a promise 
   window.speechSynthesis.onvoiceschanged = function(e) {
     voices = speechSynthesis.getVoices();
   };
