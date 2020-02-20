@@ -127,12 +127,7 @@ let minScreenPercentCombo = new combobox();
 
 export function initializeSettings(props) {
   currentVersion = props.currentVersion;
-  voices = speechSynthesis.getVoices();
-  // Chrome loads voices asynchronously.
-  // FIXME add a promise 
-  window.speechSynthesis.onvoiceschanged = function(e) {
-    voices = speechSynthesis.getVoices();
-  };
+  voices = window.evc_voices;  // set in startupChecks
   let initialSettings = { voiceName, volume, rate, pitch, sampleText, appFontSize,
     minScreenPercent, autoDeleteHistory, syncMyData, okUseMyData };
   let Settings;

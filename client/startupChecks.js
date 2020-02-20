@@ -25,17 +25,44 @@ export function startupChecks(successCB, failureCB) {
   	window.location = 'https://eyevocalize.com' + window.location.pathname;
   }
 
-  if ('speechSynthesis' in window) {
-    successCB();
-
-  } else {
-  	render(html`
+  let badBrowser = () => {
+    render(html`
   		<div class=nospeechsupport>
   			Sorry, your browser does not support speech synthesis,
   			which is required by this application.
   			Please try a different browser.
   		</div>`, document.body);
     failureCB();
+  };
+
+  if ('speechSynthesis' in window) {
+    let voicesPromise = new Promise((resolve, reject) => {
+      window.evc_voices = speechSynthesis.getVoices();
+      if (Array.isArray(window.evc_voices) && window.evc_voices.length > 0) {
+        resolve();
+      } else {
+        // Chrome loads voices asynchronously.
+        window.speechSynthesis.onvoiceschanged = function(e) {
+          window.evc_voices = speechSynthesis.getVoices();
+          if (Array.isArray(window.evc_voices) && window.evc_voices.length > 0) {
+            resolve();
+          } else {
+            reject();
+          }
+        };
+      }
+    });
+    voicesPromise.then(() => {
+      successCB();
+    }, () => {
+      badBrowser();
+    }).catch(e => {
+      console.error('startupChecks promise error, e='+e);
+      badBrowser();
+    });
+
+  } else {
+    badBrowser();
   }
 
 }
