@@ -109,7 +109,7 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
   let HistoryPromise = syncHistory(connectionsByEmail[email], minLastSyncConnected,
     thisSyncClientTimestamp, thisSyncServerTimestamp, clientInitiatedSyncData.updates.History);
   Promise.all([HistoryPromise]).then(values => {
-    updateClients(socket, email, values, fn);
+    updateClients(socket, email, thisSyncServerTimestamp, values, fn);
   }, () => {
     logger.error('updateTopicTables Promise.all topic promises rejected');
     if (fn) {
@@ -123,7 +123,7 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
   });
 };
 
-let updateClients = (socket, email, values, fn) => {
+let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
   const logger = global.logger;
   logger.info('updateClients entered');
   logger.info('updateClients values='+JSON.stringify(values));
@@ -135,39 +135,45 @@ let updateClients = (socket, email, values, fn) => {
     let client = connectionsByEmail[email][clientId];
     logger.info('updateClients client='+JSON.stringify(client));
     let clientPromise = new Promise((clientResolve, clientReject) => {
+      logger.info('updateClients promise function entered');
       let { clientId, socketId } = client;
       let skt = socketById[socketId];
+      logger.info('updateClients typeof skt='+typeof skt);
       if (skt) {
         logger.info('updateClients before emit for socketId='+socketId+', clientId='+clientId);
         let serverInitiatedSyncDataJson = JSON.stringify({
           History: returnHistory[clientId] || null,
         });
         logger.info('updateClients before emit serverInitiatedSyncDataJson='+serverInitiatedSyncDataJson);
+        let ServerInitiatedSyncAck = false;
         skt.emit('ServerInitiatedSync', serverInitiatedSyncDataJson, msg => {
           logger.info('updateClients return from emit, msg='+msg+' for socketId='+socketId+', clientId='+clientId);
+          logger.info('updateClients before calling updateClientTableLastSync ');
           updateClientTableLastSync(email, clientId, thisSyncServerTimestamp).then(() => {
-            clientResolve();
+            logger.info('updateClients updateClientTableLastSync promise resolved. Just before clientResolve ');
           }, () => {
             logger.error('updateClients updateClientTableLastSync rejected');
-            clientResolve();
           }).catch(e => {
             logger.error('updateClients updateClientTableLastSync Error e='+JSON.stringify(e));
+          }).finally(() => {
+            ServerInitiatedSyncAck = true;
             clientResolve();
           });
-        }, () => {
-          logger.error('updateClients Promise.all rejected');
-          clientResolve();
-        }).catch(e => {
-          logger.error('updateClients Promise.all. e='+JSON.stringify(e));
-          clientResolve();
         });
+        setTimeout(() => {
+          if (!ServerInitiatedSyncAck) {
+            clientResolve();
+          }
+        }, 1000);
       } else {
         logger.error('updateClients no socket for socketId='+socketId+', clientId='+clientId);
         clientResolve();
       }
     });
+    logger.info('updateClients before clientPromise push');
     clientPromises.push(clientPromise);
   }
+  logger.info('updateClients before Promise.all. clientPromises.length='+clientPromises.length);
   Promise.all(clientPromises).then(values => {
     logger.info('updateClients Promise.all clientPromises resolved');
     if (fn) {
@@ -190,6 +196,7 @@ let updateClientTableLastSync = (email, clientId, thisSyncServerTimestamp) => {
   const logger = global.logger;
   logger.info('updateClientTableLastSync entered. email='+email+', clientId='+clientId+', thisSyncServerTimestamp='+thisSyncServerTimestamp);
   return new Promise((resolve, reject) => {
+    logger.info('updateClientTableLastSync start of promise function ');
     resolve();
     return;
     dbconnection.dbReady().then(connectionPool => {
