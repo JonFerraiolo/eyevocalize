@@ -99,7 +99,7 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
   let HistoryPromise = syncHistory(connectionsByEmail[email], minLastSyncConnected,
     thisSyncClientTimestamp, thisSyncServerTimestamp, clientInitiatedSyncData.updates.History);
   Promise.all([HistoryPromise]).then(values => {
-    updateClients(socket, values, fn);
+    updateClients(socket, email, values, fn);
   }, () => {
     logger.error('updateTopicTables Promise.all topic promises rejected');
     fn(JSON.stringify({ success: false, error: 'ClientInitiatedSync topic promises server error' }));
@@ -109,12 +109,17 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
   });
 };
 
-let updateClients = (socket, values, fn) => {
+let updateClients = (socket, email, values, fn) => {
   const logger = global.logger;
   logger.info('updateClients entered');
+  logger.info('updateClients values='+JSON.stringify(values));
   let returnHistory = values[0];
   let clientPromises = [];
-  for (let client in connectionsByEmail[email]) {
+  logger.info('updateClients before for in ');
+  for (let clientId in connectionsByEmail[email]) {
+    logger.info('updateClients clientId='+clientId);
+    let client = connectionsByEmail[email][clientId];
+    logger.info('updateClients client='+JSON.stringify(client));
     let clientPromise = new Promise((clientResolve, clientReject) => {
       let { clientId, socketId } = client;
       let skt = socketById[socketId];
@@ -229,10 +234,17 @@ let syncHistory = (connectedClients, minLastSyncConnected, thisSyncClientTimesta
   logger.info('at start of syncHistory  thisSyncServerTimestamp='+thisSyncServerTimestamp);
   logger.info('at start of syncHistory  clientInitiatedSyncData='+JSON.stringify(clientInitiatedSyncData));
   return new Promise((outerResolve, outerReject) => {
-    let cid = connectedClients[0].clientId;
-    let robj = {} ;
+    logger.info('syncHistory promise function entered ');
+    let cid;
+    for (let cli in connectedClients) {
+      cid = cli;
+    }
+    logger.info('syncHistory  cid='+cid);
+    let robj = {};
     robj[cid] = { deletions: [], additions: []  };
+    logger.info('syncHistory  robj='+JSON.stringify(robj));
     outerResolve(robj);
+    logger.info('syncHistory just after outerResolve ');
     return;
     dbconnection.dbReady().then(connectionPool => {
       logger.info('syncHistory got connection');
@@ -286,14 +298,15 @@ let syncHistory = (connectedClients, minLastSyncConnected, thisSyncClientTimesta
           Promise.all([deletePromise, insertPromise]).then(values => {
             logger.info('syncHistory promise all before outerResolve');
             let returnObj = {};
-            connectedClients.forEach(client => {
-              let { clientId, lastSync } = client;
+            for (let clientId in connectedClients) {
+              let client = connectedClients[clientId];
+              let { lastSync } = client;
               let mintime = calcMinTime([lastSync]);
               returnObj[clientId] = {
                 deletions: filteredDeletions.filter(item => item.timestamp > mintime),
                 additions: filteredAdditions.filter(item => item.timestamp > mintime),
               };
-            });
+            };
             logger.info('syncHistory, returnObj='+JSON.stringify(returnObj));
             outerResolve(returnObj);
             /*
@@ -327,11 +340,6 @@ let syncHistory = (connectedClients, minLastSyncConnected, thisSyncClientTimesta
       outerReject();
     });
   });
-  // get all records where timestamp >= minLastSyncConnected
-  // Make list of records to delete from table and to add to table
-  // for each connectedClient, make list of deletions and additions since lastSync
-  // delete and add records from and to table
-  // return array of serverInitiatedSyncData, which is [{clientId, updates}] Where updates should have same data
 }
 
 let calcMinTime = arr => {

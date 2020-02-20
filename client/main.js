@@ -261,7 +261,9 @@ function main() {
 			});
 			socket.on('ServerInitiatedSync', (msg, fn) => {
 				console.log('ServerInitiatedSync msg='+msg);
-				fn(JSON.stringify({ success: false, error: 'not yet implemented' }));
+				if (typeof fn === 'function') {
+					fn(JSON.stringify({ success: false, error: 'not yet implemented' }));
+				}
 			});
 			let o = { email: window.eyevocalizeUserEmail, clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
 			socket.emit('ClientId', JSON.stringify(o), msg => {
