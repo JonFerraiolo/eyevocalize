@@ -247,6 +247,21 @@ function main() {
 		}
 	});
 	autoLoginPromise.then(() => {
+		let sendClientId = () => {
+			let o = { email: window.eyevocalizeUserEmail, clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
+			let ClientIdAck = false;
+			socket.emit('ClientId', JSON.stringify(o), msg => {
+				console.log('Send ClientID, the server says: '+msg);
+				ClientIdAck = true;
+				sync();
+			});
+			setTimeout(() => {
+				if (!ClientIdAck) {
+					console.log('Send ClientID, no server response after delay');
+					sync();
+				}
+			}, 3000);
+		};
 		try {
 			socket = io();
 			socket.on('disconnect', msg => {
@@ -255,21 +270,25 @@ function main() {
 			socket.on('reconnect', msg => {
 				console.log ('socket.io reconnect. msg='+msg);
 				let o = { clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
-				socket.emit('ClientId', JSON.stringify(o), msg => {
-					console.log('server says: '+msg);
-				});
+				sendClientId();
 			});
-			socket.on('ServerInitiatedSync', (msg, fn) => {
-				console.log('ServerInitiatedSync msg='+msg);
-				if (typeof fn === 'function') {
-					fn(JSON.stringify({ success: false, error: 'not yet implemented' }));
+			socket.on('ServerInitiatedSync', (serverSyncDataJson, fn) => {
+				console.log('ServerInitiatedSync serverSyncDataJson='+serverSyncDataJson);
+				try {
+					let serverSyncData = JSON.parse(serverSyncDataJson);
+					HistorySync(serverSyncData.History);
+					window.eyevocalizeLastSync = Date.now();
+					// localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
+				} catch(e) {
+					console.error('sync exception, possibly bad JSON. e=');
+					console.dir(e);
+				} finally {
+					if (typeof fn === 'function') {
+						fn(JSON.stringify({ success: false, error: 'not yet implemented' }));
+					}
 				}
 			});
-			let o = { email: window.eyevocalizeUserEmail, clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
-			socket.emit('ClientId', JSON.stringify(o), msg => {
-				console.log('Dp the server says: '+msg);
-				sync();
-			});
+			sendClientId();
 		} catch(e) {
 			console.error('socket.io initialization failed. ');
 		}
@@ -349,17 +368,8 @@ export function sync() {
 		console.dir(socket.connected);
 	}
 	if (socket && socket.connected && window.eyevocalizeUserEmail && getSyncMyData()) {
-		socket.emit('ClientInitiatedSync', JSON.stringify(syncData), serverSyncDataJson => {
-			console.log('server says: '+serverSyncDataJson);
-			try {
-				let serverSyncData = JSON.parse(serverSyncDataJson);
-				HistorySync(serverSyncData.History);
-				window.eyevocalizeLastSync = Date.now();
-				// localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
-			} catch(e) {
-				console.error('sync exception, possibly bad JSON. e=');
-				console.dir(e);
-			}
+		socket.emit('ClientInitiatedSync', JSON.stringify(syncData), msg => {
+			console.log('server says: '+msg);
 		});
 	}
 }

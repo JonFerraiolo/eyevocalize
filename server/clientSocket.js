@@ -25,7 +25,9 @@ exports.onConnect = function(socket) {
       logger.info('d');
       if (typeof email !=='string' || !regex_email.test(email) || isNaN(clientIdInt) || isNaN(lastSync)) {
         logger.info('e');
-        fn(JSON.stringify({ success: false, error: 'invalid email, clientId or lastSync' }));
+        if (fn) {
+          fn(JSON.stringify({ success: false, error: 'invalid email, clientId or lastSync' }));
+        }
       } else {
         logger.info('f');
         if (!connectionsByEmail[email]) connectionsByEmail[email] = {};
@@ -43,11 +45,15 @@ exports.onConnect = function(socket) {
         logger.info('j');
         logger.info('at end of ClientId  connectionsBySocket='+JSON.stringify(connectionsBySocket));
         logger.info('k');
-        fn(JSON.stringify({ success: true }));
-        logger.info('l');
+        if (fn) {
+          fn(JSON.stringify({ success: true }));
+          logger.info('l');
+        }
       }
     } catch(e) {
-      fn(JSON.stringify({ success: false, error: 'server exception, perhaps unparseable  JSON' }));
+      if (fn) {
+        fn(JSON.stringify({ success: false, error: 'server exception, perhaps unparseable  JSON' }));
+      }
     }
   });
   socket.on('ClientInitiatedSync', (msg, fn) => {
@@ -57,12 +63,16 @@ exports.onConnect = function(socket) {
       let { email, clientId, lastSync, thisSyncClientTimestamp } = clientInitiatedSyncData;
       let clientIdInt = parseInt(clientId);
       if (typeof email !=='string' || !regex_email.test(email) || isNaN(clientIdInt) || isNaN(lastSync)) {
-        fn(JSON.stringify({ success: false, error: 'invalid email, clientId or lastSync' }));
+        if (fn) {
+          fn(JSON.stringify({ success: false, error: 'invalid email, clientId or lastSync' }));
+        }
       } else {
         updateTopicTables(socket, clientInitiatedSyncData, fn);
       }
     } catch(e) {
-      fn(JSON.stringify({ success: false, error: 'server exception, e='+e }));
+      if (fn) {
+        fn(JSON.stringify({ success: false, error: 'server exception, e='+e }));
+      }
     }
   });
 }
@@ -102,10 +112,14 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
     updateClients(socket, email, values, fn);
   }, () => {
     logger.error('updateTopicTables Promise.all topic promises rejected');
-    fn(JSON.stringify({ success: false, error: 'ClientInitiatedSync topic promises server error' }));
+    if (fn) {
+      fn(JSON.stringify({ success: false, error: 'ClientInitiatedSync topic promises server error' }));
+    }
   }).catch(e => {
     logger.error('updateTopicTables Promise.all. topic promises e='+JSON.stringify(e));
-    fn(JSON.stringify({ success: false, error: 'ClientInitiatedSync topic promises server exception' }));
+    if (fn) {
+      fn(JSON.stringify({ success: false, error: 'ClientInitiatedSync topic promises server exception' }));
+    }
   });
 };
 
@@ -156,13 +170,19 @@ let updateClients = (socket, email, values, fn) => {
   }
   Promise.all(clientPromises).then(values => {
     logger.info('updateClients Promise.all clientPromises resolved');
-    fn(JSON.stringify({ success: true }));
+    if (fn) {
+      fn(JSON.stringify({ success: true }));
+    }
   }, () => {
     logger.error('updateClients Promise.all clientPromises rejected');
-    fn(JSON.stringify({ success: false, error: 'ClientInitiatedSync server error' }));
+    if (fn) {
+      fn(JSON.stringify({ success: false, error: 'ClientInitiatedSync server error' }));
+    }
   }).catch(e => {
     logger.error('updateClients Promise.all. clientPromises e='+JSON.stringify(e));
-    fn(JSON.stringify({ success: false, error: 'ClientInitiatedSync server exception' }));
+    if (fn) {
+      fn(JSON.stringify({ success: false, error: 'ClientInitiatedSync server exception' }));
+    }
   });
 };
 
