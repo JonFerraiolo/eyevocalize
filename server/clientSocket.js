@@ -142,7 +142,10 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
       if (skt) {
         logger.info('updateClients before emit for socketId='+socketId+', clientId='+clientId);
         let serverInitiatedSyncDataJson = JSON.stringify({
-          History: returnHistory[clientId] || null,
+          thisSyncServerTimestamp,
+          updates: {
+            History: returnHistory[clientId] || null,
+          }
         });
         logger.info('updateClients before emit serverInitiatedSyncDataJson='+serverInitiatedSyncDataJson);
         let ServerInitiatedSyncAck = false;

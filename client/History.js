@@ -127,13 +127,18 @@ export function initializeHistory(props) {
     History = initialHistory;
     HistoryPendingAdditions = HistoryPendingDeletions = [];
   }
+  // FIXME remove this line. Just for early testing.
+  HistoryPendingAdditions = HistoryPendingDeletions = [];
 }
 
 export function HistoryGetPending() {
   return { HistoryPendingAdditions, HistoryPendingDeletions };
 }
 
-export function HistorySync(serverSyncData) {
+export function HistorySync(thisSyncServerTimestamp, updates) {
+  if (updates) {
+    let { deletions, additions } = updates;
+  }
 }
 
 function updateStorage()  {
@@ -248,10 +253,20 @@ export function updateHistory(parentElement, props) {
       }
     }
   };
+  // FIXME will multiple event listeners be created? Yes.
   document.addEventListener('visibilitychange', e => {
+    console.log('updateHistory visibilitychange event listener entered ');
     updateInterval();
   }, false);
   updateInterval();
+  // FIXME will multiple event listeners be created?
+  window.addEventListener('ServerInitiatedSync', function(e) {
+    console.log('updateHistory ServerInitiatedSync custom event listener entered ');
+    localUpdate();
+  });
+  document.body.addEventListener('ServerInitiatedSync', e => {
+    localUpdate();
+  }, false);
 
 }
 
