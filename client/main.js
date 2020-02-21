@@ -247,21 +247,6 @@ function main() {
 		}
 	});
 	autoLoginPromise.then(() => {
-		let sendClientId = () => {
-			let o = { email: window.eyevocalizeUserEmail, clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
-			let ClientIdAck = false;
-			socket.emit('ClientId', JSON.stringify(o), msg => {
-				console.log('Send ClientID, the server says: '+msg);
-				ClientIdAck = true;
-				sync();
-			});
-			setTimeout(() => {
-				if (!ClientIdAck) {
-					console.log('Send ClientID, no server response after delay');
-					sync();
-				}
-			}, 3000);
-		};
 		try {
 			socket = io();
 			socket.on('disconnect', msg => {
@@ -270,7 +255,6 @@ function main() {
 			socket.on('reconnect', msg => {
 				console.log ('socket.io reconnect. msg='+msg);
 				let o = { clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
-				sendClientId();
 			});
 			socket.on('ServerInitiatedSync', (serverSyncDataJson, fn) => {
 				console.log('ServerInitiatedSync serverSyncDataJson='+serverSyncDataJson);
@@ -291,7 +275,6 @@ function main() {
 					}
 				}
 			});
-			sendClientId();
 		} catch(e) {
 			console.error('socket.io initialization failed. ');
 		}

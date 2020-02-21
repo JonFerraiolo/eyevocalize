@@ -10,52 +10,6 @@ let socketById = {};
 exports.onConnect = function(socket) {
   const logger = global.logger;
   logger.info('onConnect socket.id='+socket.id);
-  // change to ClientStartup, also pass in client lastSync
-  // if client lastSync greater than server, client needs to send a sync
-  // If client lastSync less than table value, generate ServerInitiatedSync
-  socket.on('ClientId', (msg, fn) => {
-    logger.info('ClientId socket.id='+socket.id+', message was: '+msg);
-    try {
-      logger.info('1');
-      let o = JSON.parse(msg);
-      logger.info('b');
-      let { email, clientId, lastSync } = o;
-      logger.info('c');
-      let clientIdInt = parseInt(clientId);
-      logger.info('d');
-      if (typeof email !=='string' || !regex_email.test(email) || isNaN(clientIdInt) || isNaN(lastSync)) {
-        logger.info('e');
-        if (fn) {
-          fn(JSON.stringify({ success: false, error: 'invalid email, clientId or lastSync' }));
-        }
-      } else {
-        logger.info('f');
-        if (!connectionsByEmail[email]) connectionsByEmail[email] = {};
-        logger.info('g');
-        socketById[socket.id] = socket;
-        connectionsByEmail[email][clientId] = { socketId: socket.id, lastSync };
-        logger.info('h');
-        logger.info('socket='+socket);
-        logger.info('socket.id='+socket.id);
-        logger.info('email='+email);
-        logger.info('clientId='+clientId);
-        connectionsBySocket[socket.id] = { email, clientId };
-        logger.info('i');
-        logger.info('at end of ClientId  connectionsByEmail='+JSON.stringify(connectionsByEmail));
-        logger.info('j');
-        logger.info('at end of ClientId  connectionsBySocket='+JSON.stringify(connectionsBySocket));
-        logger.info('k');
-        if (fn) {
-          fn(JSON.stringify({ success: true }));
-          logger.info('l');
-        }
-      }
-    } catch(e) {
-      if (fn) {
-        fn(JSON.stringify({ success: false, error: 'server exception, perhaps unparseable  JSON' }));
-      }
-    }
-  });
   socket.on('ClientInitiatedSync', (msg, fn) => {
     logger.info('ClientInitiatedSync socket.id='+socket.id+', message was: '+msg);
     try {
@@ -67,6 +21,10 @@ exports.onConnect = function(socket) {
           fn(JSON.stringify({ success: false, error: 'invalid email, clientId or lastSync' }));
         }
       } else {
+        if (!connectionsByEmail[email]) connectionsByEmail[email] = {};
+        socketById[socket.id] = socket;
+        connectionsByEmail[email][clientId] = { socketId: socket.id, lastSync };
+        connectionsBySocket[socket.id] = { email, clientId };
         updateTopicTables(socket, clientInitiatedSyncData, fn);
       }
     } catch(e) {
