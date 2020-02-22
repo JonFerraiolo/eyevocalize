@@ -169,7 +169,19 @@ export function playLastHistoryItem() {
   }
 };
 
+let updateHistoryFirstTime = true;
 export function updateHistory(parentElement, props) {
+  if (updateHistoryFirstTime) {
+    document.addEventListener('visibilitychange', e => {
+      console.log('updateHistory visibilitychange event listener entered ');
+      updateInterval();
+    }, false);
+    window.addEventListener('ServerInitiatedSync', function(e) {
+      console.log('updateHistory ServerInitiatedSync custom event listener entered ');
+      localUpdate();
+    });
+    updateHistoryFirstTime = false;
+  }
   let { searchTokens } = props;
   let onClickEdit = e => {
     e.preventDefault();
@@ -253,21 +265,7 @@ export function updateHistory(parentElement, props) {
       }
     }
   };
-  // FIXME will multiple event listeners be created? Yes.
-  document.addEventListener('visibilitychange', e => {
-    console.log('updateHistory visibilitychange event listener entered ');
-    updateInterval();
-  }, false);
   updateInterval();
-  // FIXME will multiple event listeners be created?
-  window.addEventListener('ServerInitiatedSync', function(e) {
-    console.log('updateHistory ServerInitiatedSync custom event listener entered ');
-    localUpdate();
-  });
-  document.body.addEventListener('ServerInitiatedSync', e => {
-    localUpdate();
-  }, false);
-
 }
 
 function onEditHistory() {
