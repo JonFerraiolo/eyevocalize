@@ -121,14 +121,17 @@ export function initializeHistory(props) {
     HistoryPendingDeletions = (typeof DeletionsString === 'string') ? JSON.parse(DeletionsString) : [];
   } catch(e) {
     History = initialHistory;
-    HistoryPendingAdditions = HistoryPendingDeletions = [];
+    HistoryPendingAdditions = [];
+    HistoryPendingDeletions = [];
   }
   if (typeof History.version != 'number'|| History.version < currentVersion) {
     History = initialHistory;
-    HistoryPendingAdditions = HistoryPendingDeletions = [];
+    HistoryPendingAdditions = [];
+    HistoryPendingDeletions = [];
   }
   // FIXME remove this line. Just for early testing.
-  HistoryPendingAdditions = HistoryPendingDeletions = [];
+  HistoryPendingAdditions = [];
+  HistoryPendingDeletions = [];
 }
 
 export function HistoryGetPending() {

@@ -64,7 +64,7 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
     if (client.lastSync < minLastSyncConnected) minLastSyncConnected = client.lastSync;
   }
   let thisSyncServerTimestamp = Date.now();
-  let HistoryPromise = syncHistory(connectionsByEmail[email], minLastSyncConnected,
+  let HistoryPromise = syncHistory(email, connectionsByEmail[email], minLastSyncConnected,
     thisSyncClientTimestamp, thisSyncServerTimestamp, clientInitiatedSyncData.updates.History);
   Promise.all([HistoryPromise]).then(values => {
     updateClients(socket, email, thisSyncServerTimestamp, values, fn);
@@ -158,8 +158,6 @@ let updateClientTableLastSync = (email, clientId, thisSyncServerTimestamp) => {
   logger.info('updateClientTableLastSync entered. email='+email+', clientId='+clientId+', thisSyncServerTimestamp='+thisSyncServerTimestamp);
   return new Promise((resolve, reject) => {
     logger.info('updateClientTableLastSync start of promise function ');
-    resolve();
-    return;
     dbconnection.dbReady().then(connectionPool => {
       logger.info('updateClientTableLastSync got connection');
       const clientTable = global.clientTable;
@@ -215,7 +213,7 @@ connectedClients[{clientId, lastSync}],
   @param connectedClients {object} associative array of all currently connected clients
       for the given email, whichere each entry is clientId:{socketId, clientId}
 */
-let syncHistory = (connectedClients, minLastSyncConnected, thisSyncClientTimestamp, thisSyncServerTimestamp, clientInitiatedSyncData) => {
+let syncHistory = (email, connectedClients, minLastSyncConnected, thisSyncClientTimestamp, thisSyncServerTimestamp, clientInitiatedSyncData) => {
   const logger = global.logger;
   logger.info('at start of syncHistory  connectedClients='+JSON.stringify(connectedClients));
   logger.info('at start of syncHistory  minLastSyncConnected='+minLastSyncConnected);
@@ -228,60 +226,65 @@ let syncHistory = (connectedClients, minLastSyncConnected, thisSyncClientTimesta
       cid = cli;
     }
     logger.info('syncHistory  cid='+cid);
-    let robj = {};
-    robj[cid] = { deletions: [], additions: []  };
-    logger.info('syncHistory  robj='+JSON.stringify(robj));
-    outerResolve(robj);
-    logger.info('syncHistory just after outerResolve ');
-    return;
     dbconnection.dbReady().then(connectionPool => {
       logger.info('syncHistory got connection');
       const historyTable = global.historyTable;
+      logger.info('syncHistory before calcMinTime. minLastSyncConnected='+minLastSyncConnected+', thisSyncClientTimestamp='+thisSyncClientTimestamp+', thisSyncServerTimestamp='+thisSyncServerTimestamp);
       let mintime = calcMinTime([minLastSyncConnected, thisSyncClientTimestamp, thisSyncServerTimestamp]);
+      logger.info('syncHistory before select. mintime='+mintime+', email='+email+', historyTable='+historyTable);
       connectionPool.query(`SELECT * FROM ${historyTable} WHERE email = ? and timestamp > ?`, [email, mintime], function (error, results, fields) {
+        logger.info('syncHistory select return function start ');
         if (error) {
           logger.error("syncHistory select history database failure for email '" + email + "'");
           reject();
         } else {
           logger.info('syncHistory after select, results='+JSON.stringify(results));
           let currentRows = results;
-          let { deletions, additions } = clientInitiatedSyncData;
-          logger.info('syncHistory after select, deletions='+JSON.stringify(deletions));
-          logger.info('syncHistory after select, additions='+JSON.stringify(additions));
+          let { HistoryPendingDeletions, HistoryPendingAdditions } = clientInitiatedSyncData;
+          logger.info('syncHistory after select, HistoryPendingDeletions='+JSON.stringify(HistoryPendingDeletions));
+          logger.info('syncHistory after select, HistoryPendingAdditions='+JSON.stringify(HistoryPendingAdditions));
           let currentRowsObj = {};
           currentRows.forEach(row => {
             currentRowsObj[row.timestamp] = row;
           });
           logger.info('syncHistory after select, currentRowsObj='+JSON.stringify(currentRowsObj));
-          let filteredDeletions = deletions.filter(item => currentRows[item.timestamp]);
+          let filteredDeletions = HistoryPendingDeletions.filter(item => currentRows[item.timestamp]);
           logger.info('syncHistory after select, filteredDeletions='+JSON.stringify(filteredDeletions));
           let tableDeletions = filteredDeletions.map(item => item.timestamp);
           logger.info('syncHistory after select, tableDeletions='+JSON.stringify(tableDeletions));
-          let filteredAdditions = additions.filter(item => !currentRows[item.timestamp]);
+          let filteredAdditions = HistoryPendingAdditions.filter(item => !currentRows[item.timestamp]);
           logger.info('syncHistory after select, filteredAdditions='+JSON.stringify(filteredAdditions));
-          let tableAdditions = filteredAdditions.map(item => Object.assign({}, item, { email, clientId }));
+          let tableAdditions = filteredAdditions.map(item => Object.assign({}, { email, timestamp:item.timestamp, phrase: JSON.stringify(item) }));
           logger.info('syncHistory after select, tableAdditions='+JSON.stringify(tableAdditions));
           let deletePromise = new Promise((resolve, reject) => {
-            connectionPool.query(`DELETE FROM ${historyTable} WHERE timestamp IN (?)`, tableDeletions, function (error, results, fields) {
-              if (error) {
-                logger.error('DELETE failed syncHistory. error='+error);
-                reject();
-              } else {
-                logger.info('syncHistory delete success');
-                resolve();
-              }
-            });
+            if (tableDeletions.length === 0) {
+              resolve();
+            } else {
+              connectionPool.query(`DELETE FROM ${historyTable} WHERE timestamp IN (?)`, tableDeletions, function (error, results, fields) {
+                if (error) {
+                  logger.error('DELETE failed syncHistory. error='+error);
+                  reject();
+                } else {
+                  logger.info('syncHistory delete success');
+                  resolve();
+                }
+              });
+            }
           });
           let insertPromise = new Promise((resolve, reject) => {
-            connectionPool.query(`INSERT INTO ${historyTable} SET ?`, tableAdditions, function (error, results, fields) {
-              if (error) {
-                logger.error("insert syncHistory database failure for email '" + email + "'");
-                reject();
-              } else {
-                logger.info('syncHistory insert success');
-                resolve();
-              }
-            });
+            if (tableAdditions.length === 0) {
+              resolve();
+            } else {
+              connectionPool.query(`INSERT INTO ${historyTable} SET ?`, tableAdditions, function (error, results, fields) {
+                if (error) {
+                  logger.error("insert syncHistory database failure for email '" + email + "'");
+                  reject();
+                } else {
+                  logger.info('syncHistory insert success');
+                  resolve();
+                }
+              });
+            }
           });
           Promise.all([deletePromise, insertPromise]).then(values => {
             logger.info('syncHistory promise all before outerResolve');
@@ -297,20 +300,6 @@ let syncHistory = (connectedClients, minLastSyncConnected, thisSyncClientTimesta
             };
             logger.info('syncHistory, returnObj='+JSON.stringify(returnObj));
             outerResolve(returnObj);
-            /*
-            updateClientTableLastSync(email, clientId, thisSyncServerTimestamp).then(() => {
-              fn(JSON.stringify({ success: true }));
-              // for each connected client, push data, and
-              // acknowledge function updates lastSync for that client,
-              // and sends update message with new last sync
-            }, () => {
-              logger.error('updateClientTableLastSync Promise.all rejected');
-              fn(JSON.stringify({ success: false, error: 'updateClientTableLastSync server error' }));
-            }).catch(e => {
-              logger.error('updateClientTableLastSync Promise.all. e='+JSON.stringify(e));
-              fn(JSON.stringify({ success: false, error: 'updateClientTableLastSync server exception' }));
-            });
-            */
           }, () => {
             logger.error('syncHistory Promise.all rejected');
             outerReject();

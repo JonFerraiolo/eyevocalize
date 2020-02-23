@@ -132,6 +132,7 @@ exports.initialize = function() {
   // and to create tables if necessary.
   const accountTable = global.accountTable = global.config.DB_TABLE_PREFIX + 'account';
   const clientTable = global.clientTable = global.config.DB_TABLE_PREFIX + 'client';
+  const historyTable = global.historyTable = global.config.DB_TABLE_PREFIX + 'history';
   const showTables = `show tables;`;
   const createAccount = `CREATE TABLE ${accountTable} (
     id int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -152,8 +153,15 @@ exports.initialize = function() {
   const createClient = `CREATE TABLE ${clientTable} (
     clientId bigint unsigned UNIQUE NOT NULL,
     email varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-    lastSync datetime NOT NULL,
+    lastSync bigint unsigned NOT NULL,
     PRIMARY KEY (clientId),
+    INDEX(email(100))
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
+  const createHistory = `CREATE TABLE ${historyTable} (
+    timestamp bigint unsigned UNIQUE NOT NULL,
+    email varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+    phrase varchar(10000) COLLATE utf8_unicode_ci NOT NULL,
+    PRIMARY KEY (timestamp),
     INDEX(email(100))
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
 
@@ -194,9 +202,13 @@ exports.initialize = function() {
   let dropAndMakeTables = (() => {
     logger.info("dropAndMakeTables entered");
     let dropAndMakeTable = (tableName, createTable) => {
+      logger.info('dropAndMakeTable entered. tableName='+tableName);
       return new Promise((resolve, reject) => {
+        logger.info('dropAndMakeTable promise function entered. tableName='+tableName);
         const dropTable = `DROP TABLE IF EXISTS ${tableName};`;
+        logger.info('dropAndMakeTable before drop table. tableName='+tableName);
         pool.query(dropTable, function (error, results, fields) {
+          logger.info('dropAndMakeTable return from drop table. tableName='+tableName);
           if (error) {
             logger.error(`drop ${tableName} table error`);
             logger.error(JSON.stringify(error));
@@ -204,7 +216,9 @@ exports.initialize = function() {
           } else {
             logger.info(`drop ${tableName} table success`);
             logger.info(JSON.stringify(results));
+            logger.info('dropAndMakeTable before create table. tableName='+tableName);
             pool.query(createTable, function (error, results, fields) {
+              logger.info('dropAndMakeTable before create table. tableName='+tableName);
               if (error) {
                 logger.error(`create ${tableName} table error`);
                 logger.error(JSON.stringify(error));
@@ -221,7 +235,9 @@ exports.initialize = function() {
     };
     let accountPromise = dropAndMakeTable(accountTable, createAccount);
     let clientPromise = dropAndMakeTable(clientTable, createClient);
-    Promise.all([accountPromise, clientPromise]).then(values => {
+    let historyPromise = dropAndMakeTable(historyTable, createHistory);
+    Promise.all([accountPromise, clientPromise, historyPromise]).then(values => {
+      logger.info('dropAndMakeTables all promises resolved');
       dbInitialized = true;
     }, () => {
       logger.error('dropAndMakeTables promise rejected');
