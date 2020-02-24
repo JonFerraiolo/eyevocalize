@@ -141,14 +141,49 @@ export function HistoryGetPending() {
 export function HistorySync(thisSyncServerTimestamp, updates) {
   if (updates) {
     let { deletions, additions } = updates;
+    if (!Array.isArray(deletions)) deletions = [];
+    if (!Array.isArray(additions)) additions = [];
+    let HistoryIndex = {};
+    History.items.forEach((item, i) => {
+      HistoryIndex[item.timestamp] = item.timestamp;
+    });
+    additions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
+    additions.forEach((item) => {
+      if (typeof HistoryIndex[item.timestamp] !== 'number') {
+        try {
+          History.items.unshift(item);
+          HistoryIndex[item.timestamp] = item.timestamp;
+        } catch(e) {
+          console.error('exception in HistorySync. e='+e);
+        }
+      }
+    });
+    let DeletionsIndex = {};
+    deletions.forEach(item => {
+      DeletionsIndex[item.timestamp] = item;
+    });
+    for (let i = History.items.length-1; i>=0; i--) {
+      let phrase = History.items[i];
+      if (DeletionsIndex[phrase.timestamp]) {
+        History.items.splice(i, 1);
+      }
+    }
+    History.items.sort((a, b) => b.timestamp - a.timestamp); // most recent first
+    updateLocalStorage();
+    let event = new CustomEvent("ServerInitiatedSyncHistory", { detail: null } );
+    window.dispatchEvent(event);
   }
 }
 
 function updateStorage()  {
+  updateLocalStorage();
+  sync();
+}
+
+function updateLocalStorage() {
   localStorage.setItem("History", JSON.stringify(History));
   localStorage.setItem("HistoryPendingAdditions", JSON.stringify(HistoryPendingAdditions));
   localStorage.setItem("HistoryPendingDeletions", JSON.stringify(HistoryPendingDeletions));
-  sync();
 }
 
 export function addToHistory(obj) {
@@ -175,15 +210,15 @@ export function playLastHistoryItem() {
 let updateHistoryFirstTime = true;
 export function updateHistory(parentElement, props) {
   if (updateHistoryFirstTime) {
+    updateHistoryFirstTime = false;
     document.addEventListener('visibilitychange', e => {
       console.log('updateHistory visibilitychange event listener entered ');
       updateInterval();
     }, false);
-    window.addEventListener('ServerInitiatedSync', function(e) {
-      console.log('updateHistory ServerInitiatedSync custom event listener entered ');
+    window.addEventListener('ServerInitiatedSyncHistory', function(e) {
+      console.log('updateHistory ServerInitiatedSyncHistory custom event listener entered ');
       localUpdate();
     });
-    updateHistoryFirstTime = false;
   }
   let { searchTokens } = props;
   let onClickEdit = e => {

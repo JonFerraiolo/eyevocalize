@@ -94,11 +94,11 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
     logger.info('updateClients client='+JSON.stringify(client));
     let clientPromise = new Promise((clientResolve, clientReject) => {
       logger.info('updateClients promise function entered');
-      let { clientId, socketId } = client;
+      let { lastSync, socketId } = client;
       let skt = socketById[socketId];
       logger.info('updateClients typeof skt='+typeof skt);
       if (skt) {
-        logger.info('updateClients before emit for socketId='+socketId+', clientId='+clientId);
+        logger.info('updateClients before emit for socketId='+socketId+', lastSync='+lastSync);
         let serverInitiatedSyncDataJson = JSON.stringify({
           thisSyncServerTimestamp,
           updates: {
@@ -243,18 +243,18 @@ let syncHistory = (email, connectedClients, minLastSyncConnected, thisSyncClient
           let { HistoryPendingDeletions, HistoryPendingAdditions } = clientInitiatedSyncData;
           logger.info('syncHistory after select, HistoryPendingDeletions='+JSON.stringify(HistoryPendingDeletions));
           logger.info('syncHistory after select, HistoryPendingAdditions='+JSON.stringify(HistoryPendingAdditions));
-          let currentRowsObj = {};
+          let currentRowsIndex = {};
           currentRows.forEach(row => {
-            currentRowsObj[row.timestamp] = row;
+            currentRowsIndex[row.timestamp] = row;
           });
-          logger.info('syncHistory after select, currentRowsObj='+JSON.stringify(currentRowsObj));
-          let filteredDeletions = HistoryPendingDeletions.filter(item => currentRows[item.timestamp]);
+          logger.info('syncHistory after select, currentRowsIndex='+JSON.stringify(currentRowsIndex));
+          let filteredDeletions = HistoryPendingDeletions.filter(item => currentRowsIndex[item.timestamp]);
           logger.info('syncHistory after select, filteredDeletions='+JSON.stringify(filteredDeletions));
           let tableDeletions = filteredDeletions.map(item => item.timestamp);
           logger.info('syncHistory after select, tableDeletions='+JSON.stringify(tableDeletions));
-          let filteredAdditions = HistoryPendingAdditions.filter(item => !currentRows[item.timestamp]);
+          let filteredAdditions = HistoryPendingAdditions.filter(item => !currentRowsIndex[item.timestamp]);
           logger.info('syncHistory after select, filteredAdditions='+JSON.stringify(filteredAdditions));
-          let tableAdditions = filteredAdditions.map(item => Object.assign({}, { email, timestamp:item.timestamp, phrase: JSON.stringify(item) }));
+          let tableAdditions = filteredAdditions.map(item => [email, item.timestamp, JSON.stringify(item)] );
           logger.info('syncHistory after select, tableAdditions='+JSON.stringify(tableAdditions));
           let deletePromise = new Promise((resolve, reject) => {
             if (tableDeletions.length === 0) {
@@ -275,7 +275,7 @@ let syncHistory = (email, connectedClients, minLastSyncConnected, thisSyncClient
             if (tableAdditions.length === 0) {
               resolve();
             } else {
-              connectionPool.query(`INSERT INTO ${historyTable} SET ?`, tableAdditions, function (error, results, fields) {
+              connectionPool.query(`INSERT INTO ${historyTable} (email, timestamp, phrase) VALUES ?`, [tableAdditions], function (error, results, fields) {
                 if (error) {
                   logger.error("insert syncHistory database failure for email '" + email + "'");
                   reject();
@@ -294,8 +294,8 @@ let syncHistory = (email, connectedClients, minLastSyncConnected, thisSyncClient
               let { lastSync } = client;
               let mintime = calcMinTime([lastSync]);
               returnObj[clientId] = {
-                deletions: filteredDeletions.filter(item => item.timestamp > mintime),
-                additions: filteredAdditions.filter(item => item.timestamp > mintime),
+                deletions: filteredDeletions.filter(item => item.timestamp > mintime).concat(HistoryPendingDeletions),
+                additions: filteredAdditions.filter(item => item.timestamp > mintime).concat(HistoryPendingAdditions),
               };
             };
             logger.info('syncHistory, returnObj='+JSON.stringify(returnObj));
