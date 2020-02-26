@@ -232,15 +232,18 @@ let syncHistory = (email, connectedClients, minLastSyncConnected, thisSyncClient
       logger.info('syncHistory before calcMinTime. minLastSyncConnected='+minLastSyncConnected+', thisSyncClientTimestamp='+thisSyncClientTimestamp+', thisSyncServerTimestamp='+thisSyncServerTimestamp);
       let mintime = calcMinTime([minLastSyncConnected, thisSyncClientTimestamp, thisSyncServerTimestamp]);
       logger.info('syncHistory before select. mintime='+mintime+', email='+email+', historyTable='+historyTable);
-      connectionPool.query(`SELECT * FROM ${historyTable} WHERE email = ? and timestamp > ?`, [email, mintime], function (error, results, fields) {
+      let { HistoryPendingDeletions, HistoryPendingAdditions } = clientInitiatedSyncData;
+      let additionTimestamps = HistoryPendingAdditions.map(item => item.timestamp);
+      if (!Array.isArray(additionTimestamps) || additionTimestamps.length === 0) additionTimestamps = [1]; // query fails with empty array. Time=1 is 1ms into 1970
+      logger.info('syncHistory before select, additionTimestamps='+JSON.stringify(additionTimestamps));
+      connectionPool.query(`SELECT * FROM ${historyTable} WHERE (email = ? and timestamp > ?) or timestamp IN (?)`, [email, mintime, additionTimestamps], function (error, results, fields) {
         logger.info('syncHistory select return function start ');
         if (error) {
           logger.error("syncHistory select history database failure for email '" + email + "'");
-          reject();
+          outerReject();
         } else {
           logger.info('syncHistory after select, results='+JSON.stringify(results));
           let currentRows = results;
-          let { HistoryPendingDeletions, HistoryPendingAdditions } = clientInitiatedSyncData;
           logger.info('syncHistory after select, HistoryPendingDeletions='+JSON.stringify(HistoryPendingDeletions));
           logger.info('syncHistory after select, HistoryPendingAdditions='+JSON.stringify(HistoryPendingAdditions));
           let currentRowsIndex = {};

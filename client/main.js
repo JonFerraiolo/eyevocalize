@@ -263,7 +263,7 @@ function main() {
 					let { thisSyncServerTimestamp, updates } = serverSyncData;
 					HistorySync(thisSyncServerTimestamp, updates.History);
 					window.eyevocalizeLastSync = Date.now();
-					// localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
+					localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
 				} catch(e) {
 					console.error('sync exception, possibly bad JSON. e=');
 					console.dir(e);

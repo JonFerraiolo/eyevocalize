@@ -129,9 +129,6 @@ export function initializeHistory(props) {
     HistoryPendingAdditions = [];
     HistoryPendingDeletions = [];
   }
-  // FIXME remove this line. Just for early testing.
-  HistoryPendingAdditions = [];
-  HistoryPendingDeletions = [];
 }
 
 export function HistoryGetPending() {
@@ -147,7 +144,18 @@ export function HistorySync(thisSyncServerTimestamp, updates) {
     History.items.forEach((item, i) => {
       HistoryIndex[item.timestamp] = item.timestamp;
     });
+    deletions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
     additions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
+    HistoryPendingDeletions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
+    HistoryPendingAdditions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
+    let HistoryPendingDeletionsIndex = {};
+    HistoryPendingDeletions.forEach((item, i) => {
+      HistoryPendingDeletionsIndex[item.timestamp] = i;
+    });
+    let HistoryPendingAdditionsIndex = {};
+    HistoryPendingAdditions.forEach((item, i) => {
+      HistoryPendingAdditionsIndex[item.timestamp] = i;
+    });
     additions.forEach((item) => {
       if (typeof HistoryIndex[item.timestamp] !== 'number') {
         try {
@@ -169,6 +177,20 @@ export function HistorySync(thisSyncServerTimestamp, updates) {
       }
     }
     History.items.sort((a, b) => b.timestamp - a.timestamp); // most recent first
+    for (let i = deletions.length-1; i>=0; i--) {
+      let phrase = deletions[i];
+      let index = HistoryPendingDeletionsIndex[phrase.timestamp];
+      if (typeof index === 'number') {
+        HistoryPendingDeletions.splice(index, 1);
+      }
+    }
+    for (let i = additions.length-1; i>=0; i--) {
+      let phrase = additions[i];
+      let index = HistoryPendingAdditionsIndex[phrase.timestamp];
+      if (typeof index === 'number') {
+        HistoryPendingAdditions.splice(index, 1);
+      }
+    }
     updateLocalStorage();
     let event = new CustomEvent("ServerInitiatedSyncHistory", { detail: null } );
     window.dispatchEvent(event);
