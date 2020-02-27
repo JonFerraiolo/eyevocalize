@@ -230,12 +230,15 @@ export function playLastHistoryItem() {
 };
 
 let updateHistoryFirstTime = true;
+
 export function updateHistory(parentElement, props) {
   if (updateHistoryFirstTime) {
     updateHistoryFirstTime = false;
     document.addEventListener('visibilitychange', e => {
-      console.log('updateHistory visibilitychange event listener entered ');
-      updateInterval();
+      if (document.visibilityState === 'visible') {
+        console.log('updateHistory visibilitychange event listener entered ');
+        updateInterval();
+      }
     }, false);
     window.addEventListener('ServerInitiatedSyncHistory', function(e) {
       console.log('updateHistory ServerInitiatedSyncHistory custom event listener entered ');
@@ -338,7 +341,34 @@ function onEditHistoryReturn() {
   secondLevelScreenHide();
 }
 
+let editHistoryFirstTime = true;
+
 export function editHistory(parentElement, props) {
+  let editHistoryActive = true;
+  let externalEvent = () => {
+    if (editHistoryActive && parentElement) {
+      let HistoryContent = parentElement.querySelector('.HistoryContent');
+      if (HistoryContent) {
+        initializeLocalHistory();
+        localUpdate();
+      }
+    }
+  };
+  if (editHistoryFirstTime) {
+    editHistoryFirstTime = false;
+    document.addEventListener('visibilitychange', e => {
+      if (editHistoryActive && document.visibilityState === 'visible') {
+        console.log('editHistory visibilitychange event listener entered ');
+        externalEvent();
+      }
+    }, false);
+    window.addEventListener('ServerInitiatedSyncHistory', function(e) {
+      if (editHistoryActive) {
+        console.log('editHistory ServerInitiatedSyncHistory custom event listener entered ');
+        externalEvent();
+      }
+    });
+  }
   let lastClickItemIndex = null;
   let searchString = '';
   let searchTokens = [];
@@ -557,6 +587,7 @@ export function editHistory(parentElement, props) {
   };
   let onReturn = () => {
     document.removeEventListener('keydown', keydownEvent, false);
+    editHistoryActive = false;
     onEditHistoryReturn();
   };
   document.addEventListener('keydown', keydownEvent, false);
