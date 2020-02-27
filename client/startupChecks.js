@@ -1,9 +1,6 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
 
-let css = `
-`;
-
 export const markedLoadedPromise = new Promise((resolve, reject) => {
   let elem = document.createElement('script');
   elem.setAttribute('src', 'lib/marked.js');

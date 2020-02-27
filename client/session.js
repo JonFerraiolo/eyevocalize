@@ -87,6 +87,9 @@ html {
   padding-bottom: 1.5em;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 const EMAIL_NOT_REGISTERED = 'EMAIL_NOT_REGISTERED'
 const EMAIL_NOT_VERIFIED = 'EMAIL_NOT_VERIFIED'
@@ -208,7 +211,6 @@ const Signup = () => {
       `;
     }
     render(html`
-      <style>${css}</style>
       <div class=LoginSignup>
         <div class=LoginSignupTitle>
           You are signing up for EyeVocalize.com
@@ -515,7 +517,6 @@ const Login = () => {
       `;
     }
     render(html`
-      <style>${css}</style>
       <div class=LoginSignup>
         <div class=LoginSignupTitle>${title}<span class=logo></span></div>
         ${mainBody}
@@ -627,7 +628,6 @@ const ResetPassword = () => {
       `;
     }
     render(html`
-      <style>${css}</style>
       <div class=LoginSignup>
         <div class=LoginSignupTitle>
           You are resetting your password for EyeVocalize.com

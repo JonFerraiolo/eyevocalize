@@ -50,6 +50,9 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 export class combobox {
   constructor() {
@@ -137,7 +140,6 @@ export class combobox {
     let localUpdate = () => {
       let selectStyle = styleMap({ width:selectWidthEms+'em', display: showMenu ? 'block': 'none' });
       render(html`
-        <style>${css}</style>
         <span class=combobox
           ><select @change=${onChangeSelect} .size=${options.length} style=${selectStyle} @blur=${onBlurSelect}>${optionElements}</select
           ><input id=${inputId} type=${inputType} .value=${value} @input=${onInput} style=${styleMap({width:inputWidthEms+'em'})}></input

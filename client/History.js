@@ -88,6 +88,9 @@ let css = `
   background-position: 50% 40%;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 let History;
 let HistoryPendingAdditions = [];
@@ -301,7 +304,6 @@ export function updateHistory(parentElement, props) {
       `);
     }
     render(html`
-      <style>${css}</style>
       <div class=PhrasesSectionLabel>
         ${HistoryTitle}${rightSideIcons({ onClickEdit })}
       </div>
@@ -629,7 +631,6 @@ export function editHistory(parentElement, props) {
     }, 0) === 1;
     let atLeastOneSelected = localHistory.items.some(item => item.selected);
     render(html`
-    <style>${css}</style>
     <div class="History editHistory skinnyScreenParent">
       <div class=skinnyScreenChild>
         ${buildSlideRightTitle("Manage History", onReturn)}

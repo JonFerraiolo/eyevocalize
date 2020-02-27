@@ -8,6 +8,9 @@ let css = `
   text-align: right;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 const Welcome = () => {
   const tryit = e => {
@@ -23,7 +26,6 @@ const Welcome = () => {
     window.location='/login';
   };
   render(html`
-    <style>${css}</style>
     <div class=Welcome>
       <div class=WelcomeTopBar>
         <button @click=${tryit}>Try It</button>

@@ -125,6 +125,9 @@ let css = `
   vertical-align: top;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 const expandArrowSpan = html`<span class=collapsearrow>&#x2304;</span>`;
 const collapseArrowSpan = html`<span class=expandarrow>&#x2303;</span>`;
@@ -195,7 +198,6 @@ export function updatePhrases(parentElement, props) {
   let HistoryProps = { searchTokens };
   let MyPhrasesProps = { searchTokens };
   render(html`
-  <style>${css}</style>
   <div class=Phrases>
     <div class=StashAndHistory>
       <div id=StashContainer></div>

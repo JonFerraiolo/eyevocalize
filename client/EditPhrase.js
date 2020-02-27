@@ -45,6 +45,9 @@ let css = `
   background-color: #f66;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 export function EditPhrase(parentElement, params) {
   let { phrase, title, doItButtonLabel, doItCallback, cancelCallback,
@@ -183,7 +186,6 @@ export function EditPhrase(parentElement, params) {
       `;
     }
     render(html`
-      <style>${css}</style>
       <div class="EditPhrase skinnyScreenParent">
         <div class=skinnyScreenChild>
           ${buildSlideRightTitle(title, null)}

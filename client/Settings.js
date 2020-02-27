@@ -84,6 +84,9 @@ let css = `
   border-top: 2px solid gray;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 let currentVersion;
 let section = 'Voice';
@@ -386,7 +389,6 @@ export function editSettings(parentElement, params) {
       `;
     }
     render(html`
-      <style>${css}</style>
       <div class="Settings skinnyScreenParent">
         <div class=skinnyScreenChild>
           ${buildSlideRightTitle(title, onSettingsReturn)}

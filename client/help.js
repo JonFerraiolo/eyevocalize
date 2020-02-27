@@ -58,6 +58,9 @@ let css = `
   cursor: pointer;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 let oldClientX, oldClientY;
 let showingHelp = false;
@@ -79,7 +82,6 @@ function showHelp(topic) {
   };
   let content = helpPages[topic] || '';
   render(html`
-    <style>${css}</style>
     <div class=HelpHeader @mousedown=${dragMouseDown}>
       <span class=HelpHeaderIcon></span>Help
       <span class=HelpHeaderClose @click=${onClose}></span>

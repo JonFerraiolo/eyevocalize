@@ -5,10 +5,12 @@ import { startupChecks } from './startupChecks.js';
 
 let css = `
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 const LegalDoc = () => {
   render(html`
-    <style>${css}</style>
     <div class=LegalDoc>
       ${unsafeHTML(marked(window.eyevocalizeMarkdown))}
     </div>`, document.body);

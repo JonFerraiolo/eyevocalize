@@ -131,6 +131,9 @@ let css = `
   vertical-align: 110%;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 export function updateTextEntryRow(parentElement, props) {
   let text = props.initialText || '';
@@ -192,7 +195,6 @@ export function updateTextEntryRow(parentElement, props) {
     let userIconClass = "" + (window.eyevocalizeUserEmail ? '' : ' notloggedin');
     let signupLoginClass =  + (window.eyevocalizeUserEmail ? ' loggedin' : '');
     render(html`
-    <style>${css}</style>
     <div class=TextEntryRow>
       <label class=TextEntryLabel for=TextEntryRowTextArea>Compose:</label
       ><textarea id=TextEntryRowTextArea>${text}</textarea

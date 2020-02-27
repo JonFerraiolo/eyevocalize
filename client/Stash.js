@@ -41,6 +41,9 @@ let css = `
   background-position: 50% 40%;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 let Stash;
 
@@ -137,7 +140,6 @@ export function updateStash(parentElement, props) {
   let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Clipboard", "StashTitleIcon");
   let localUpdate = () => {
     render(html`
-      <style>${css}</style>
       <div class=PhrasesSectionLabel>
         ${StashTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
       </div>
@@ -371,7 +373,6 @@ export function editStash(parentElement, props) {
     let enableMoveDown = localStash.items.some((item, index, arr) =>
       item.selected && (index < arr.length-1 && !arr[index+1].selected));
     render(html`
-    <style>${css}</style>
     <div class="Stash editStash skinnyScreenParent">
       <div class=skinnyScreenChild>
         ${buildSlideRightTitle("Manage Clipboard", onEditStashReturn)}

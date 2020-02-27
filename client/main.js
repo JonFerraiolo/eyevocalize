@@ -16,6 +16,9 @@ import { html, render } from './lib/lit-html/lit-html.js';
 import { styleMap } from './lib/lit-html/directives/style-map.js';
 
 let css = `@import 'app.css';`;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 let mainShowing = true;
 
@@ -123,7 +126,6 @@ export function updateMain(searchString) {
 		html`<div class=TrialVersion>You are using the Trial Version.
 		To remove this message, sign up and log in. (The app is free) </div>`;
 	render(html`
-		<style>${css}</style>
 		<div class=appfullheight style=${styleMap({fontSize: appFontSize+'%'})}>
 			${trial}
 			<div class=appmaincontent>

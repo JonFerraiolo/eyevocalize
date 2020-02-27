@@ -265,6 +265,9 @@ let css = `
   justify-content: space-around;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 let Favorites;
 let Builtins;
@@ -579,7 +582,6 @@ function updateMyPhrases(Section, parentElement, props) {
       });
     });
     render(html`
-    <style>${css}</style>
     <div class=MyPhrases>
       <div class=PhrasesSectionLabel><span class=MyPhrasesTitleIcon
         ></span>${Section}${rightSideIcons({ onClickAdd: Section === 'Favorites' ? onClickAdd : null, onClickEdit } )}</div>
@@ -1233,7 +1235,6 @@ function editMyPhrases(Section, parentElement, props) {
     }
     // FIXME css might be added multiple times
     render(html`
-    <style>${css}</style>
     <div class="MyPhrases EditMyPhrases skinnyScreenParent">
       <div class="EditMyPhrasesChild skinnyScreenChild">
         ${buildSlideRightTitle("Manage "+(Section === 'Favorites' ? 'Favorites' : 'Builtins'), onEditFavoritesReturn)}

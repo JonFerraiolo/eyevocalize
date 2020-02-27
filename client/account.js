@@ -39,6 +39,9 @@ let css = `
 	font-size: 95%;
 }
 `;
+let styleElement = document.createElement('style');
+styleElement.appendChild(document.createTextNode(css));
+document.head.appendChild(styleElement);
 
 export function showAccountMenu(refNode, hideCB) {
 	let params = {
@@ -74,7 +77,7 @@ let AccountMenu = (parentElement, customControlsData) => {
 				resp.json().then(data => {
 					console.log('logout fetch return data=');
 					console.dir(data);
-					localStorage.setItem('userChecksum', ''); // to prevent autologin if user goes to /app without logging in 
+					localStorage.setItem('userChecksum', ''); // to prevent autologin if user goes to /app without logging in
 					window.location.href = '/login';
 				});
 			} else {
@@ -164,7 +167,6 @@ let CloseAccountDialog = (parentElement, customControlsData) => {
 	let errorMessage = '';
 	let localUpdate = () => {
 		render(html`
-		<style>${css}</style>
 		<div class="CloseAccountDialog">
 			<div class=CloseAccountDialogTitle>Are you sure you want to close your account?</div>
 			<div class=CloseAccountDialogErrorMessage>${errorMessage}</div>
