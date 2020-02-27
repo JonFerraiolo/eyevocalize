@@ -15,6 +15,7 @@ exports.onConnect = function(socket) {
     try {
       let clientInitiatedSyncData = JSON.parse(msg);
       let { email, clientId, lastSync, thisSyncClientTimestamp } = clientInitiatedSyncData;
+      email = email.toLowerCase();
       let clientIdInt = parseInt(clientId);
       if (typeof email !=='string' || !regex_email.test(email) || isNaN(clientIdInt) || isNaN(lastSync)) {
         if (fn) {
@@ -59,6 +60,7 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
   const logger = global.logger;
   logger.info('updateTopicTables Entered');
   let { email, clientId, lastSync, thisSyncClientTimestamp } = clientInitiatedSyncData;
+  email = email.toLowerCase();
   let minLastSyncConnected = Number.MAX_SAFE_INTEGER;
   for (const client in connectionsByEmail[email]) {
     if (client.lastSync < minLastSyncConnected) minLastSyncConnected = client.lastSync;

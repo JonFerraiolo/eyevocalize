@@ -43,7 +43,7 @@ exports.signup = function(req, res, next) {
     encryptedPW += pwKey.final('hex');
     logger.info('signup encryptedPW='+encryptedPW);
     let account = {
-       email: req.body.email,
+       email: req.body.email.toLowerCase(),
        password: encryptedPW,
        emailValidateToken: null,
        emailValidateTokenDateTime: now,
@@ -129,7 +129,7 @@ exports.login = function(req, res, next) {
   let encryptedPW = pwKey.update(password, 'utf8', 'hex');
   encryptedPW += pwKey.final('hex');
   logger.info('login encryptedPW='+encryptedPW);
-  doLoginLogSend(req, res, req.body.email, encryptedPW);
+  doLoginLogSend(req, res, req.body.email.toLowerCase(), encryptedPW);
 }
 
 exports.autologin = function(req, res, next) {
@@ -151,11 +151,11 @@ exports.autologin = function(req, res, next) {
   let encryptedPW = pwKey.update(checksum, 'hex', 'utf8')
   encryptedPW += pwKey.final('utf8');
   logger.info('autologin encryptedPW='+encryptedPW);
-  doLoginLogSend(req, res, req.body.email, encryptedPW);
+  doLoginLogSend(req, res, req.body.email.toLowerCase(), encryptedPW);
 }
 
 exports.doLoginValidate = function(req, res, email, encryptedPW, cb) {
-  doLogin(req, res, email, encryptedPW, (res, clientData, clientMsg) => {
+  doLogin(req, res, email.toLowerCase(), encryptedPW, (res, clientData, clientMsg) => {
     cb(true);
   }, (res, status, clientErrorString, clientMessage, clientData) => {
     cb(false);
@@ -165,7 +165,7 @@ exports.doLoginValidate = function(req, res, email, encryptedPW, cb) {
 }
 
 let doLoginLogSend = function(req, res, email, encryptedPW) {
-  doLogin(req, res, email, encryptedPW, (res, clientData, clientMsg) => {
+  doLogin(req, res, email.toLowerCase(), encryptedPW, (res, clientData, clientMsg) => {
     logSendOK(res, clientData, clientMsg);
   }, (res, status, clientErrorString, clientMessage, clientData) => {
     logSendCE(res, status, clientErrorString, clientMessage, clientData);
@@ -234,7 +234,7 @@ exports.loginexists = function(req, res, next) {
     const accountTable = global.accountTable;
     logger.info('loginexists req.body=');
     try { logger.info(JSON.stringify(req.body)); } catch(e) { logger.error('stringify error'); }
-    const email = req.body.email;
+    const email = req.body.email.toLowerCase();
     logger.info('email='+email);
     connectionPool.query(`SELECT email FROM ${accountTable} WHERE email = ?`, [email], function (error, results, fields) {
       if (error) {
@@ -257,7 +257,7 @@ exports.resendVerificationEmail = function(req, res, next) {
   dbconnection.dbReady().then(connectionPool => {
     logger.info('resendVerificationEmail req.body='+req.body);
     logger.info(req.body);
-    const email = req.body.email;
+    const email = req.body.email.toLowerCase();
     logger.info('email='+email);
     connectionPool.query(`SELECT * FROM ${accountTable} WHERE email = ?`, [email], function (error, results, fields) {
       if (error) {
@@ -311,7 +311,7 @@ exports.sendResetPasswordEmail = function(req, res, next) {
   dbconnection.dbReady().then(connectionPool => {
     logger.info('sendResetPasswordEmail req.body='+req.body);
     logger.info(req.body);
-    const email = req.body.email;
+    const email = req.body.email.toLowerCase();
     logger.info('email='+email);
     connectionPool.query(`SELECT * FROM ${accountTable} WHERE email = ?`, [email], function (error, results, fields) {
       if (error) {

@@ -645,7 +645,6 @@ const ResetPassword = () => {
 
 const AccountClosed = () => {
   render(html`
-    <style>${css}</style>
     <div class=LoginSignup>
       <div class=LoginSignupTitle>
         Your account on EyeVocalize.com has been closed. We will miss you.

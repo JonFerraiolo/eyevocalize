@@ -86,7 +86,7 @@ function reconnect() {
             user: global.config.DB_USER,
             password: global.config.DB_PASSWORD,
             database: global.config.DB_DATABASE,
-            debug: global.config.DB_DEBUG === 'true' ? true : true ,
+            debug: global.config.DB_DEBUG || false,
           });
         } catch(e) {
           logger.error('mysql createPool  error');
