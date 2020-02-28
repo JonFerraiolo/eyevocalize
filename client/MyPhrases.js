@@ -1099,7 +1099,6 @@ function editMyPhrases(Section, parentElement, props) {
         </label>
       </span>
     `;
-    return '';
   };
   let localUpdate = () => {
     localMyPhrases.columns.forEach(column => {

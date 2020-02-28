@@ -9,7 +9,7 @@ import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } fro
 import { slideInAddFavoriteScreen } from './MyPhrases.js';
 
 let css = `
-.StashTitleIcon {
+.ClipboardTitleIcon {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -19,19 +19,19 @@ let css = `
   background-position: 0% 0%;
   background-repeat: no-repeat;
 }
-.editStash .skinnyScreenChild {
+.editClipboard .skinnyScreenChild {
   display: flex;
   flex-direction: column;
 }
-.editStash .ScreenInstructions {
+.editClipboard .ScreenInstructions {
   text-align: center;
   font-size: 90%;
 }
-.editStashPhraseRows {
+.editClipboardPhraseRows {
   flex: 1;
   overflow: auto;
 }
-.editStashNewMyPhrase {
+.editClipboardNewMyPhrase {
   display: inline-block;
   width: 1.4em;
   height: 1.4em;
@@ -45,56 +45,56 @@ let styleElement = document.createElement('style');
 styleElement.appendChild(document.createTextNode(css));
 document.head.appendChild(styleElement);
 
-let Stash;
+let Clipboard;
 
-export function initializeStash(props) {
+export function initializeClipboard(props) {
   let { currentVersion } = props;
-  let initialStash = { version: currentVersion, expanded: true, items: [] };
-  let StashString = localStorage.getItem("Stash");
+  let initialClipboard = { version: currentVersion, expanded: true, items: [] };
+  let ClipboardString = localStorage.getItem("Clipboard");
   try {
-    Stash = (typeof StashString === 'string') ? JSON.parse(StashString) : initialStash;
+    Clipboard = (typeof ClipboardString === 'string') ? JSON.parse(ClipboardString) : initialClipboard;
   } catch(e) {
-    Stash = initialStash;
+    Clipboard = initialClipboard;
   }
-  if (typeof Stash.version != 'number'|| Stash.version < currentVersion) {
-    Stash = initialStash;
+  if (typeof Clipboard.version != 'number'|| Clipboard.version < currentVersion) {
+    Clipboard = initialClipboard;
   }
 }
 
-// Add phrase to Stash without speaking
-export function addToStash(phrase) {
-  Stash.items.unshift(phrase);
-  localStorage.setItem("Stash", JSON.stringify(Stash));
+// Add phrase to Clipboard without speaking
+export function addToClipboard(phrase) {
+  Clipboard.items.unshift(phrase);
+  localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
 };
 
-function replaceStashEntry(index, phrase) {
-  Stash.items[index] = Object.assign({}, phrase);
-  localStorage.setItem("Stash", JSON.stringify(Stash));
+function replaceClipboardEntry(index, phrase) {
+  Clipboard.items[index] = Object.assign({}, phrase);
+  localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
 };
 
-function traverseItems(aStash, func) {
-  aStash.items.forEach((item, itIndex) => {
-    func(item, aStash, itIndex);
+function traverseItems(aClipboard, func) {
+  aClipboard.items.forEach((item, itIndex) => {
+    func(item, aClipboard, itIndex);
   });
 };
 
-// Add text to Stash without speaking
+// Add text to Clipboard without speaking
 export function stash(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	if (text.length > 0) {
 		TextEntryRowSetText('');
 		let phrase = { type: 'text', text, timestamp: Date.now() };
-    addToStash(phrase);
+    addToClipboard(phrase);
     updateMain();
 	}
 }
 
-function onStashChange() {
-  localStorage.setItem("Stash", JSON.stringify(Stash));
+function onClipboardChange() {
+  localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
 }
 
 
-function slideInAddEntryToStashScreen(props) {
+function slideInAddEntryToClipboardScreen(props) {
   props = props || {};
   let { phrase } = props;
   let params = {
@@ -103,8 +103,8 @@ function slideInAddEntryToStashScreen(props) {
       title: 'Add Entry to Clipboard',
       doItButtonLabel: 'Add Entry',
       doItCallback: function(phrase) {
-        // add phrase to Stash, go back to parent screen
-        addToStash(phrase);
+        // add phrase to Clipboard, go back to parent screen
+        addToClipboard(phrase);
         updateMain();
         secondLevelScreenHide();
       },
@@ -118,34 +118,34 @@ function slideInAddEntryToStashScreen(props) {
   secondLevelScreenShow(params);
 };
 
-export function updateStash(parentElement, props) {
+export function updateClipboard(parentElement, props) {
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
-    slideInAddEntryToStashScreen();
+    slideInAddEntryToClipboardScreen();
   };
   let onClickEdit = e => {
     e.preventDefault();
-    onEditStash();
+    onEditClipboard();
   };
-  let filteredStash = JSON.parse(JSON.stringify(Stash));  // deep clone
+  let filteredClipboard = JSON.parse(JSON.stringify(Clipboard));  // deep clone
   if (searchTokens.length > 0) {
-    filteredStash.items = filteredStash.items.filter(phrase => {
+    filteredClipboard.items = filteredClipboard.items.filter(phrase => {
       return searchTokens.some(token => {
         return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
                 (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
       });
     });
   }
-  let StashTitle = buildTitleWithCollapseExpandArrows(Stash, "Clipboard", "StashTitleIcon");
+  let ClipboardTitle = buildTitleWithCollapseExpandArrows(Clipboard, "Clipboard", "ClipboardTitleIcon");
   let localUpdate = () => {
     render(html`
       <div class=PhrasesSectionLabel>
-        ${StashTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
+        ${ClipboardTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
       </div>
-      ${filteredStash.expanded ?
-        html`<div class=StashContent>
-          ${filteredStash.items.map(phrase =>
+      ${filteredClipboard.expanded ?
+        html`<div class=ClipboardContent>
+          ${filteredClipboard.items.map(phrase =>
             html`
               <div class=PhraseRow>
                 <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
@@ -158,17 +158,17 @@ export function updateStash(parentElement, props) {
   localUpdate();
 }
 
-function onEditStash() {
+function onEditClipboard() {
   let renderFuncParams = { };
-  secondLevelScreenShow({ renderFunc: editStash, renderFuncParams });
+  secondLevelScreenShow({ renderFunc: editClipboard, renderFuncParams });
 }
 
-function onEditStashReturn() {
+function onEditClipboardReturn() {
   updateMain();
   secondLevelScreenHide();
 }
 
-export function editStash(parentElement, props) {
+export function editClipboard(parentElement, props) {
   let lastClickItemIndex = null;
   let onItemClick = e => {
     e.preventDefault();
@@ -183,17 +183,17 @@ export function editStash(parentElement, props) {
       lastClickItemIndex = phraseIndex;
     } else if (shift && !meta && !control && lastClickItemIndex != null) {
       // shift click is range selection
-      localStash.items.forEach(item => {
+      localClipboard.items.forEach(item => {
         item.selected = false;
       });
       let f = (lastClickItemIndex > phraseIndex) ? phraseIndex : lastClickItemIndex;
       let l = (lastClickItemIndex > phraseIndex) ? lastClickItemIndex : phraseIndex;
       for (let i=f; i<=l; i++) {
-        localStash.items[i].selected = true;
+        localClipboard.items[i].selected = true;
       }
     } else if (!control && !meta && (!shift || lastClickItemIndex === null)) {
       // simple click deselects everything else but the item getting the click
-      localStash.items.forEach(item => {
+      localClipboard.items.forEach(item => {
         item.selected = false;
       });
       phrase.selected = true;
@@ -203,7 +203,7 @@ export function editStash(parentElement, props) {
   };
   let onClickSelectAll = e => {
     e.preventDefault();
-    localStash.items.forEach(item => {
+    localClipboard.items.forEach(item => {
       item.selected = true;
     });
     localUpdate();
@@ -211,7 +211,7 @@ export function editStash(parentElement, props) {
   };
   let onClickDeselectAll = e => {
     e.preventDefault();
-    localStash.items.forEach(item => {
+    localClipboard.items.forEach(item => {
       item.selected = false;
     });
     localUpdate();
@@ -225,9 +225,9 @@ export function editStash(parentElement, props) {
         title: 'Add New Entry To Clipboard',
         doItButtonLabel: 'Add to Clipboard',
         doItCallback: function(phrase) {
-          // add phrase to Stash, go back to parent screen
-          addToStash(phrase);
-          localStash = JSON.parse(JSON.stringify(Stash));  // deep clone
+          // add phrase to Clipboard, go back to parent screen
+          addToClipboard(phrase);
+          localClipboard = JSON.parse(JSON.stringify(Clipboard));  // deep clone
           initializeSelection();
           localUpdate();
           thirdLevelScreenHide();
@@ -243,8 +243,8 @@ export function editStash(parentElement, props) {
   };
   let onClickEditItem = e => {
     e.preventDefault();
-    let index = localStash.items.findIndex(phrase => phrase.selected);
-    let phrase = Stash.items[index];
+    let index = localClipboard.items.findIndex(phrase => phrase.selected);
+    let phrase = Clipboard.items[index];
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
@@ -252,10 +252,10 @@ export function editStash(parentElement, props) {
         title: 'Edit Entry From Clipboard',
         doItButtonLabel: 'Update Entry',
         doItCallback: function(phrase) {
-          // add phrase to Stash, go back to parent screen
-          replaceStashEntry(index, phrase);
-          localStash = JSON.parse(JSON.stringify(Stash));  // deep clone
-          localStash.items[index].selected = true;
+          // add phrase to Clipboard, go back to parent screen
+          replaceClipboardEntry(index, phrase);
+          localClipboard = JSON.parse(JSON.stringify(Clipboard));  // deep clone
+          localClipboard.items[index].selected = true;
           localUpdate();
           thirdLevelScreenHide();
         },
@@ -269,118 +269,118 @@ export function editStash(parentElement, props) {
   };
   let onClickRemoveSelected = e => {
     e.preventDefault();
-    localStash.items = localStash.items.filter(item => !item.selected);
-    Stash = JSON.parse(JSON.stringify(localStash));  // deep clone
-    traverseItems(Stash, deleteTemporaryProperties);
-    onStashChange();
+    localClipboard.items = localClipboard.items.filter(item => !item.selected);
+    Clipboard = JSON.parse(JSON.stringify(localClipboard));  // deep clone
+    traverseItems(Clipboard, deleteTemporaryProperties);
+    onClipboardChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickAddToMyPhrases = e => {
     e.preventDefault();
-    let index = localStash.items.findIndex(phrase => phrase.selected);
-    let phrase = Stash.items[index];
+    let index = localClipboard.items.findIndex(phrase => phrase.selected);
+    let phrase = Clipboard.items[index];
     slideInAddFavoriteScreen({ slideInLevel: 'third', phrase });
   };
   let onClickMoveUp = e => {
     e.preventDefault();
-    for (let i=1, n=localStash.items.length; i<n; i++) {
-      let item = localStash.items[i];
-      if (item.selected && !localStash.items[i-1].selected) {
-        [ localStash.items[i-1], localStash.items[i] ] = [ localStash.items[i], localStash.items[i-1] ];  // swap
+    for (let i=1, n=localClipboard.items.length; i<n; i++) {
+      let item = localClipboard.items[i];
+      if (item.selected && !localClipboard.items[i-1].selected) {
+        [ localClipboard.items[i-1], localClipboard.items[i] ] = [ localClipboard.items[i], localClipboard.items[i-1] ];  // swap
       }
     }
-    Stash = JSON.parse(JSON.stringify(localStash));  // deep clone
-    traverseItems(Stash, deleteTemporaryProperties);
-    onStashChange();
+    Clipboard = JSON.parse(JSON.stringify(localClipboard));  // deep clone
+    traverseItems(Clipboard, deleteTemporaryProperties);
+    onClipboardChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickMoveDown = e => {
     e.preventDefault();
-    for (let n=localStash.items.length, i=n-2; i>=0; i--) {
-      let item = localStash.items[i];
-      if (item.selected && !localStash.items[i+1].selected) {
-        [ localStash.items[i+1], localStash.items[i] ] = [ localStash.items[i], localStash.items[i+1] ];  // swap
+    for (let n=localClipboard.items.length, i=n-2; i>=0; i--) {
+      let item = localClipboard.items[i];
+      if (item.selected && !localClipboard.items[i+1].selected) {
+        [ localClipboard.items[i+1], localClipboard.items[i] ] = [ localClipboard.items[i], localClipboard.items[i+1] ];  // swap
       }
     }
-    Stash = JSON.parse(JSON.stringify(localStash));  // deep clone
-    traverseItems(Stash, deleteTemporaryProperties);
-    onStashChange();
+    Clipboard = JSON.parse(JSON.stringify(localClipboard));  // deep clone
+    traverseItems(Clipboard, deleteTemporaryProperties);
+    onClipboardChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickMoveToTop = e => {
     e.preventDefault();
-    for (let n=localStash.items.length, toPosition=0, fromPosition=1; fromPosition<n; fromPosition++) {
-      let toItem = localStash.items[toPosition];
-      let fromItem = localStash.items[fromPosition];
+    for (let n=localClipboard.items.length, toPosition=0, fromPosition=1; fromPosition<n; fromPosition++) {
+      let toItem = localClipboard.items[toPosition];
+      let fromItem = localClipboard.items[fromPosition];
       if (fromItem.selected && !toItem.selected) {
-        localStash.items.splice(fromPosition, 1);
-        localStash.items.splice(toPosition, 0, fromItem);
+        localClipboard.items.splice(fromPosition, 1);
+        localClipboard.items.splice(toPosition, 0, fromItem);
       }
-      if (localStash.items[toPosition].selected) {
+      if (localClipboard.items[toPosition].selected) {
         toPosition++;
       }
     }
-    Stash = JSON.parse(JSON.stringify(localStash));  // deep clone
-    traverseItems(Stash, deleteTemporaryProperties);
-    onStashChange();
+    Clipboard = JSON.parse(JSON.stringify(localClipboard));  // deep clone
+    traverseItems(Clipboard, deleteTemporaryProperties);
+    onClipboardChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickMoveToBottom = e => {
     e.preventDefault();
-    for (let n=localStash.items.length, toPosition=n-1, fromPosition=n-2; fromPosition>=0; fromPosition--) {
-      let toItem = localStash.items[toPosition];
-      let fromItem = localStash.items[fromPosition];
+    for (let n=localClipboard.items.length, toPosition=n-1, fromPosition=n-2; fromPosition>=0; fromPosition--) {
+      let toItem = localClipboard.items[toPosition];
+      let fromItem = localClipboard.items[fromPosition];
       if (fromItem.selected && !toItem.selected) {
-        localStash.items.splice(fromPosition, 1);
-        localStash.items.splice(toPosition, 0, fromItem);
+        localClipboard.items.splice(fromPosition, 1);
+        localClipboard.items.splice(toPosition, 0, fromItem);
       }
-      if (localStash.items[toPosition].selected) {
+      if (localClipboard.items[toPosition].selected) {
         toPosition--;
       }
     }
-    Stash = JSON.parse(JSON.stringify(localStash));  // deep clone
-    traverseItems(Stash, deleteTemporaryProperties);
-    onStashChange();
+    Clipboard = JSON.parse(JSON.stringify(localClipboard));  // deep clone
+    traverseItems(Clipboard, deleteTemporaryProperties);
+    onClipboardChange();
     localUpdate();
     lastClickItemIndex = null;
 
   };
   let initializeSelection = () => {
-    localStash.items.forEach((item, index) => {
+    localClipboard.items.forEach((item, index) => {
       item.selected = false;
     });
     lastClickItemIndex = null;
   };
   let localUpdate = () => {
-    localStash.items.forEach(item => {
+    localClipboard.items.forEach(item => {
       item.cls = item.selected ? 'selected' : '';
       item.checkmark = item.selected ? html`<span class=checkmark>&#x2714;</span>` : '';
     });
-    let enableEditItem = localStash.items.reduce((accumulator, item) => {
+    let enableEditItem = localClipboard.items.reduce((accumulator, item) => {
       if (item.selected) {
         accumulator++;
       }
       return accumulator;
     }, 0) === 1;
     let enableAddToMyPhrases = enableEditItem;
-    let enableRemoveSelected = localStash.items.some(item => item.selected);
-    let enableMoveUp = localStash.items.some((item, index, arr) =>
+    let enableRemoveSelected = localClipboard.items.some(item => item.selected);
+    let enableMoveUp = localClipboard.items.some((item, index, arr) =>
       item.selected && (index > 0 && !arr[index-1].selected));
-    let enableMoveDown = localStash.items.some((item, index, arr) =>
+    let enableMoveDown = localClipboard.items.some((item, index, arr) =>
       item.selected && (index < arr.length-1 && !arr[index+1].selected));
     render(html`
-    <div class="Stash editStash skinnyScreenParent">
+    <div class="Clipboard editClipboard skinnyScreenParent">
       <div class=skinnyScreenChild>
-        ${buildSlideRightTitle("Manage Clipboard", onEditStashReturn)}
+        ${buildSlideRightTitle("Manage Clipboard", onEditClipboardReturn)}
         <div class=ScreenInstructions>
           (Click to select, control-click to toggle, shift-click for range)
         </div>
-        <div class=editStashPhraseRows>
-          ${localStash.items.map((phrase, index) => {
+        <div class=editClipboardPhraseRows>
+          ${localClipboard.items.map((phrase, index) => {
             return html`
               <div class=PhraseRow>
                 <button @click=${onItemClick} .phraseObject=${phrase} .phraseIndex=${index} class=${phrase.cls}>
@@ -403,7 +403,7 @@ export function editStash(parentElement, props) {
             title="Delete selected items">Delete</button>
           <button @click=${onClickAddToMyPhrases} ?disabled=${!enableAddToMyPhrases}
             title="Make selected item into a favorite">
-            <span class=editStashNewMyPhrase></span></button>
+            <span class=editClipboardNewMyPhrase></span></button>
           <button @click=${onClickMoveUp} ?disabled=${!enableMoveUp}
             title="Move selected items up one position">
             <span class=arrowButton>&#x1f851;</span></button>
@@ -420,7 +420,7 @@ export function editStash(parentElement, props) {
       </div>
     </div>`, parentElement);
   };
-  let localStash = JSON.parse(JSON.stringify(Stash));  // deep clone
+  let localClipboard = JSON.parse(JSON.stringify(Clipboard));  // deep clone
   initializeSelection();
   localUpdate();
 }

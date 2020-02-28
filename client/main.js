@@ -6,7 +6,7 @@ import { popupShowing } from './popup.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize, getSyncMyData } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
-import { initializeStash, stash, editStash } from './Stash.js';
+import { initializeClipboard, stash, editClipboard } from './Clipboard.js';
 import { initializeHistory, HistoryGetPending, HistorySync, playLastHistoryItem } from './History.js';
 import { initializeFavorites, editFavorites } from './MyPhrases.js';
 import { initializeBuiltins, editBuiltins } from './MyPhrases.js';
@@ -178,7 +178,7 @@ function main() {
   let currentVersion = 4;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
-  initializeStash(initializationProps);
+  initializeClipboard(initializationProps);
   initializeHistory(initializationProps);
 	initializeFavorites(initializationProps);
 	initializeBuiltins(initializationProps);
