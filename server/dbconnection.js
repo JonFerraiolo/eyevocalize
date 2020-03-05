@@ -132,6 +132,7 @@ exports.initialize = function() {
   // and to create tables if necessary.
   const accountTable = global.accountTable = global.config.DB_TABLE_PREFIX + 'account';
   const clientTable = global.clientTable = global.config.DB_TABLE_PREFIX + 'client';
+  const miscsyncdataTable = global.miscsyncdataTable = global.config.DB_TABLE_PREFIX + 'miscsyncdata';
   const historyTable = global.historyTable = global.config.DB_TABLE_PREFIX + 'history';
   const showTables = `show tables;`;
   const createAccount = `CREATE TABLE ${accountTable} (
@@ -155,6 +156,14 @@ exports.initialize = function() {
     email varchar(100) COLLATE utf8_unicode_ci NOT NULL,
     lastSync bigint unsigned NOT NULL,
     PRIMARY KEY (clientId),
+    INDEX(email(100))
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
+  const createMiscSyncData = `CREATE TABLE ${miscsyncdataTable} (
+    timestamp bigint unsigned UNIQUE NOT NULL,
+    email varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+    type varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+    data varchar(10000) COLLATE utf8_unicode_ci NOT NULL,
+    PRIMARY KEY (timestamp),
     INDEX(email(100))
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
   const createHistory = `CREATE TABLE ${historyTable} (
@@ -235,8 +244,9 @@ exports.initialize = function() {
     };
     let accountPromise = dropAndMakeTable(accountTable, createAccount);
     let clientPromise = dropAndMakeTable(clientTable, createClient);
+    let miscsyncdataPromise = dropAndMakeTable(miscsyncdataTable, createMiscSyncData);
     let historyPromise = dropAndMakeTable(historyTable, createHistory);
-    Promise.all([accountPromise, clientPromise, historyPromise]).then(values => {
+    Promise.all([accountPromise, clientPromise, miscsyncdataPromise, historyPromise]).then(values => {
       logger.info('dropAndMakeTables all promises resolved');
       dbInitialized = true;
     }, () => {

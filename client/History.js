@@ -1,6 +1,7 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
-import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows, playPhrase } from './Phrases.js';
+import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows, playPhrase,
+          PhrasesAddDelSync } from './Phrases.js';
 import { deleteTemporaryProperties } from './Phrases.js';
 import { getAutoDeleteHistory } from './Settings.js';
 import { EditPhrase } from './EditPhrase.js';
@@ -114,7 +115,7 @@ let autoDeleteOffset = {
 
 export function initializeHistory(props) {
   let { currentVersion } = props;
-  let initialHistory = { version: currentVersion, expanded: true, items: [] };
+  let initialHistory = { version: currentVersion, timestamp: Date.now(), expanded: true, items: [] };
   let HistoryString = localStorage.getItem("History");
   let AdditionsString = localStorage.getItem("HistoryPendingAdditions");
   let DeletionsString = localStorage.getItem("HistoryPendingDeletions");
@@ -134,66 +135,16 @@ export function initializeHistory(props) {
   }
 }
 
-export function HistoryGetPending() {
+export function HistoryGetPending(clientLastSync) {
   return { HistoryPendingAdditions, HistoryPendingDeletions };
 }
 
 export function HistorySync(thisSyncServerTimestamp, updates) {
   if (updates) {
-    let { deletions, additions } = updates;
-    if (!Array.isArray(deletions)) deletions = [];
-    if (!Array.isArray(additions)) additions = [];
-    let HistoryIndex = {};
-    History.items.forEach((item, i) => {
-      HistoryIndex[item.timestamp] = item.timestamp;
-    });
-    deletions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
-    additions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
-    HistoryPendingDeletions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
-    HistoryPendingAdditions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
-    let HistoryPendingDeletionsIndex = {};
-    HistoryPendingDeletions.forEach((item, i) => {
-      HistoryPendingDeletionsIndex[item.timestamp] = i;
-    });
-    let HistoryPendingAdditionsIndex = {};
-    HistoryPendingAdditions.forEach((item, i) => {
-      HistoryPendingAdditionsIndex[item.timestamp] = i;
-    });
-    additions.forEach((item) => {
-      if (typeof HistoryIndex[item.timestamp] !== 'number') {
-        try {
-          History.items.unshift(item);
-          HistoryIndex[item.timestamp] = item.timestamp;
-        } catch(e) {
-          console.error('exception in HistorySync. e='+e);
-        }
-      }
-    });
-    let DeletionsIndex = {};
-    deletions.forEach(item => {
-      DeletionsIndex[item.timestamp] = item;
-    });
-    for (let i = History.items.length-1; i>=0; i--) {
-      let phrase = History.items[i];
-      if (DeletionsIndex[phrase.timestamp]) {
-        History.items.splice(i, 1);
-      }
-    }
-    History.items.sort((a, b) => b.timestamp - a.timestamp); // most recent first
-    for (let i = deletions.length-1; i>=0; i--) {
-      let phrase = deletions[i];
-      let index = HistoryPendingDeletionsIndex[phrase.timestamp];
-      if (typeof index === 'number') {
-        HistoryPendingDeletions.splice(index, 1);
-      }
-    }
-    for (let i = additions.length-1; i>=0; i--) {
-      let phrase = additions[i];
-      let index = HistoryPendingAdditionsIndex[phrase.timestamp];
-      if (typeof index === 'number') {
-        HistoryPendingAdditions.splice(index, 1);
-      }
-    }
+    let retObj = PhrasesAddDelSync(thisSyncServerTimestamp, updates, History, HistoryPendingDeletions, HistoryPendingAdditions);
+    History = retObj.Phrases;
+    HistoryPendingDeletions = retObj.PhrasesPendingDeletions;
+    HistoryPendingAdditions = retObj.PhrasesPendingAdditions;
     updateLocalStorage();
     let event = new CustomEvent("ServerInitiatedSyncHistory", { detail: null } );
     window.dispatchEvent(event);
@@ -206,6 +157,7 @@ function updateStorage()  {
 }
 
 function updateLocalStorage() {
+  History.timestamp = Date.now();
   localStorage.setItem("History", JSON.stringify(History));
   localStorage.setItem("HistoryPendingAdditions", JSON.stringify(HistoryPendingAdditions));
   localStorage.setItem("HistoryPendingDeletions", JSON.stringify(HistoryPendingDeletions));

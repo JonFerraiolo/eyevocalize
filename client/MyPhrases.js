@@ -361,7 +361,7 @@ export function initializeFavorites(props) {
       ]},
     ]
   };
-  HiddenBuiltins = [];
+  HiddenBuiltins = { version: currentVersion, timestamp: Date.now(), items: [], };
 };
 
 export function initializeBuiltins(props) {
@@ -412,7 +412,7 @@ export function initializeBuiltins(props) {
 
 // transfer hidden flags HiddenBuiltins to from the given MyPhrases data structure
 function transferHiddenTo(aMyPhrases) {
-  HiddenBuiltins.forEach(item => {
+  HiddenBuiltins.items.forEach(item => {
     let tokens = item.split('_');
     if (tokens.length  < 2) return;
     let [ col, cat, itm ] = tokens;
@@ -433,15 +433,15 @@ function transferHiddenTo(aMyPhrases) {
 
 // transfer hidden flags from the given MyPhrases data structure to HiddenBuiltins
 function transferHiddenFrom(aMyPhrases) {
-  HiddenBuiltins = [];
+  HiddenBuiltins.items = [];
   aMyPhrases.columns.forEach((column, colIndex) => {
     column.categories.forEach((category, catIndex) => {
       if (category.hidden) {
-        HiddenBuiltins.push(colIndex+'_'+category.label);
+        HiddenBuiltins.items.push(colIndex+'_'+category.label);
       }
       category.items.forEach((item, itIndex) => {
         if (item.hidden) {
-          HiddenBuiltins.push(colIndex+'_'+category.label+'_'+item.label);
+          HiddenBuiltins.items.push(colIndex+'_'+category.label+'_'+item.label);
         }
       });
     });
@@ -483,10 +483,12 @@ function traverseColumnsCategoriesItems(aMyPhrases, func) {
 }
 
 function onFavoritesChange() {
+  Favorites.timestamp = Date.now();
   // FIXME localStorage.setItem("Favorites", JSON.stringify(Favorites));
 };
 
 function onBuiltinsChange() {
+  HiddenBuiltins.timestamp = Date.now();
   // FIXME localStorage.setItem("HiddenBuiltins", JSON.stringify(HiddenBuiltins));
 };
 

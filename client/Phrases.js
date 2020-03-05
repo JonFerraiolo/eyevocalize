@@ -211,3 +211,63 @@ export function updatePhrases(parentElement, props) {
   updateFavorites(document.getElementById('FavoritesContainer'), MyPhrasesProps);
   updateBuiltins(document.getElementById('BuiltinsContainer'), MyPhrasesProps);
 }
+
+export function PhrasesAddDelSync(thisSyncServerTimestamp, updates, Phrases, PhrasesPendingDeletions, PhrasesPendingAdditions) {
+  if (updates) {
+    let { deletions, additions } = updates;
+    if (!Array.isArray(deletions)) deletions = [];
+    if (!Array.isArray(additions)) additions = [];
+    let PhrasesIndex = {};
+    Phrases.items.forEach((item, i) => {
+      PhrasesIndex[item.timestamp] = item.timestamp;
+    });
+    deletions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
+    additions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
+    PhrasesPendingDeletions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
+    PhrasesPendingAdditions.sort((a, b) => a.timestamp - b.timestamp); // most recent last
+    let PhrasesPendingDeletionsIndex = {};
+    PhrasesPendingDeletions.forEach((item, i) => {
+      PhrasesPendingDeletionsIndex[item.timestamp] = i;
+    });
+    let PhrasesPendingAdditionsIndex = {};
+    PhrasesPendingAdditions.forEach((item, i) => {
+      PhrasesPendingAdditionsIndex[item.timestamp] = i;
+    });
+    additions.forEach((item) => {
+      if (typeof PhrasesIndex[item.timestamp] !== 'number') {
+        try {
+          Phrases.items.unshift(item);
+          PhrasesIndex[item.timestamp] = item.timestamp;
+        } catch(e) {
+          console.error('exception in PhrasesAddDelSync. e='+e);
+        }
+      }
+    });
+    let DeletionsIndex = {};
+    deletions.forEach(item => {
+      DeletionsIndex[item.timestamp] = item;
+    });
+    for (let i = Phrases.items.length-1; i>=0; i--) {
+      let phrase = Phrases.items[i];
+      if (DeletionsIndex[phrase.timestamp]) {
+        Phrases.items.splice(i, 1);
+      }
+    }
+    Phrases.items.sort((a, b) => b.timestamp - a.timestamp); // most recent first
+    for (let i = deletions.length-1; i>=0; i--) {
+      let phrase = deletions[i];
+      let index = PhrasesPendingDeletionsIndex[phrase.timestamp];
+      if (typeof index === 'number') {
+        PhrasesPendingDeletions.splice(index, 1);
+      }
+    }
+    for (let i = additions.length-1; i>=0; i--) {
+      let phrase = additions[i];
+      let index = PhrasesPendingAdditionsIndex[phrase.timestamp];
+      if (typeof index === 'number') {
+        PhrasesPendingAdditions.splice(index, 1);
+      }
+    }
+  }
+  return { Phrases, PhrasesPendingDeletions, PhrasesPendingAdditions };
+}

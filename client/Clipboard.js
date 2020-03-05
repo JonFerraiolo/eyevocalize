@@ -3,7 +3,7 @@ import { html, render } from './lib/lit-html/lit-html.js';
 import { TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { deleteTemporaryProperties } from './Phrases.js';
 import { EditPhrase } from './EditPhrase.js';
-import { updateMain, buildSlideRightTitle,
+import { updateMain, sync, buildSlideRightTitle,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } from './Phrases.js';
 import { slideInAddFavoriteScreen } from './MyPhrases.js';
@@ -49,7 +49,7 @@ let Clipboard;
 
 export function initializeClipboard(props) {
   let { currentVersion } = props;
-  let initialClipboard = { version: currentVersion, expanded: true, items: [] };
+  let initialClipboard = { version: currentVersion, timestamp: Date.now(), expanded: true, items: [] };
   let ClipboardString = localStorage.getItem("Clipboard");
   try {
     Clipboard = (typeof ClipboardString === 'string') ? JSON.parse(ClipboardString) : initialClipboard;
@@ -61,15 +61,38 @@ export function initializeClipboard(props) {
   }
 }
 
+export function ClipboardGetPending(clientLastSync) {
+  return Clipboard.timestamp > clientLastSync ? Clipboard : null;
+}
+
+export function ClipboardSync(thisSyncServerTimestamp, newData) {
+  if (typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Clipboard.timestamp) {
+    Clipboard = newData;
+    updateLocalStorage();
+    let event = new CustomEvent("ServerInitiatedSyncClipboard", { detail: null } );
+    window.dispatchEvent(event);
+  }
+}
+
+function updateStorage()  {
+  updateLocalStorage();
+  sync();
+}
+
+function updateLocalStorage() {
+  Clipboard.timestamp = Date.now();
+  localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
+}
+
 // Add phrase to Clipboard without speaking
 export function addToClipboard(phrase) {
   Clipboard.items.unshift(phrase);
-  localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
+  updateStorage();
 };
 
 function replaceClipboardEntry(index, phrase) {
   Clipboard.items[index] = Object.assign({}, phrase);
-  localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
+  updateStorage();
 };
 
 function traverseItems(aClipboard, func) {
@@ -79,7 +102,7 @@ function traverseItems(aClipboard, func) {
 };
 
 // Add text to Clipboard without speaking
-export function stash(text) {
+export function AddTextToClipboard(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	if (text.length > 0) {
 		TextEntryRowSetText('');
@@ -90,7 +113,7 @@ export function stash(text) {
 }
 
 function onClipboardChange() {
-  localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
+  updateStorage();
 }
 
 
@@ -118,7 +141,16 @@ function slideInAddEntryToClipboardScreen(props) {
   secondLevelScreenShow(params);
 };
 
+let updateClipboardFirstTime = true;
+
 export function updateClipboard(parentElement, props) {
+  if (updateClipboardFirstTime) {
+    updateClipboardFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncClipboard', function(e) {
+      console.log('updateClipboard ServerInitiatedSyncClipboard custom event listener entered ');
+      localUpdate();
+    });
+  }
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
@@ -128,17 +160,17 @@ export function updateClipboard(parentElement, props) {
     e.preventDefault();
     onEditClipboard();
   };
-  let filteredClipboard = JSON.parse(JSON.stringify(Clipboard));  // deep clone
-  if (searchTokens.length > 0) {
-    filteredClipboard.items = filteredClipboard.items.filter(phrase => {
-      return searchTokens.some(token => {
-        return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
-                (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
-      });
-    });
-  }
   let ClipboardTitle = buildTitleWithCollapseExpandArrows(Clipboard, "Clipboard", "ClipboardTitleIcon");
   let localUpdate = () => {
+    let filteredClipboard = JSON.parse(JSON.stringify(Clipboard));  // deep clone
+    if (searchTokens.length > 0) {
+      filteredClipboard.items = filteredClipboard.items.filter(phrase => {
+        return searchTokens.some(token => {
+          return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
+                  (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
+        });
+      });
+    }
     render(html`
       <div class=PhrasesSectionLabel>
         ${ClipboardTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
@@ -158,17 +190,41 @@ export function updateClipboard(parentElement, props) {
   localUpdate();
 }
 
+let editClipboardActive = false;
+
 function onEditClipboard() {
+  editClipboardActive = true;
   let renderFuncParams = { };
   secondLevelScreenShow({ renderFunc: editClipboard, renderFuncParams });
 }
 
 function onEditClipboardReturn() {
+  editClipboardActive = true;
   updateMain();
   secondLevelScreenHide();
 }
 
+let editClipboardFirstTime = true;
+
 export function editClipboard(parentElement, props) {
+  let externalEvent = () => {
+    if (editClipboardActive && parentElement) {
+      let ClipboardContent = parentElement.querySelector('.ClipboardContent');
+      if (ClipboardContent) {
+        initializeSelection();
+        localUpdate();
+      }
+    }
+  };
+  if (editClipboardFirstTime) {
+    editClipboardFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncClipboard', function(e) {
+      if (editClipboardActive) {
+        console.log('editClipboard ServerInitiatedSyncClipboard custom event listener entered ');
+        externalEvent();
+      }
+    });
+  }
   let lastClickItemIndex = null;
   let onItemClick = e => {
     e.preventDefault();

@@ -19,7 +19,7 @@ server does not send email
   email and checksum ls
   socket connection
   clientId to server
-  resolve socket promise 
+  resolve socket promise
   autologin if necessary
 
 what about history, etc for multiple emails?
@@ -133,7 +133,7 @@ new ideas
   each new phrase saved forever, at least for now
   each phrase gets an int index auto increment
   each built in only saved once in database
-  each revision of history, stash, favorites has new phrases plus updated arrays with array of integers, which are phrase ids
+  each revision of history, AddTextToClipboard, favorites has new phrases plus updated arrays with array of integers, which are phrase ids
   Change the data structures on the client to match the server
   Have server APIs that match client local storage options, such as addToHistory
 
@@ -177,7 +177,7 @@ localStorage
 history, last sync timestamp, deleted timestamp, entries after last server sync removed only by auto delete
 client maintains an associative array of all deletions
 
-stash, full list with timestamp back to last server sync
+AddTextToClipboard, full list with timestamp back to last server sync
 favorites, full list, saved history back to last server sync
 settings, same
 need to figure out built in favorites!!!

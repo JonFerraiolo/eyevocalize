@@ -6,7 +6,7 @@ import { popupShowing } from './popup.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize, getSyncMyData } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
-import { initializeClipboard, stash, editClipboard } from './Clipboard.js';
+import { initializeClipboard, ClipboardGetPending, ClipboardSync, AddTextToClipboard, editClipboard } from './Clipboard.js';
 import { initializeHistory, HistoryGetPending, HistorySync, playLastHistoryItem } from './History.js';
 import { initializeFavorites, editFavorites } from './MyPhrases.js';
 import { initializeBuiltins, editBuiltins } from './MyPhrases.js';
@@ -256,14 +256,15 @@ function main() {
 			});
 			socket.on('reconnect', msg => {
 				console.log ('socket.io reconnect. msg='+msg);
-				let o = { clientId: window.eyevocalizeClientId, lastSync: window.eyevocalizeLastSync };
+				sync();
 			});
 			socket.on('ServerInitiatedSync', (serverSyncDataJson, fn) => {
 				console.log('ServerInitiatedSync serverSyncDataJson='+serverSyncDataJson);
 				try {
 					let serverSyncData = JSON.parse(serverSyncDataJson);
 					let { thisSyncServerTimestamp, updates } = serverSyncData;
-					HistorySync(thisSyncServerTimestamp, updates.History);
+					ClipboardSync(thisSyncServerTimestamp, updates && updates.Clipboard);
+					HistorySync(thisSyncServerTimestamp, updates && updates.History);
 					window.eyevocalizeLastSync = Date.now();
 					localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
 				} catch(e) {
@@ -275,6 +276,7 @@ function main() {
 					}
 				}
 			});
+			sync();
 		} catch(e) {
 			console.error('socket.io initialization failed. ');
 		}
@@ -305,7 +307,7 @@ function main() {
         // just pass through to default processing, which will add a newline
       } else if (!shift && (control || meta)) {
         e.preventDefault();
-        stash();
+        AddTextToClipboard();
       } else {
         e.preventDefault();
         speak();
@@ -338,13 +340,15 @@ function main() {
 };
 
 export function sync() {
+	let lastSync = window.eyevocalizeLastSync;
 	let syncData = {
 		email: window.eyevocalizeUserEmail,
 		clientId: window.eyevocalizeClientId,
-		lastSync: window.eyevocalizeLastSync,
+		lastSync,
 		thisSyncClientTimestamp: Date.now(),
 		updates: {
-			History: HistoryGetPending()
+			Clipboard: ClipboardGetPending(lastSync),
+			History: HistoryGetPending(lastSync),
 		}
 	};
 	console.log('sync entered. syncData=');
@@ -353,7 +357,7 @@ export function sync() {
 		console.log('socket.connected=');
 		console.dir(socket.connected);
 	}
-	if (socket && socket.connected && window.eyevocalizeUserEmail && getSyncMyData()) {
+	if (socket /*&& socket.connected*/ && window.eyevocalizeUserEmail && getSyncMyData()) {
 		socket.emit('ClientInitiatedSync', JSON.stringify(syncData), msg => {
 			console.log('server says: '+msg);
 		});

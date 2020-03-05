@@ -1,6 +1,6 @@
 
 import { speak } from './vocalize.js';
-import { stash } from './Clipboard.js';
+import { AddTextToClipboard } from './Clipboard.js';
 import { slideInAddFavoriteScreen } from './MyPhrases.js';
 import { search, clear, getAppMinOrMax, setAppMinOrMax } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
@@ -145,7 +145,7 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onClipboard = e => {
     e.preventDefault();
-    stash(document.getElementById('TextEntryRowTextArea').value);
+    AddTextToClipboard(document.getElementById('TextEntryRowTextArea').value);
     TextEntryRowSetFocus();
   }
   let onClear = e => {
@@ -209,7 +209,7 @@ export function updateTextEntryRow(parentElement, props) {
           ><button class="TextEntryIcon TextEntryClipboard" @click=${onClipboard}
             title='Save these words in the "Clipboard", the storage area for things you might need to say soon'></button
           ><button class="TextEntryIcon TextEntrySearch" @click=${search}
-            title='Filter the stash, the history and your favorites using the search words typed into the text entry box'></button
+            title='Filter the clipboard, the history and your favorites using the search words typed into the text entry box'></button
         ></span
         ><span class=TextEntryIconBlock
           ><button class="TextEntryIcon TextEntryMinOrMax ${MinOrMax}" @click=${onMinOrMax}

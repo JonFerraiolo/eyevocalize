@@ -157,7 +157,7 @@ export function initializeSettings(props) {
 };
 
 let updateLocalStorage = () => {
-  let Settings = { version: currentVersion, section,
+  let Settings = { version: currentVersion, timestamp: Date.now(), section,
     voiceName, volume, rate, pitch, sampleText,
     appFontSize, minScreenPercent, autoDeleteHistory, syncMyData, okUseMyData };
   localStorage.setItem("Settings", JSON.stringify(Settings));
