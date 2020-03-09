@@ -1,6 +1,6 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
-import { buildSlideRightTitle, secondLevelScreenShow, secondLevelScreenHide, updateMain, isChrome } from './main.js';
+import { buildSlideRightTitle, secondLevelScreenShow, secondLevelScreenHide, updateMain, sync, isChrome } from './main.js';
 import { speak } from './vocalize.js';
 import { showCloseAccountPopup } from './account.js';
 import { combobox } from './combobox.js';
@@ -128,11 +128,13 @@ let pitchCombo = new combobox();
 let appFontSizeCombo = new combobox();
 let minScreenPercentCombo = new combobox();
 
-export function initializeSettings(props) {
-  currentVersion = props.currentVersion;
-  voices = window.evc_voices;  // set in startupChecks
-  let initialSettings = { voiceName, volume, rate, pitch, sampleText, appFontSize,
+let getInitialSettings = () => {
+  return { timestamp: 0, voiceName, volume, rate, pitch, sampleText, appFontSize,
     minScreenPercent, autoDeleteHistory, syncMyData, okUseMyData };
+}
+
+let getSettings = () => {
+  let initialSettings = getInitialSettings();
   let Settings;
   let SettingsString = localStorage.getItem("Settings");
   try {
@@ -140,9 +142,10 @@ export function initializeSettings(props) {
   } catch(e) {
     Settings = initialSettings;
   }
-  if (typeof Settings.version != 'number'|| Settings.version < currentVersion) {
-    Settings = initialSettings;
-  }
+  return Settings;
+}
+
+let setSettings = Settings => {
   section = Settings.section || 'Voice';
   voiceName = Settings.voiceName;
   volume = Settings.volume;
@@ -154,12 +157,42 @@ export function initializeSettings(props) {
   autoDeleteHistory = Settings.autoDeleteHistory;
   syncMyData = Settings.syncMyData;
   okUseMyData = Settings.okUseMyData;
+}
+
+export function initializeSettings(props) {
+  voices = window.evc_voices;  // set in startupChecks
+  let Settings = getSettings();
+  setSettings(Settings);
+  localStorage.setItem("Settings", JSON.stringify(Settings));
 };
 
-let updateLocalStorage = () => {
-  let Settings = { version: currentVersion, timestamp: Date.now(), section,
-    voiceName, volume, rate, pitch, sampleText,
-    appFontSize, minScreenPercent, autoDeleteHistory, syncMyData, okUseMyData };
+export function SettingsGetPending(clientLastSync) {
+  let Settings = getSettings();
+  let { timestamp, voiceName, volume, rate, pitch, sampleText, autoDeleteHistory, syncMyData, okUseMyData } = Settings;
+  let o = { timestamp, voiceName, volume, rate, pitch, sampleText, autoDeleteHistory, syncMyData, okUseMyData };
+  return timestamp > clientLastSync ? o : null;
+}
+
+export function SettingsSync(thisSyncServerTimestamp, newData) {
+  let Settings = getSettings();
+  if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Settings.timestamp) {
+    console.log('SettingsSync. newData.timestamp='+newData.timestamp+', Settings.timestamp='+Settings.timestamp);
+    Settings = Object.assign({}, Settings, newData);
+    setSettings(Settings);
+    updateLocalStorage({ timestamp: newData.timestamp });
+    let event = new CustomEvent("ServerInitiatedSyncSettings", { detail: null } );
+    window.dispatchEvent(event);
+  }
+}
+
+function updateStorage()  {
+  updateLocalStorage({ timestamp: Date.now() });
+  sync();
+}
+
+let updateLocalStorage = overrides => {
+  let Settings = getSettings();
+  Settings = Object.assign({}, Settings, overrides || {});
   localStorage.setItem("Settings", JSON.stringify(Settings));
 };
 
@@ -183,7 +216,7 @@ export function editSettings(parentElement, params) {
   let { initialSection } = params;
   if (initialSection) {
     section = initialSection;
-    updateLocalStorage();
+    updateStorage();
   }
   if (isChrome()) pitch = 1;  // chrome freezes voice synthesis if you speak with pitch! =1
   let buildSectionRadioButton = (id, value, label) => {
@@ -201,7 +234,7 @@ export function editSettings(parentElement, params) {
     e.preventDefault();
     section = e.currentTarget.SectionName;
     localUpdate();
-    updateLocalStorage();
+    updateStorage();
   };
   let onChangeVoice = e => {
     e.preventDefault();
@@ -210,30 +243,30 @@ export function editSettings(parentElement, params) {
     voice = voices[voiceIndex];
     voiceName = voice.name;
     localUpdate();
-    updateLocalStorage();
+    updateStorage();
   };
   let onChangeVolume = newValue => {
     volume = parseFloat(newValue);
     if (volume === NaN) volume = defaultVolume;
     localUpdate();
-    updateLocalStorage();
+    updateStorage();
   };
   let onChangeRate = newValue => {
     rate = parseFloat(newValue);
     if (rate === NaN) rate = defaultRate;
     localUpdate();
-    updateLocalStorage();
+    updateStorage();
   };
   let onChangePitch = newValue => {
     pitch = parseFloat(newValue);
     if (pitch === NaN) pitch = defaultPitch;
     localUpdate();
-    updateLocalStorage();
+    updateStorage();
   };
   let onInputSampleText = e => {
     e.preventDefault();
     sampleText = document.getElementById('SettingsVoiceSampleText').value;
-    updateLocalStorage();
+    updateStorage();
   };
   let onTest = e => {
     e.preventDefault();
@@ -245,14 +278,14 @@ export function editSettings(parentElement, params) {
     if (appFontSize === NaN) appFontSize = defaultFontSize;
     localUpdate();
     updateMain();
-    updateLocalStorage();
+    updateStorage();
   };
   let onChangeMinScreenPercent = newValue => {
     let v = parseFloat(newValue);
     if (v === NaN || v < minScreenPercentMin || v > minScreenPercentMax) return;
     minScreenPercent = v;
     updateMain();
-    updateLocalStorage();
+    updateStorage();
   };
   let onChangeAutoDeleteHistory = e => {
     e.preventDefault();
@@ -261,19 +294,19 @@ export function editSettings(parentElement, params) {
     autoDeleteHistory = autoDeleteHistoryOptions[autoDeleteHistoryIndex].value;
     localUpdate();
     updateMain();
-    updateLocalStorage();
+    updateStorage();
   };
   let onChangeSyncData = e => {
     e.preventDefault();
     syncMyData = e.target.checked;
     updateMain();
-    updateLocalStorage();
+    updateStorage();
   };
   let onChangeOKUseMyData = e => {
     e.preventDefault();
     okUseMyData = e.target.checked;
     updateMain();
-    updateLocalStorage();
+    updateStorage();
   };
   let onClickCloseAccount = e => {
     e.preventDefault();
@@ -298,7 +331,7 @@ export function editSettings(parentElement, params) {
     }
     localUpdate();
     updateMain();
-    updateLocalStorage();
+    updateStorage();
   };
   let voiceOptionElements = html`${
     voices.map(

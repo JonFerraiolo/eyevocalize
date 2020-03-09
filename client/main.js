@@ -4,12 +4,12 @@ import { startupChecks } from './startupChecks.js';
 import { helpShowing } from './help.js';
 import { popupShowing } from './popup.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
-import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize, getSyncMyData } from './Settings.js';
+import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize, getSyncMyData, SettingsGetPending, SettingsSync } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
 import { initializeClipboard, ClipboardGetPending, ClipboardSync, AddTextToClipboard, editClipboard } from './Clipboard.js';
 import { initializeHistory, HistoryGetPending, HistorySync, playLastHistoryItem } from './History.js';
-import { initializeFavorites, editFavorites } from './MyPhrases.js';
-import { initializeBuiltins, editBuiltins } from './MyPhrases.js';
+import { initializeFavorites, FavoritesGetPending, FavoritesSync,  editFavorites } from './MyPhrases.js';
+import { initializeBuiltins, HiddenBuiltinsGetPending, HiddenBuiltinsSync, editBuiltins } from './MyPhrases.js';
 import { fromRight, fromLeft } from './animSlide.js';
 import { speak, playAudio } from './vocalize.js';
 import { html, render } from './lib/lit-html/lit-html.js';
@@ -265,6 +265,9 @@ function main() {
 					let { thisSyncServerTimestamp, updates } = serverSyncData;
 					ClipboardSync(thisSyncServerTimestamp, updates && updates.Clipboard);
 					HistorySync(thisSyncServerTimestamp, updates && updates.History);
+					FavoritesSync(thisSyncServerTimestamp, updates && updates.Favorites);
+					HiddenBuiltinsSync(thisSyncServerTimestamp, updates && updates.HiddenBuiltins);
+					SettingsSync(thisSyncServerTimestamp, updates && updates.Settings);
 					window.eyevocalizeLastSync = Date.now();
 					localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
 				} catch(e) {
@@ -349,6 +352,9 @@ export function sync() {
 		updates: {
 			Clipboard: ClipboardGetPending(lastSync),
 			History: HistoryGetPending(lastSync),
+			Favorites: FavoritesGetPending(lastSync),
+			HiddenBuiltins: HiddenBuiltinsGetPending(lastSync),
+			Settings: SettingsGetPending(lastSync),
 		}
 	};
 	console.log('sync entered. syncData=');

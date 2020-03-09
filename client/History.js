@@ -115,7 +115,7 @@ let autoDeleteOffset = {
 
 export function initializeHistory(props) {
   let { currentVersion } = props;
-  let initialHistory = { version: currentVersion, timestamp: Date.now(), expanded: true, items: [] };
+  let initialHistory = { version: currentVersion, timestamp: 0, expanded: true, items: [] };
   let HistoryString = localStorage.getItem("History");
   let AdditionsString = localStorage.getItem("HistoryPendingAdditions");
   let DeletionsString = localStorage.getItem("HistoryPendingDeletions");
@@ -133,6 +133,9 @@ export function initializeHistory(props) {
     HistoryPendingAdditions = [];
     HistoryPendingDeletions = [];
   }
+  localStorage.setItem("History", JSON.stringify(History));
+  localStorage.setItem("HistoryPendingAdditions", JSON.stringify(HistoryPendingAdditions));
+  localStorage.setItem("HistoryPendingDeletions", JSON.stringify(HistoryPendingDeletions));
 }
 
 export function HistoryGetPending(clientLastSync) {

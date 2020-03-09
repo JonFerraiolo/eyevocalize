@@ -49,7 +49,7 @@ let Clipboard;
 
 export function initializeClipboard(props) {
   let { currentVersion } = props;
-  let initialClipboard = { version: currentVersion, timestamp: Date.now(), expanded: true, items: [] };
+  let initialClipboard = { version: currentVersion, timestamp: 0, expanded: true, items: [] };
   let ClipboardString = localStorage.getItem("Clipboard");
   try {
     Clipboard = (typeof ClipboardString === 'string') ? JSON.parse(ClipboardString) : initialClipboard;
@@ -59,6 +59,7 @@ export function initializeClipboard(props) {
   if (typeof Clipboard.version != 'number'|| Clipboard.version < currentVersion) {
     Clipboard = initialClipboard;
   }
+  localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
 }
 
 export function ClipboardGetPending(clientLastSync) {
@@ -66,9 +67,9 @@ export function ClipboardGetPending(clientLastSync) {
 }
 
 export function ClipboardSync(thisSyncServerTimestamp, newData) {
-  if (typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Clipboard.timestamp) {
+  if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Clipboard.timestamp) {
     Clipboard = newData;
-    updateLocalStorage();
+    updateLocalStorage({ timestamp: newData.timestamp });
     let event = new CustomEvent("ServerInitiatedSyncClipboard", { detail: null } );
     window.dispatchEvent(event);
   }
@@ -79,8 +80,9 @@ function updateStorage()  {
   sync();
 }
 
-function updateLocalStorage() {
+function updateLocalStorage(overrides) {
   Clipboard.timestamp = Date.now();
+  Clipboard = Object.assign({}, Clipboard, overrides || {});
   localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
 }
 
@@ -207,21 +209,16 @@ function onEditClipboardReturn() {
 let editClipboardFirstTime = true;
 
 export function editClipboard(parentElement, props) {
-  let externalEvent = () => {
-    if (editClipboardActive && parentElement) {
-      let ClipboardContent = parentElement.querySelector('.ClipboardContent');
-      if (ClipboardContent) {
-        initializeSelection();
-        localUpdate();
-      }
-    }
-  };
   if (editClipboardFirstTime) {
     editClipboardFirstTime = false;
     window.addEventListener('ServerInitiatedSyncClipboard', function(e) {
-      if (editClipboardActive) {
+      if (editClipboardActive && parentElement) {
         console.log('editClipboard ServerInitiatedSyncClipboard custom event listener entered ');
-        externalEvent();
+        let ClipboardContent = parentElement.querySelector('.ClipboardContent');
+        if (ClipboardContent) {
+          initializeSelection();
+          localUpdate();
+        }
       }
     });
   }

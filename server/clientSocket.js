@@ -70,7 +70,13 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
     clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Clipboard);
   let HistoryPromise = syncHistory(email, connectionsByEmail[email], minLastSyncConnected,
     thisSyncClientTimestamp, thisSyncServerTimestamp, clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.History);
-  Promise.all([ClipboardPromise, HistoryPromise]).then(values => {
+  let FavoritesPromise = syncMiscDataSync(email, 'Favorites', connectionsByEmail[email],
+    clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Favorites);
+  let HiddenBuiltinsPromise = syncMiscDataSync(email, 'HiddenBuiltins', connectionsByEmail[email],
+    clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.HiddenBuiltins);
+  let SettingsPromise = syncMiscDataSync(email, 'Settings', connectionsByEmail[email],
+    clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Settings);
+  Promise.all([ClipboardPromise, HistoryPromise, FavoritesPromise, HiddenBuiltinsPromise, SettingsPromise]).then(values => {
     updateClients(socket, email, thisSyncServerTimestamp, values, fn);
   }, () => {
     logger.error('updateTopicTables Promise.all topic promises rejected');
@@ -91,6 +97,9 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
   logger.info('updateClients values='+JSON.stringify(values));
   let returnClipboard = values[0];
   let returnHistory = values[1];
+  let returnFavorites = values[2];
+  let returnHiddenBuiltins = values[3];
+  let returnSettings = values[4];
   let clientPromises = [];
   logger.info('updateClients before for in ');
   for (let clientId in connectionsByEmail[email]) {
@@ -109,6 +118,9 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
           updates: {
             Clipboard: returnClipboard[clientId] || null,
             History: returnHistory[clientId] || null,
+            Favorites: returnFavorites[clientId] || null,
+            HiddenBuiltins: returnHiddenBuiltins[clientId] || null,
+            Settings: returnSettings[clientId] || null,
           }
         });
         logger.info('updateClients before emit serverInitiatedSyncDataJson='+serverInitiatedSyncDataJson);
@@ -211,13 +223,7 @@ let syncMiscDataSync = (email, type, connectedClients, clientInitiatedSyncData) 
               if (currentRows.length === 1) {
                 let dbRecord = currentRows[0];
                 if (clientInitiatedSyncData === null || dbRecord.timestamp >= timestamp) {
-                  try {
-                    let o = { email, type, timestamp: dbRecord.timestamp, data: JSON.parse(dbRecord.data), };
-                    innerResolve(o);
-                  } catch(e) {
-                    logger.error("syncMiscDataSync JSON parse error  email=" + email + " and type=" + type);
-                    innerReject();
-                  }
+                  innerResolve(null);
                 } else {
                   connectionPool.query(`UPDATE ${miscsyncdataTable} SET timestamp = ?, data = ? WHERE email = ? and type = ?`, [timestamp, data, email, type], function (error, results, fields) {
                     if (error) {

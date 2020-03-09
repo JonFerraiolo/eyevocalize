@@ -2,7 +2,7 @@
 import { html, render } from './lib/lit-html/lit-html.js';
 import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows,
   deleteTemporaryProperties } from './Phrases.js';
-import { updateMain, buildSlideRightTitle,
+import { updateMain, buildSlideRightTitle, sync,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { EditPhrase } from './EditPhrase.js';
 import { showPopup, hidePopup } from './popup.js';
@@ -275,8 +275,22 @@ let HiddenBuiltins;
 
 export function initializeFavorites(props) {
   let { currentVersion } = props;
-  Favorites = {
+  // FIXME temporary
+  let initialFavorites = window.eyevocalizeUserEmail.toLowerCase().indexOf('jonferraiolo') !== 0 ? {
     version: currentVersion,
+    timestamp: 0,
+    lastChooseCategory: { columnIndex: 0, categoryIndex: 0, categoryLabel: null },
+    columns: [
+      { categories: [
+        	{ label: 'Category 1', expanded: true, items: [] },
+      ]},
+      { categories: [
+          { label: 'Category 2', expanded: true, items: [] },
+      ]},
+    ],
+  } : {
+    version: currentVersion,
+    timestamp: 0,
     lastChooseCategory: { columnIndex: 0, categoryIndex: 0, categoryLabel: null },
     columns: [
       { categories: [
@@ -361,7 +375,16 @@ export function initializeFavorites(props) {
       ]},
     ]
   };
-  HiddenBuiltins = { version: currentVersion, timestamp: Date.now(), items: [], };
+  let FavoritesString = localStorage.getItem("Favorites");
+  try {
+    Favorites = (typeof FavoritesString === 'string') ? JSON.parse(FavoritesString) : initialFavorites;
+  } catch(e) {
+    Favorites = initialFavorites;
+  }
+  if (typeof Favorites.version != 'number'|| Favorites.version < currentVersion) {
+    Favorites = initialFavorites;
+  }
+  localStorage.setItem("Favorites", JSON.stringify(Favorites));
 };
 
 export function initializeBuiltins(props) {
@@ -408,7 +431,68 @@ export function initializeBuiltins(props) {
       ]},
     ]
   };
+  let initialHiddenBuiltins = { version: currentVersion, timestamp: 0, items: [], };
+  let HiddenBuiltinsString = localStorage.getItem("HiddenBuiltins");
+  try {
+    HiddenBuiltins = (typeof HiddenBuiltinsString === 'string') ? JSON.parse(HiddenBuiltinsString) : initialHiddenBuiltins;
+  } catch(e) {
+    HiddenBuiltins = initialHiddenBuiltins;
+  }
+  if (typeof HiddenBuiltins.version != 'number'|| HiddenBuiltins.version < currentVersion) {
+    HiddenBuiltins = initialHiddenBuiltins;
+  }
+  localStorage.setItem("HiddenBuiltins", JSON.stringify(HiddenBuiltins));
 };
+
+export function FavoritesGetPending(clientLastSync) {
+  return Favorites.timestamp > clientLastSync ? Favorites : null;
+}
+
+export function HiddenBuiltinsGetPending(clientLastSync) {
+  return HiddenBuiltins.timestamp > clientLastSync ? HiddenBuiltins : null;
+}
+
+export function FavoritesSync(thisSyncServerTimestamp, newData) {
+  if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Favorites.timestamp) {
+    console.log('FavoritesSync. newData.timestamp='+newData.timestamp+', Favorites.timestamp='+Favorites.timestamp);
+    Favorites = newData;
+    updateLocalStorage({ timestamp: newData.timestamp });
+    let event = new CustomEvent("ServerInitiatedSyncFavorites", { detail: null } );
+    window.dispatchEvent(event);
+  }
+}
+
+export function HiddenBuiltinsSync(thisSyncServerTimestamp, newData) {
+  if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > HiddenBuiltins.timestamp) {
+    console.log('HiddenBuiltinsSync. newData.timestamp='+newData.timestamp+', HiddenBuiltins.timestamp='+HiddenBuiltins.timestamp);
+    HiddenBuiltins = newData;
+    updateLocalStorage({ timestamp: newData.timestamp });
+    let event = new CustomEvent("ServerInitiatedSyncHiddenBuiltins", { detail: null } );
+    window.dispatchEvent(event);
+  }
+}
+
+function updateStorageFavorites()  {
+  updateLocalStorageFavorites();
+  sync();
+}
+
+function updateStorageHiddenBuiltins()  {
+  updateLocalStorageHiddenBuiltins();
+  sync();
+}
+
+function updateLocalStorageFavorites(overrides) {
+  Favorites.timestamp = Date.now();
+  Favorites = Object.assign({}, Favorites, overrides || {});
+  localStorage.setItem("Favorites", JSON.stringify(Favorites));
+}
+
+function updateLocalStorageHiddenBuiltins(overrides) {
+  HiddenBuiltins.timestamp = Date.now();
+  HiddenBuiltins = Object.assign({}, HiddenBuiltins, overrides || {});
+  localStorage.setItem("HiddenBuiltins", JSON.stringify(HiddenBuiltins));
+}
 
 // transfer hidden flags HiddenBuiltins to from the given MyPhrases data structure
 function transferHiddenTo(aMyPhrases) {
@@ -446,18 +530,18 @@ function transferHiddenFrom(aMyPhrases) {
       });
     });
   });
-  onBuiltinsChange();
+  updateStorageHiddenBuiltins();
 }
 
 // Add phrase to Favorites without speaking
 export function addToFavorites(phrase, columnIndex, categoryIndex) {
   Favorites.columns[columnIndex].categories[categoryIndex].items.push(phrase);
-  // FIXME localStorage.setItem("Favorites", JSON.stringify(Favorites));
+  updateStorageFavorites();
 };
 
 function replaceFavoritesEntry(columnIndex, categoryIndex, itemIndex, phrase) {
   Favorites.columns[columnIndex].categories[categoryIndex].items[itemIndex] = Object.assign({}, phrase);
-  // FIXME localStorage.setItem("Favorites", JSON.stringify(Favorites));
+  updateStorageFavorites();
 };
 
 // invoke a function for each category stored in a MyPhrases data structure
@@ -481,16 +565,6 @@ function traverseColumnsCategoriesItems(aMyPhrases, func) {
     });
   });
 }
-
-function onFavoritesChange() {
-  Favorites.timestamp = Date.now();
-  // FIXME localStorage.setItem("Favorites", JSON.stringify(Favorites));
-};
-
-function onBuiltinsChange() {
-  HiddenBuiltins.timestamp = Date.now();
-  // FIXME localStorage.setItem("HiddenBuiltins", JSON.stringify(HiddenBuiltins));
-};
 
 export function slideInAddFavoriteScreen(props) {
   props = props || {};
@@ -539,7 +613,41 @@ export function updateFavorites(parentElement, props) {
 export function updateBuiltins(parentElement, props) {
   updateMyPhrases('Builtins', parentElement, props);
 }
+let lastParentFavorites, lastParentHiddenBuiltins;
+let updateFavoritesFirstTime = true;
+let updateHiddenBuiltinsFirstTime = true;
 function updateMyPhrases(Section, parentElement, props) {
+  if (Section === 'Favorites') {
+    lastParentFavorites = parentElement;
+  } else {
+    lastParentHiddenBuiltins = parentElement;
+  }
+  if (updateFavoritesFirstTime) {
+    updateFavoritesFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncFavorites', function(e) {
+      console.log('updateFavorites ServerInitiatedSyncFavorites custom event listener entered ');
+      let oldSection = Section;
+      let oldParent = parentElement;
+      Section = 'Favorites';
+      parentElement = lastParentFavorites;
+      localUpdate();
+      Section = oldSection;
+      parentElement = oldParent;
+    });
+  }
+  if (updateHiddenBuiltinsFirstTime) {
+    updateHiddenBuiltinsFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncHiddenBuiltins', function(e) {
+      console.log('updateHiddenBuiltins ServerInitiatedSyncHiddenBuiltins custom event listener entered ');
+      let oldSection = Section;
+      let oldParent = parentElement;
+      Section = 'HiddenBuiltins';
+      parentElement = lastParentHiddenBuiltins;
+      localUpdate();
+      Section = oldSection;
+      parentElement = oldParent;
+    });
+  }
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
@@ -610,26 +718,35 @@ function updateMyPhrases(Section, parentElement, props) {
   localUpdate();
 }
 
+let editFavoritesActive = false;
+let editHiddenBuiltinsActive = false;
+
 function onEditFavorites() {
+  editFavoritesActive = true;
   let renderFuncParams = { };
   secondLevelScreenShow({ renderFunc: editFavorites, renderFuncParams });
 }
 
 function onEditBuiltins() {
+  editHiddenBuiltinsActive = true;
   let renderFuncParams = { };
   secondLevelScreenShow({ renderFunc: editBuiltins, renderFuncParams });
 }
 
 function onEditFavoritesReturn() {
+  editFavoritesActive = false;
   updateMain();
   secondLevelScreenHide();
 }
 
 function onEditBuiltinsReturn() {
+  editHiddenBuiltinsActive = false;
   updateMain();
   secondLevelScreenHide();
 }
 
+let editFavoritesFirstTime = true;
+let editHiddenBuiltinsFirstTime = true;
 export function editFavorites(parentElement, props) {
   editMyPhrases('Favorites', parentElement, props);
 }
@@ -637,6 +754,32 @@ export function editBuiltins(parentElement, props) {
   editMyPhrases('Builtins', parentElement, props);
 }
 function editMyPhrases(Section, parentElement, props) {
+  if (editFavoritesFirstTime) {
+    editFavoritesFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncFavorites', function(e) {
+      if (editFavoritesActive && parentElement) {
+        console.log('editFavorites ServerInitiatedSyncFavorites custom event listener entered ');
+        let MyPhrases = parentElement.querySelector('.MyPhrases');
+        if (MyPhrases) {
+          initializeSelection();
+          localUpdate();
+        }
+      }
+    });
+  }
+  if (editHiddenBuiltinsFirstTime) {
+    editHiddenBuiltinsFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncHiddenBuiltins', function(e) {
+      if (editHiddenBuiltinsActive && parentElement) {
+        console.log('editHiddenBuiltins ServerInitiatedSyncHiddenBuiltins custom event listener entered ');
+        let MyPhrases = parentElement.querySelector('.MyPhrases');
+        if (MyPhrases) {
+          initializeSelection();
+          localUpdate();
+        }
+      }
+    });
+  }
   let editWhat = 'items';
   let lastClickItemIndex = null, lastClickCategoryIndex = null, lastClickColumnIndex = null;
   let editCategoryNameColumnIndex = null, editCategoryNameCategoryIndex = null;
@@ -644,9 +787,9 @@ function editMyPhrases(Section, parentElement, props) {
     if (Section === 'Favorites') {
       Favorites = JSON.parse(JSON.stringify(localMyPhrases)); // deep clone
       traverseColumnsCategoriesItems(Favorites, deleteTemporaryProperties);
-      onFavoritesChange();
+      updateStorageFavorites();
     } else {
-      onBuiltinsChange();
+      updateStorageHiddenBuiltins();
     }
     localUpdate();
   });
