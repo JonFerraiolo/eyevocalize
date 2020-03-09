@@ -747,6 +747,7 @@ function onEditBuiltinsReturn() {
 
 let editFavoritesFirstTime = true;
 let editHiddenBuiltinsFirstTime = true;
+let lastWhat;
 export function editFavorites(parentElement, props) {
   editMyPhrases('Favorites', parentElement, props);
 }
@@ -761,6 +762,8 @@ function editMyPhrases(Section, parentElement, props) {
         console.log('editFavorites ServerInitiatedSyncFavorites custom event listener entered ');
         let MyPhrases = parentElement.querySelector('.MyPhrases');
         if (MyPhrases) {
+          Section = 'Favorites';
+          editWhat = lastWhat;
           initializeSelection();
           localUpdate();
         }
@@ -774,13 +777,15 @@ function editMyPhrases(Section, parentElement, props) {
         console.log('editHiddenBuiltins ServerInitiatedSyncHiddenBuiltins custom event listener entered ');
         let MyPhrases = parentElement.querySelector('.MyPhrases');
         if (MyPhrases) {
+          Section = 'Builtins';
+          editWhat = lastWhat;
           initializeSelection();
           localUpdate();
         }
       }
     });
   }
-  let editWhat = 'items';
+  let editWhat = lastWhat = 'items';
   let lastClickItemIndex = null, lastClickCategoryIndex = null, lastClickColumnIndex = null;
   let editCategoryNameColumnIndex = null, editCategoryNameCategoryIndex = null;
   let makeLocalChangesPermanent = (() => {
@@ -795,7 +800,7 @@ function editMyPhrases(Section, parentElement, props) {
   });
   let onClickTab = e => {
     e.preventDefault();
-    editWhat = e.currentTarget.EditMyPhrasesEditWhatValue;
+    editWhat = lastWhat = e.currentTarget.EditMyPhrasesEditWhatValue;
     localUpdate();
   };
   let onItemClick = e => {
