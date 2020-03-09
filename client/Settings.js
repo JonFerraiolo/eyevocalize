@@ -192,7 +192,8 @@ function updateStorage()  {
 
 let updateLocalStorage = overrides => {
   let Settings = getSettings();
-  Settings = Object.assign({}, Settings, overrides || {});
+  let o = { section, voiceName, volume, rate, pitch, sampleText, appFontSize, minScreenPercent, autoDeleteHistory, syncMyData, okUseMyData };
+  Settings = Object.assign({}, Settings, o, overrides || {});
   localStorage.setItem("Settings", JSON.stringify(Settings));
 };
 

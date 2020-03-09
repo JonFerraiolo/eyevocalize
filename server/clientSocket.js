@@ -181,7 +181,7 @@ let syncMiscDataSync = (email, type, connectedClients, clientInitiatedSyncData) 
   logger.info('at start of syncMiscDataSync  type='+type);
   logger.info('at start of syncMiscDataSync  connectedClients='+JSON.stringify(connectedClients));
   logger.info('at start of syncMiscDataSync  clientInitiatedSyncData='+JSON.stringify(clientInitiatedSyncData));
-  return new Promise((outerResolve, outerReject) => {
+  return new Promise(function(email, type, connectedClients, clientInitiatedSyncData, outerResolve, outerReject) {
     logger.info('syncMiscDataSync promise function entered for email='+ email + ' and type=' + type);
     if (clientInitiatedSyncData !== null && typeof clientInitiatedSyncData !== 'object') {
       logger.info('syncMiscDataSync invalid clientInitiatedSyncData for email='+ email + ' and type=' + type);
@@ -203,7 +203,7 @@ let syncMiscDataSync = (email, type, connectedClients, clientInitiatedSyncData) 
       cid = cli;
     }
     logger.info('syncMiscDataSync  cid='+cid);
-    dbconnection.dbReady().then(connectionPool => {
+    dbconnection.dbReady().then(function(connectionPool) {
       logger.info('syncMiscDataSync got connection');
       const miscsyncdataTable = global.miscsyncdataTable;
       logger.info('syncMiscDataSync before select. email='+email+', miscsyncdataTable='+miscsyncdataTable);
@@ -219,7 +219,7 @@ let syncMiscDataSync = (email, type, connectedClients, clientInitiatedSyncData) 
             logger.error("syncMiscDataSync select found more than one entry for email=" + email + " and type=" + type);
             outerReject();
           } else {
-            let innerPromise = new Promise((innerResolve, innerReject) => {
+            let innerPromise = new Promise(function(innerResolve, innerReject) {
               if (currentRows.length === 1) {
                 let dbRecord = currentRows[0];
                 if (clientInitiatedSyncData === null || dbRecord.timestamp >= timestamp) {
@@ -251,7 +251,7 @@ let syncMiscDataSync = (email, type, connectedClients, clientInitiatedSyncData) 
                 }
               }
             });
-            innerPromise.then(retval => {
+            innerPromise.then(function(retval) {
               logger.info("syncMiscDataSync innerPromise resolved for email=" + email + " and type=" + type);
               let returnObj = {};
               for (let clientId in connectedClients) {
@@ -276,7 +276,7 @@ let syncMiscDataSync = (email, type, connectedClients, clientInitiatedSyncData) 
       logger.error("syncMiscDataSync: promise exception");
       outerReject();
     });
-  });
+  }.bind(null, email, type, connectedClients, clientInitiatedSyncData));
 }
 
 
