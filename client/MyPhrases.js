@@ -764,6 +764,7 @@ function editMyPhrases(Section, parentElement, props) {
         if (MyPhrases) {
           Section = 'Favorites';
           editWhat = lastWhat;
+          localMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
           initializeSelection();
           localUpdate();
         }
@@ -779,6 +780,8 @@ function editMyPhrases(Section, parentElement, props) {
         if (MyPhrases) {
           Section = 'Builtins';
           editWhat = lastWhat;
+          localMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
+          transferHiddenTo(localMyPhrases);
           initializeSelection();
           localUpdate();
         }
