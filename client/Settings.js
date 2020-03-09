@@ -197,7 +197,10 @@ let updateLocalStorage = overrides => {
   localStorage.setItem("Settings", JSON.stringify(Settings));
 };
 
+let editSettingsActive = false;
+
 export function slideInSettingsScreen(props) {
+  editSettingsActive = true;
   props = props || {};
   let { initialSection } = props;
   let params = {
@@ -208,11 +211,26 @@ export function slideInSettingsScreen(props) {
 };
 
 function onSettingsReturn() {
+  editSettingsActive = false;;
   updateMain();
   secondLevelScreenHide();
 }
 
+let editSettingsFirstTime = true;
+
 export function editSettings(parentElement, params) {
+  if (editSettingsFirstTime) {
+    editSettingsFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncSettings', function(e) {
+      if (editSettingsActive && parentElement) {
+        console.log('editSettings ServerInitiatedSyncSettings custom event listener entered ');
+        let SettingsContent = parentElement.querySelector('.SettingsContent');
+        if (SettingsContent) {
+          localUpdate();
+        }
+      }
+    });
+  }
   params = params || {};
   let { initialSection } = params;
   if (initialSection) {

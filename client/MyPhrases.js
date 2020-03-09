@@ -456,7 +456,7 @@ export function FavoritesSync(thisSyncServerTimestamp, newData) {
   if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Favorites.timestamp) {
     console.log('FavoritesSync. newData.timestamp='+newData.timestamp+', Favorites.timestamp='+Favorites.timestamp);
     Favorites = newData;
-    updateLocalStorage({ timestamp: newData.timestamp });
+    updateLocalStorageFavorites({ timestamp: newData.timestamp });
     let event = new CustomEvent("ServerInitiatedSyncFavorites", { detail: null } );
     window.dispatchEvent(event);
   }
@@ -466,7 +466,7 @@ export function HiddenBuiltinsSync(thisSyncServerTimestamp, newData) {
   if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > HiddenBuiltins.timestamp) {
     console.log('HiddenBuiltinsSync. newData.timestamp='+newData.timestamp+', HiddenBuiltins.timestamp='+HiddenBuiltins.timestamp);
     HiddenBuiltins = newData;
-    updateLocalStorage({ timestamp: newData.timestamp });
+    updateLocalStorageHiddenBuiltins({ timestamp: newData.timestamp });
     let event = new CustomEvent("ServerInitiatedSyncHiddenBuiltins", { detail: null } );
     window.dispatchEvent(event);
   }

@@ -201,7 +201,7 @@ function onEditClipboard() {
 }
 
 function onEditClipboardReturn() {
-  editClipboardActive = true;
+  editClipboardActive = false;
   updateMain();
   secondLevelScreenHide();
 }
