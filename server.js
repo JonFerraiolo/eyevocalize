@@ -85,51 +85,14 @@ logger.info('');
 logger.info('===== New process =====');
 logger.info('before https check. protocol='+protocol+', port='+port);
 let credentials;
-if (hostname === 'zeyevocalize.com' && protocol === 'https') {
-  // special shenanigans for eyevocalize.com on A2 hosting because certs change every 90 days
-  logger.info('https with eyevocalize.com');
-  const ssldb = global.config.SSL_DB; // this file contains pointers to keys and certs
-  const ssldir = global.config.SSL_DIR; // keys and certs are in this folder
-  logger.info('ssldb='+ssldb+', ssldir='+ssldir);
-  if (!fs.existsSync(ssldb)) {
-    protocol = 'http'; // revert to http server, which will actually use https under hood
-    port = '80';
-  } else {
-    logger.info('ssldb exists');
-    let ssldbcontent;
-    try {
-      ssldbcontent = fs.readFileSync(ssldb).toString();
-      logger.info('ssldb successful read');
-      let prefix = 'eyevocalize_com_';
-      let index1 = ssldbcontent.indexOf(prefix);
-      let index2 = index1 + prefix.length;
-      let index3 = ssldbcontent.substr(index2).indexOf(':');
-      logger.info('index1='+index1+', index2='+index2+', index3='+index3);
-      let id = ssldbcontent.Substr(index2, index3 - index2);
-      logger.info('id='+id);
-      let sslkey = ssldir + '/keys/' + id + '.key';
-      let sslcert = ssldir + '/certs/' + prefix + id + '.crt';
-      logger.info('ssldb='+ssldb+', ssldir='+ssldir);
-      if (!fs.existsSync(sslkey) || !fs.existsSync(sslcert)) {
-        protocol = 'http'; // revert to http server, which will actually use https under hood
-        port = '80';
-      } else {
-        credentials = { key: sslkey, cert: sslcert };
-        logger.info('credentials='+JSON.stringify(credentials));
-      }
-    } catch(e) {
-      protocol = 'http'; // revert to http server, which will actually use https under hood
-      port = '80';
-    }
-  }
-} else if (protocol === 'https') {
-  logger.info('https without eyevocalize.com');
+if (protocol === 'https') {
+  logger.info('https');
   try {
     credentials = { key: fs.readFileSync(global.config.SSL_KEY), cert: fs.readFileSync(global.config.SSL_CERT) };
     logger.info('credentials='+JSON.stringify(credentials));
   } catch(e) {
     logger.info('fs read file failure for https');
-    protocol = 'http'; // revert to http server, which will actually use https under hood
+    protocol = 'http'; // revert to http server, which at Eyevocalize.com will actually use https under hood
     port = '80';
   }
 }
@@ -148,7 +111,7 @@ try {
   httpServer = http.createServer(app);
 }
 logger.info('after calling createServer');
-let io = require('socket.io')(httpServer);
+let io = require('socket.io')(httpServer, global.config.SOCKETIO_OPTIONS);
 logger.info('after creating io');
 
 const authMiddleware = sessionMgmt.auth;
@@ -221,6 +184,10 @@ sessionMgmt.init(app).then(() => {
   app.post('/api/closeaccount', sessionRoutes.closeAccount)
   app.get('/*', (req, res) => res.redirect(301, '/'));
 
+  logger.info('before calling listen on port');
+  httpServer.listen(port, () => logger.info(`App listening on port ${port}!`));
+  logger.info('after calling listen on port');
+
   io.on('connection', function(socket){
     logger.info('user connected');
     clientSocket.onConnect(socket);
@@ -229,10 +196,6 @@ sessionMgmt.init(app).then(() => {
       clientSocket.onDisconnect(socket);
     });
   });
-
-  logger.info('before calling listen on port');
-  httpServer.listen(port, () => logger.info(`App listening on port ${port}!`));
-  logger.info('after calling listen on port');
 
 }, () => {
   logger.error('serverjs sessionMgmt.init promise reject.');
