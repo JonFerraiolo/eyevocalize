@@ -6,6 +6,7 @@ const https = require('https');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
+const localizationIndex = require('./localization/index');
 const dbconnection = require('./server/dbconnection');
 const sessionMgmt = require('./server/sessionMgmt');
 const sessionRoutes = require('./server/sessionRoutes');
@@ -98,6 +99,20 @@ if (protocol === 'https') {
 }
 logger.info('after https check. protocol='+protocol+', port='+port);
 
+logger.info('localizationIndex='+JSON.stringify(localizationIndex));
+let localizationLanguages = localizationIndex.map(item => {
+  for (let language in item) {
+    return language; // should be only one property, and the name of the property is the language identifier
+  }
+});
+logger.info('localizationLanguages='+JSON.stringify(localizationLanguages));
+let localizationFolders = localizationIndex.map(item => {
+  for (let language in item) {
+    return item[language]; // should be only one property, and we return the value of the property, which is folder name
+  }
+});
+logger.info('localizationFolders='+JSON.stringify(localizationFolders));
+
 dbconnection.initialize(); // kick off the connection to the db and any needed db inits
 const app = express();
 let httpServer;
@@ -147,6 +162,18 @@ sessionMgmt.init(app).then(() => {
     });
   });
   app.get('/app', (req, res) => {
+    let lang = req.acceptsLanguages(localizationLanguages) || 'en';
+    logger.info('app lang='+lang);
+    let langIndex = localizationLanguages.indexOf(lang);
+    logger.info('langIndex='+langIndex);
+    let langFileName = rootDir+'/localization/'+localizationFolders[langIndex]+'/app.js';
+    logger.info('langFileName='+langFileName);
+    let langJs = fs.readFileSync(langFileName);
+    if (!langJs) {
+      let msg = 'could not read file '+langFileName;
+      logSendSE(res, msg, msg);
+      return;
+    }
     fs.readFile(rootDir+'/app.html', (err, data) => {
       if (err) { logSendSE(res, err, 'app.html'); }
       else {
@@ -161,7 +188,9 @@ sessionMgmt.init(app).then(() => {
           } else {
             email = checksum = '';
           }
-          const s = data.toString().replace('((EVUSER))', email).replace('((EVCHECKSUM))', checksum);
+          const s = data.toString().replace('((EVUSER))', email)
+            .replace('((EVCHECKSUM))', checksum)
+            .replace('((EVCLOCALIZATION))', langJs);
           res.send(s);
         });
       }

@@ -161,6 +161,7 @@ let socket;
 
 function main() {
 	console.log(window.eyevocalizeUserEmail+'/'+window.eyevocalizeUserChecksum);
+	console.dir(window.EvcL12n);
 	window.eyevocalizeClientId = localStorage.getItem('clientId');
 	if (window.eyevocalizeClientId) {
 		window.eyevocalizeLastSync = parseInt(localStorage.getItem('lastSync'));

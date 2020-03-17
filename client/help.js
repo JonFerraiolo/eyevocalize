@@ -80,18 +80,25 @@ function showHelp(topic) {
     document.addEventListener('mousemove', dragElement, false);
     document.addEventListener('mouseup', closeDragElement, false);
   };
-  let content = helpPages[topic] || '';
-  render(html`
-    <div class=HelpHeader @mousedown=${dragMouseDown}>
-      <span class=HelpHeaderIcon></span>Help
-      <span class=HelpHeaderClose @click=${onClose}></span>
-    </div>
-    <div class=HelpContent></div>
-  `, helpDiv);
-  helpDiv.style.visibility = 'hidden';
-  helpDiv.style.display = 'block';
-  markedLoadedPromise.then(() => {
-    render(html`${unsafeHTML(marked(content))}`, helpDiv.querySelector('.HelpContent'));
+  let onGoto = e => {
+    e.preventDefault();
+    console.log('PageId='+e.currentTarget.PageId);
+  };
+  let buildGoto = PageId => {
+    return html`<a href="" @click=${onGoto} .PageId=${PageId}>${i18n[PageId]}</a>`;
+  };
+  let i18n = { helpShortcuts:'Keyboard shortcuts'};
+  let content = html`${buildGoto('helpShortcuts')}`;
+  let localUpdate = () => {
+    render(html`
+      <div class=HelpHeader @mousedown=${dragMouseDown}>
+        <span class=HelpHeaderIcon></span>Help
+        <span class=HelpHeaderClose @click=${onClose}></span>
+      </div>
+      <div class=HelpContent>${content}</div>
+    `, helpDiv);
+    helpDiv.style.visibility = 'hidden';
+    helpDiv.style.display = 'block';
     setTimeout(() => {
       // setTimeout to allow browser to lay out the help content so that everything has a size
       let bounds = helpDiv.getBoundingClientRect();
@@ -101,10 +108,9 @@ function showHelp(topic) {
       helpDiv.style.left = left + 'px';
       helpDiv.style.top = top + 'px';
       helpDiv.style.visibility = 'visible';
-    })
-  }).catch(e => {
-    console.error('failure loading marked.js. e='+e);
-  });
+    }, 0);
+  };
+  localUpdate();
 }
 
 function hideHelp() {
