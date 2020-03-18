@@ -106,12 +106,12 @@ let localizationLanguages = localizationIndex.map(item => {
   }
 });
 logger.info('localizationLanguages='+JSON.stringify(localizationLanguages));
-let localizationFolders = localizationIndex.map(item => {
+let localizationFilenames = localizationIndex.map(item => {
   for (let language in item) {
     return item[language]; // should be only one property, and we return the value of the property, which is folder name
   }
 });
-logger.info('localizationFolders='+JSON.stringify(localizationFolders));
+logger.info('localizationFilenames='+JSON.stringify(localizationFilenames));
 
 dbconnection.initialize(); // kick off the connection to the db and any needed db inits
 const app = express();
@@ -162,11 +162,15 @@ sessionMgmt.init(app).then(() => {
     });
   });
   app.get('/app', (req, res) => {
-    let lang = req.acceptsLanguages(localizationLanguages) || 'en';
-    logger.info('app lang='+lang);
-    let langIndex = localizationLanguages.indexOf(lang);
-    logger.info('langIndex='+langIndex);
-    let langFileName = rootDir+'/localization/'+localizationFolders[langIndex]+'/app.js';
+    let langIndex = req.query.lang ? localizationLanguages.indexOf(req.query.lang) : -1;
+    logger.info('1 langIndex='+langIndex);
+    if (langIndex === -1) {
+      let lang = req.acceptsLanguages(localizationLanguages) || 'en';
+      logger.info('app lang='+lang);
+      langIndex = localizationLanguages.indexOf(lang);
+      logger.info('2 langIndex='+langIndex);
+    }
+    let langFileName = rootDir+'/localization/'+localizationFilenames[langIndex]+'.js';
     logger.info('langFileName='+langFileName);
     let langJs = fs.readFileSync(langFileName);
     if (!langJs) {

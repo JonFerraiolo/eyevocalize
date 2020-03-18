@@ -1,4 +1,4 @@
-// us-en strings for the main application
+// us-en strings for the Web site 
 
 {
   helpShortcuts: `Keyboard shortcuts`,
