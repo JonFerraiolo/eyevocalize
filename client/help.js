@@ -5,10 +5,6 @@ import { markedLoadedPromise } from './startupChecks.js';
 import { mainAppPercentWhenSmall } from './Settings.js';
 import { welcome } from './help/welcome.js';
 
-const helpPages = {
-  welcome
-};
-
 let css = `
 .Help {
   background: white;
@@ -82,13 +78,13 @@ function showHelp(topic) {
   };
   let onGoto = e => {
     e.preventDefault();
-    console.log('PageId='+e.currentTarget.PageId);
+    content = html`${helpPages[e.currentTarget.PageId]}`;
+    localUpdate();
   };
-  let buildGoto = PageId => {
-    return html`<a href="" @click=${onGoto} .PageId=${PageId}>${i18n[PageId]}</a>`;
+  let buildGoto = (PageId, textLocalizationId) => {
+    return html`<a href="" @click=${onGoto} .PageId=${PageId}>${localization[textLocalizationId]}</a>`;
   };
-  let i18n = { helpShortcuts:'Keyboard shortcuts'};
-  let content = html`${buildGoto('helpShortcuts')}`;
+  let localization = window.EvcL12n;
   let localUpdate = () => {
     render(html`
       <div class=HelpHeader @mousedown=${dragMouseDown}>
@@ -110,6 +106,23 @@ function showHelp(topic) {
       helpDiv.style.visibility = 'visible';
     }, 0);
   };
+
+  let helpPages = {
+    root: html`
+      <div class=HelpPageTitle>${localization['helpRootTitle']}</div>
+      <div class=HelpPageGrid>
+        <span class=HelpPageGridItem>${buildGoto('shortcuts', 'helpShortcuts')}</span>
+      </div>
+    `,
+    shortcuts: html`
+      <div class=HelpPageTitle>${localization['helpShortcuts']}</div>
+      <div class=HelpPageGrid>
+        <span class=HelpPageGridItem>Shortcut one</span>
+      </div>
+    `,
+  };
+
+  let content = html`${helpPages['root']}`;
   localUpdate();
 }
 
