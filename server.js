@@ -194,7 +194,7 @@ sessionMgmt.init(app).then(() => {
           }
           const s = data.toString().replace('((EVUSER))', email)
             .replace('((EVCHECKSUM))', checksum)
-            .replace('((EVCLOCALIZATION))', langJs);
+            .replace('((EvcLocalization))', langJs);
           res.send(s);
         });
       }

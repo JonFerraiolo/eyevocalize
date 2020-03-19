@@ -3,7 +3,7 @@ import { html, render } from './lib/lit-html/lit-html.js';
 import { unsafeHTML } from './lib/lit-html/directives/unsafe-html.js';
 import { markedLoadedPromise } from './startupChecks.js';
 import { mainAppPercentWhenSmall } from './Settings.js';
-import { welcome } from './help/welcome.js';
+import { localization } from './main.js';
 
 let css = `
 .Help {
@@ -81,10 +81,9 @@ function showHelp(topic) {
     content = html`${helpPages[e.currentTarget.PageId]}`;
     localUpdate();
   };
-  let buildGoto = (PageId, textLocalizationId) => {
-    return html`<a href="" @click=${onGoto} .PageId=${PageId}>${localization[textLocalizationId]}</a>`;
+  let buildGoto = (textLocalizationId) => {
+    return html`<a href="" @click=${onGoto} .PageId=${textLocalizationId}>${localization.help[textLocalizationId]}</a>`;
   };
-  let localization = window.EvcL12n;
   let localUpdate = () => {
     render(html`
       <div class=HelpHeader @mousedown=${dragMouseDown}>
@@ -108,21 +107,21 @@ function showHelp(topic) {
   };
 
   let helpPages = {
-    root: html`
-      <div class=HelpPageTitle>${localization['helpRootTitle']}</div>
+    "Help Table of Contents": html`
+      <div class=HelpPageTitle>${localization.help['Help Table of Contents']}</div>
       <div class=HelpPageGrid>
-        <span class=HelpPageGridItem>${buildGoto('shortcuts', 'helpShortcuts')}</span>
+        <span class=HelpPageGridItem>${buildGoto('Keyboard shortcuts')}</span>
       </div>
     `,
-    shortcuts: html`
-      <div class=HelpPageTitle>${localization['helpShortcuts']}</div>
+    "Keyboard shortcuts": html`
+      <div class=HelpPageTitle>${localization.help['Keyboard shortcuts']}</div>
       <div class=HelpPageGrid>
         <span class=HelpPageGridItem>Shortcut one</span>
       </div>
     `,
   };
 
-  let content = html`${helpPages['root']}`;
+  let content = html`${helpPages['Help Table of Contents']}`;
   localUpdate();
 }
 

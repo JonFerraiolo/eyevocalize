@@ -1,6 +1,8 @@
 // us-en strings for the Web site
 
-{
-  helpRootTitle: `Help Table of Contents`,
-  helpShortcuts: `Keyboard shortcuts`,
+const Localization = {
+  help: {
+    "Help Table of Contents": `Help Table of Contents`,
+    "Keyboard shortcuts": `Keyboard shortcuts`,
+  },
 }
