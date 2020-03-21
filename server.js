@@ -183,7 +183,9 @@ sessionMgmt.init(app).then(() => {
       else {
         let email = (req.session && req.session.user && req.session.user.email) || '';
         const encryptedPW = (req.session && req.session.user && req.session.user.password) || '';
+        logger.info('/app before doLoginValidate. email='+email+', encryptedPW='+encryptedPW);
         sessionRoutes.doLoginValidate(req, res, email, encryptedPW, validLogin => {
+          logger.info('/app after doLoginValidate. validLogin='+validLogin);
           let checksum;
           if (validLogin) {
             let pwKey = crypto.createCipher('aes-128-cbc', global.config.HASH_SECRET2);

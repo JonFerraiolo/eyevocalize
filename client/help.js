@@ -106,15 +106,28 @@ function showHelp(topic) {
     }, 0);
   };
 
+  let buildTitle = (backPage, thisPage) => {
+    return html`<div class=HelpPageTitle>
+      ${backPage ? html`<span class=HelpPageBack>${buildGoto(backPage)}</span>` : ''}
+      ${localization.help[thisPage]}
+    </div>`;
+  };
   let helpPages = {
     "Help Table of Contents": html`
-      <div class=HelpPageTitle>${localization.help['Help Table of Contents']}</div>
+      ${buildTitle(null, 'Help Table of Contents')}
       <div class=HelpPageGrid>
+        <span class=HelpPageGridItem>${buildGoto('Overview')}</span>
         <span class=HelpPageGridItem>${buildGoto('Keyboard shortcuts')}</span>
       </div>
     `,
+    "Overview": html`
+      ${buildTitle('Help Table of Contents', 'Overview')}
+      <div class=HelpPageFlow>
+        <p>Paragraph</p>
+      </div>
+    `,
     "Keyboard shortcuts": html`
-      <div class=HelpPageTitle>${localization.help['Keyboard shortcuts']}</div>
+      ${buildTitle('Help Table of Contents', 'Keyboard shortcuts')}
       <div class=HelpPageGrid>
         <span class=HelpPageGridItem>Shortcut one</span>
       </div>

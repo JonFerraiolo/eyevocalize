@@ -274,12 +274,14 @@ function main() {
 					SettingsSync(thisSyncServerTimestamp, updates && updates.Settings);
 					window.eyevocalizeLastSync = Date.now();
 					localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
+					if (typeof fn === 'function') {
+						fn(JSON.stringify({ success: true }));
+					}
 				} catch(e) {
 					console.error('sync exception, possibly bad JSON. e=');
 					console.dir(e);
-				} finally {
 					if (typeof fn === 'function') {
-						fn(JSON.stringify({ success: false, error: 'not yet implemented' }));
+						fn(JSON.stringify({ success: false, error: 'client side exception' }));
 					}
 				}
 			});
