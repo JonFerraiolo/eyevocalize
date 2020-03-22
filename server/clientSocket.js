@@ -222,7 +222,15 @@ let syncMiscDataSync = (email, type, connectedClients, clientInitiatedSyncData) 
             let innerPromise = new Promise(function(innerResolve, innerReject) {
               if (currentRows.length === 1) {
                 let dbRecord = currentRows[0];
-                if (clientInitiatedSyncData === null || dbRecord.timestamp >= timestamp) {
+                if (clientInitiatedSyncData === null) {
+                  try {
+                    let o = JSON.parse(dbRecord.data);
+                    innerResolve(o);
+                  } catch(e) {
+                    logger.error("syncMiscDataSync JSON parse error for dbRecord.data for email=" + email + " and type=" + type);
+                    innerResolve(null);
+                  }
+                } else if (dbRecord.timestamp >= timestamp) {
                   innerResolve(null);
                 } else {
                   connectionPool.query(`UPDATE ${miscsyncdataTable} SET timestamp = ?, data = ? WHERE email = ? and type = ?`, [timestamp, data, email, type], function (error, results, fields) {

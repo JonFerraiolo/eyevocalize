@@ -121,6 +121,7 @@ let defaultSyncMyData = true;
 let syncMyData = defaultSyncMyData;
 let defaultOKUseMyData = false;
 let okUseMyData = defaultOKUseMyData;
+let pending;
 
 let volumeCombo = new combobox();
 let rateCombo = new combobox();
@@ -157,6 +158,7 @@ let setSettings = Settings => {
   autoDeleteHistory = Settings.autoDeleteHistory;
   syncMyData = Settings.syncMyData;
   okUseMyData = Settings.okUseMyData;
+  pending = Settings.pending;
 }
 
 export function initializeSettings(props) {
@@ -168,8 +170,10 @@ export function initializeSettings(props) {
 
 export function SettingsGetPending(clientLastSync) {
   let Settings = getSettings();
-  let { timestamp, voiceName, volume, rate, pitch, sampleText, autoDeleteHistory, syncMyData, okUseMyData } = Settings;
-  let o = { timestamp, voiceName, volume, rate, pitch, sampleText, autoDeleteHistory, syncMyData, okUseMyData };
+  if (!Settings.pending) return null;
+  delete Settings.pending;
+  let { timestamp, sampleText, autoDeleteHistory, syncMyData, okUseMyData } = Settings;
+  let o = { timestamp, sampleText, autoDeleteHistory, syncMyData, okUseMyData };
   return timestamp > clientLastSync ? o : null;
 }
 
@@ -186,7 +190,7 @@ export function SettingsSync(thisSyncServerTimestamp, newData) {
 }
 
 function updateStorage()  {
-  updateLocalStorage({ timestamp: Date.now() });
+  updateLocalStorage({ timestamp: Date.now(), pending: true, });
   sync();
 }
 

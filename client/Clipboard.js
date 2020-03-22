@@ -63,6 +63,8 @@ export function initializeClipboard(props) {
 }
 
 export function ClipboardGetPending(clientLastSync) {
+  if (!Clipboard.pending) return null;
+  delete Clipboard.pending;
   return Clipboard.timestamp > clientLastSync ? Clipboard : null;
 }
 
@@ -76,7 +78,7 @@ export function ClipboardSync(thisSyncServerTimestamp, newData) {
 }
 
 function updateStorage()  {
-  updateLocalStorage();
+  updateLocalStorage({ pending: true });
   sync();
 }
 

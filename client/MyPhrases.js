@@ -445,10 +445,14 @@ export function initializeBuiltins(props) {
 };
 
 export function FavoritesGetPending(clientLastSync) {
+  if (!Favorites.pending) return null;
+  delete Favorites.pending;
   return Favorites.timestamp > clientLastSync ? Favorites : null;
 }
 
 export function HiddenBuiltinsGetPending(clientLastSync) {
+  if (!HiddenBuiltins.pending) return null;
+  delete HiddenBuiltins.pending;
   return HiddenBuiltins.timestamp > clientLastSync ? HiddenBuiltins : null;
 }
 
@@ -473,12 +477,12 @@ export function HiddenBuiltinsSync(thisSyncServerTimestamp, newData) {
 }
 
 function updateStorageFavorites()  {
-  updateLocalStorageFavorites();
+  updateLocalStorageFavorites({ pending: true });
   sync();
 }
 
 function updateStorageHiddenBuiltins()  {
-  updateLocalStorageHiddenBuiltins();
+  updateLocalStorageHiddenBuiltins({ pending: true });
   sync();
 }
 
