@@ -61,8 +61,11 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
   logger.info('updateTopicTables Entered');
   let { email, clientId, lastSync, thisSyncClientTimestamp } = clientInitiatedSyncData;
   email = email.toLowerCase();
-  let minLastSyncConnected = Number.MAX_SAFE_INTEGER;
-  for (const client in connectionsByEmail[email]) {
+  let minLastSyncConnected = lastSync; // what this client says is the last time it sync'd
+  logger.info('updateTopicTables  connectionsByEmail='+JSON.stringify(connectionsByEmail));
+  for (const clientId in connectionsByEmail[email]) {
+    let client = connectionsByEmail[email][clientId];
+    logger.info('updateTopicTables client.lastSync='+client.lastSync);
     if (client.lastSync < minLastSyncConnected) minLastSyncConnected = client.lastSync;
   }
   let thisSyncServerTimestamp = Date.now();
@@ -376,6 +379,13 @@ let syncHistory = (email, connectedClients, minLastSyncConnected, thisSyncClient
           });
           Promise.all([deletePromise, insertPromise]).then(values => {
             logger.info('syncHistory promise all entered');
+            let dbrows;
+            try {
+              dbrows = currentRows.map(row => JSON.parse(row.phrase));
+            } catch(e) {
+              logger.error('historySync build dbrows error. currentRows='+JSON.stringify(currentRows));
+              dbrows = [];
+            }
             let returnObj = {};
             for (let clientId in connectedClients) {
               let client = connectedClients[clientId];
@@ -383,7 +393,7 @@ let syncHistory = (email, connectedClients, minLastSyncConnected, thisSyncClient
               let mintime = calcMinTime([lastSync]);
               returnObj[clientId] = {
                 deletions: filteredDeletions.filter(item => item.timestamp > mintime).concat(HistoryPendingDeletions),
-                additions: filteredAdditions.filter(item => item.timestamp > mintime).concat(HistoryPendingAdditions),
+                additions: filteredAdditions.filter(item => item.timestamp > mintime).concat(HistoryPendingAdditions).concat(dbrows),
               };
             };
             logger.info('syncHistory, returnObj='+JSON.stringify(returnObj));
