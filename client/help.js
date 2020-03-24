@@ -113,28 +113,31 @@ function showHelp(topic) {
     </div>`;
   };
   let helpPages = {
-    "Help Table of Contents": html`
-      ${buildTitle(null, 'Help Table of Contents')}
+    Contents: html`
+      ${buildTitle(null, 'Contents')}
       <div class=HelpPageGrid>
         <span class=HelpPageGridItem>${buildGoto('Overview')}</span>
-        <span class=HelpPageGridItem>${buildGoto('Keyboard shortcuts')}</span>
+        <span class=HelpPageGridItem>${buildGoto('Features')}</span>
+        <span class=HelpPageGridItem>${buildGoto('Shortcuts')}</span>
       </div>
     `,
-    "Overview": html`
-      ${buildTitle('Help Table of Contents', 'Overview')}
-      <div class=HelpPageFlow>
-        <p>Paragraph</p>
-      </div>
+    Overview: html`
+      ${buildTitle('Contents', 'Overview')}
+      <div class=HelpPageFlow>${unsafeHTML(localization.help.OverviewContent)}</div>
     `,
-    "Keyboard shortcuts": html`
-      ${buildTitle('Help Table of Contents', 'Keyboard shortcuts')}
+    Features: html`
+      ${buildTitle('Contents', 'Features')}
+      <div class=HelpPageFlow>${unsafeHTML(localization.help.FeaturesContent)}</div>
+    `,
+    Shortcuts: html`
+      ${buildTitle('Contents', 'Shortcuts')}
       <div class=HelpPageGrid>
         <span class=HelpPageGridItem>Shortcut one</span>
       </div>
     `,
   };
 
-  let content = html`${helpPages['Help Table of Contents']}`;
+  let content = html`${helpPages['Contents']}`;
   localUpdate();
 }
 
