@@ -172,7 +172,7 @@ export function updateTextEntryRow(parentElement, props) {
   }
   let onHelp = e => {
     e.preventDefault();
-    toggleHelp('welcome');;
+    toggleHelp();;
     TextEntryRowSetFocus();
   }
   let onUser = e => {

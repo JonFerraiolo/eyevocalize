@@ -11,12 +11,16 @@ let css = `
   position: fixed;
   z-index: 411;
   border: 1px solid black;
-  font-size: 0.85em;
+  font-size: 0.95em;
   top: 0px;
   left: 0px;
-  width: 30%;
-  height: 30%;
+  min-width: 20em;
+  max-width: 90%;
+  min-height: 15em;
+  max-height: 90%;
   text-align: left;
+  display: flex;
+  flex-direction: column;
 }
 .HelpHeader {
   z-index: 412;
@@ -27,9 +31,6 @@ let css = `
   height: 1.5em;
   line-height: 1.5em;
   vertical-align: middle;
-}
-.HelpContent {
-  font-size: 0.9em;
 }
 .HelpHeaderIcon {
   display: inline-block;
@@ -52,6 +53,46 @@ let css = `
   background-repeat: no-repeat;
   margin: 0 0.1em 0 0;
   cursor: pointer;
+}
+.HelpContent {
+  font-size: 0.95em;
+  padding: 0.5em 1em;
+  flex: 1;
+}
+.HelpPageTitle {
+  font-size: 105%;
+  font-weight: bold;
+  padding: 0.5em 0 1.0em;
+  display: flex;
+  line-height: 100%;
+}
+.HelpPageTitle * {
+  vertical-align: middle;
+}
+.HelpPageTitleString {
+  flex: 1;
+  text-align: center;
+}
+.HelpPageContent {
+  overflow-x: hidden;
+  overflow-y: auto;
+  white-space: normal;
+}
+.HelpContents {
+  display: grid;
+  grid-template-columns: auto auto;
+  width: fit-content;
+  grid-column-gap: 0.5em;
+  grid-row-gap: 0.5em;
+  line-height: 1.2em;
+}
+.HelpFooter {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95em;
+}
+.HelpPageContent topic {
+  font-weight: bold;
 }
 `;
 let styleElement = document.createElement('style');
@@ -78,22 +119,62 @@ function showHelp(topic) {
   };
   let onGoto = e => {
     e.preventDefault();
-    content = html`${helpPages[e.currentTarget.PageId]}`;
-    localUpdate();
+    let page = e.currentTarget.PageId;
+    if (helpPages[page]) {
+      currentPage = page;
+      localUpdate();
+    }
   };
-  let buildGoto = (textLocalizationId) => {
-    return html`<a href="" @click=${onGoto} .PageId=${textLocalizationId}>${localization.help[textLocalizationId]}</a>`;
+  let buildGoto = helpPageId => {
+    return html`<a href="" @click=${onGoto} .PageId=${helpPageId}>${localization.help[helpPageId]}</a>`;
+  };
+  let buildGotoContent = (helpPageId, content) => {
+    return html`<a href="" @click=${onGoto} .PageId=${helpPageId}>${unsafeHTML(content)}</a>`;
+  };
+  let buildGotoPrevNext = (helpPageId, PrevOrNext) => {
+    let clz = "HelpFooter"+PrevOrNext;
+    if (!helpPageId) {
+      return html`<span class=${clz}></span>`;
+    } else {
+      return html`<a href="" @click=${onGoto} .PageId=${helpPageId} class=${clz}>
+        ${localization.help[PrevOrNext]}
+        <span class=HelpFooterPrevNextName>(${localization.help[helpPageId]})</span>
+      </a>`;
+    }
   };
   let localUpdate = () => {
+    let content = html`${helpPages[currentPage].value}`;
+    let footer = '';
+    if (currentPage !== 'Contents') {
+      let prev = buildGotoPrevNext(helpPages[currentPage].prev, 'Prev');
+      let next = buildGotoPrevNext(helpPages[currentPage].next, 'Next');
+      footer = html`
+      <div class=HelpFooter>
+        ${prev}
+        <a href="" @click=${onGoto} .PageId=${"Contents"} class=HelpFooterContents>Contents</a>
+        ${next}
+      </div>
+      `;
+    }
     render(html`
       <div class=HelpHeader @mousedown=${dragMouseDown}>
         <span class=HelpHeaderIcon></span>Help
         <span class=HelpHeaderClose @click=${onClose}></span>
       </div>
       <div class=HelpContent>${content}</div>
+      ${footer}
     `, helpDiv);
+    // replace all <topic>Foo</topic> with the markup equivalent of
+    // <topic>${buildGoto(Foo)}</topic>
+    let topicElems = helpDiv.querySelectorAll('topic');
+    topicElems.forEach(topicElem => {
+      let helpPageId = topicElem.innerText;
+      if (helpPages[helpPageId]) {
+        render(buildGoto(helpPageId), topicElem);
+      }
+    });
     helpDiv.style.visibility = 'hidden';
-    helpDiv.style.display = 'block';
+    helpDiv.style.display = 'flex';
     setTimeout(() => {
       // setTimeout to allow browser to lay out the help content so that everything has a size
       let bounds = helpDiv.getBoundingClientRect();
@@ -106,38 +187,56 @@ function showHelp(topic) {
     }, 0);
   };
 
-  let buildTitle = (backPage, thisPage) => {
+  let buildTitle = (thisPage) => {
     return html`<div class=HelpPageTitle>
-      ${backPage ? html`<span class=HelpPageBack>${buildGoto(backPage)}</span>` : ''}
-      ${localization.help[thisPage]}
+      <span class=HelpPageTitleString>${localization.help[thisPage]}</span>
     </div>`;
   };
   let helpPages = {
-    Contents: html`
-      ${buildTitle(null, 'Contents')}
-      <div class=HelpPageGrid>
-        <span class=HelpPageGridItem>${buildGoto('Overview')}</span>
-        <span class=HelpPageGridItem>${buildGoto('Features')}</span>
-        <span class=HelpPageGridItem>${buildGoto('Shortcuts')}</span>
-      </div>
-    `,
-    Overview: html`
-      ${buildTitle('Contents', 'Overview')}
-      <div class=HelpPageFlow>${unsafeHTML(localization.help.OverviewContent)}</div>
-    `,
-    Features: html`
-      ${buildTitle('Contents', 'Features')}
-      <div class=HelpPageFlow>${unsafeHTML(localization.help.FeaturesContent)}</div>
-    `,
-    Shortcuts: html`
-      ${buildTitle('Contents', 'Shortcuts')}
-      <div class=HelpPageGrid>
-        <span class=HelpPageGridItem>Shortcut one</span>
-      </div>
-    `,
+    Contents: {
+      prev: null,
+      next: null,
+      value: html`
+        ${buildTitle('Contents')}
+        <div class="HelpPageContent HelpContents">
+          <span class=HelpContentsName>${buildGoto('Introduction')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.IntroductionContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Features')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.FeaturesContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Shortcuts')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.ShortcutsContentsDesc)}</span>
+        </div>
+      `,
+    },
+    Introduction: {
+      prev: null,
+      next: 'Features',
+      value: html`
+        ${buildTitle('Introduction')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.IntroductionContent)}</div>
+      `,
+    },
+    Features: {
+      prev: 'Introduction',
+      next: 'Shortcuts',
+      value: html`
+        ${buildTitle('Features')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.FeaturesContent)}</div>
+      `,
+    },
+    Shortcuts: {
+      prev: 'Features',
+      next: null,
+      value: html`
+        ${buildTitle('Shortcuts')}
+        <div class="HelpPageContent HelpShortcuts">
+          <span class=HelpPageGridItem>Shortcut one</span>
+        </div>
+      `,
+    },
   };
 
-  let content = html`${helpPages['Contents']}`;
+  let currentPage = 'Contents';
   localUpdate();
 }
 

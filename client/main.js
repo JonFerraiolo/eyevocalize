@@ -1,7 +1,7 @@
 
 
 import { startupChecks } from './startupChecks.js';
-import { helpShowing } from './help.js';
+import { helpShowing, toggleHelp } from './help.js';
 import { popupShowing } from './popup.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize, getSyncMyData, SettingsGetPending, SettingsSync } from './Settings.js';
@@ -328,6 +328,10 @@ function main() {
 			// Control+period speaks the most recent entry in the History
 			e.preventDefault();
 			playLastHistoryItem();
+		} else if (e.key === 'h' && !shift && (control || meta)) {
+			// Control+h toggles visibility of the Help popup
+			e.preventDefault();
+			toggleHelp();
     } else {
       // just pass through to default processing, which will add the character
     }
