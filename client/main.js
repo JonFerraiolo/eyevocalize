@@ -48,6 +48,10 @@ export function setAppMinOrMax(minOrMax) {
 	document.querySelector('.appinitiallyblank').style.height = appinitiallyblankpercent;
 	document.querySelector('.appinitiallyblank').style.display = minOrMax === 'Min' ? 'flex' : 'none';
 	updateMain();
+	setTimeout(() => {
+		let event = new CustomEvent("AppLayoutChanged", { detail: null } );
+    window.dispatchEvent(event);
+	}, 0);
 }
 
 /*
@@ -349,6 +353,12 @@ function main() {
 				TextEntryRowSetFocus();
 			}
 		}
+	}, false);
+	window.addEventListener('resize', e => {
+		setTimeout(() => {
+			let event = new CustomEvent("AppLayoutChanged", { detail: null } );
+			window.dispatchEvent(event);
+		}, 0);
 	}, false);
 };
 

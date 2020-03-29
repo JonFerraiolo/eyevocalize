@@ -19,7 +19,7 @@ let popupIsShowing = false;
  * @param {number} [params.offsetX] After aligning edges, shift popup this many pixels to right (default: 0)
  * @param {number} [params.offsetY] After aligning edges, shift popup this many pixels to bottom (default: 0)
  * @param {boolean} [params.clickAwayToClose] Clicking on background closes the popup (default: true)
- * @param {boolean} [params.underlayOpacity] Opacity value for underlay (default: .8)
+ * @param {boolean} [params.underlayOpacity] Opacity value for underlay (default: .6)
  * @param {function} [params.hideCallback] Callback to call when the popup comes down
  * @returns {Element} popupOverlay root element
  */
@@ -35,7 +35,7 @@ export function showPopup(params) {
 	var offsetX = params.offsetX || 0;
 	var offsetY = params.offsetY || 0;
 	clickAwayToClose = typeof params.clickAwayToClose == 'boolean' ? params.clickAwayToClose : true;
-	underlayOpacity = typeof params.underlayOpacity == 'undefined' ? '.8' : params.underlayOpacity;
+	underlayOpacity = typeof params.underlayOpacity == 'undefined' ? '.6' : params.underlayOpacity;
 	hideCallback = params.hideCallback;
 	if (!popupUnderlay) {
 		popupUnderlay = document.createElement('div');

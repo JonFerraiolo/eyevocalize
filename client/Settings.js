@@ -302,6 +302,10 @@ export function editSettings(parentElement, params) {
     localUpdate();
     updateMain();
     updateStorage();
+    setTimeout(() => {
+      let event = new CustomEvent("AppLayoutChanged", { detail: null } );
+      window.dispatchEvent(event);
+    }, 0);
   };
   let onChangeMinScreenPercent = newValue => {
     let v = parseFloat(newValue);
@@ -309,6 +313,10 @@ export function editSettings(parentElement, params) {
     minScreenPercent = v;
     updateMain();
     updateStorage();
+    setTimeout(() => {
+      let event = new CustomEvent("AppLayoutChanged", { detail: null } );
+      window.dispatchEvent(event);
+    }, 0);
   };
   let onChangeAutoDeleteHistory = e => {
     e.preventDefault();
@@ -355,6 +363,10 @@ export function editSettings(parentElement, params) {
     localUpdate();
     updateMain();
     updateStorage();
+    setTimeout(() => {
+      let event = new CustomEvent("AppLayoutChanged", { detail: null } );
+      window.dispatchEvent(event);
+    }, 0);
   };
   let voiceOptionElements = html`${
     voices.map(

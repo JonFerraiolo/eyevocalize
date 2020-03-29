@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 :root {
-  --popupMenuBackgroundColor: #d8d8d8;
+  --popupMenuBackgroundColor: #ccc;
   --popupMenuBackgroundColorHover: #9ab;
 }
 html, body, .appfullheight {
@@ -280,6 +280,7 @@ button,input,textarea,select {
 	box-shadow: 1px 1px 1px #888;
 	background: var(--popupMenuBackgroundColor);
 	padding: 1px;
+  font-size: 0.9em;
 }
 .popupMenu ul {
 	list-style-type: none;
@@ -289,6 +290,7 @@ button,input,textarea,select {
 .popupMenu li {
 	display: block;
 	margin: 1px 0;
+  padding: 0.1em 0.6em;
 	white-space: nowrap;
 }
 .popupMenu a {
@@ -319,4 +321,15 @@ button,input,textarea,select {
 .popupMenuItem.popupMenuSeparator {
 	border-bottom: 1px solid #666;
 	margin: 3px 5px;
+}
+.popupMenuTitle {
+  padding: 0.1em 0.6em;
+  font-weight: bold;
+}
+.popupMenuSection.popupMenuItem {
+  padding: 0.1em 0.6em;
+  font-style: italic;
+}
+a.popupMenuItemIndented.popupMenuItem {
+  padding-left: 0.75em;
 }

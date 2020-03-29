@@ -1,8 +1,8 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
+import { showPopup, hidePopup } from './popup.js';
 import { unsafeHTML } from './lib/lit-html/directives/unsafe-html.js';
 import { markedLoadedPromise } from './startupChecks.js';
-import { mainAppPercentWhenSmall } from './Settings.js';
 import { localization } from './main.js';
 
 let css = `
@@ -14,10 +14,6 @@ let css = `
   font-size: 0.95em;
   top: 0px;
   left: 0px;
-  min-width: 20em;
-  max-width: 90%;
-  min-height: 15em;
-  max-height: 90%;
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -31,6 +27,8 @@ let css = `
   height: 1.5em;
   line-height: 1.5em;
   vertical-align: middle;
+  padding-left: 4em;
+  cursor: move;
 }
 .HelpHeaderIcon {
   display: inline-block;
@@ -42,22 +40,32 @@ let css = `
   background-repeat: no-repeat;
   margin: 0 0.1em 0 0;
 }
-.HelpHeaderClose {
+.HelpHeaderPosition, .HelpHeaderSize, .HelpHeaderClose {
   float: right;
   display: inline-block;
   width: 1.5em;
   height: 1.5em;
   background-size: 1em 1em;
-  background-image: url('./images/close.svg');
   background-position: 50% 50%;
   background-repeat: no-repeat;
   margin: 0 0.1em 0 0;
   cursor: pointer;
 }
+.HelpHeaderPosition {
+  background-image: url('./images/position.svg');
+}
+.HelpHeaderSize {
+  background-image: url('./images/size.svg');
+}
+.HelpHeaderClose {
+  background-image: url('./images/close.svg');
+}
 .HelpContent {
   font-size: 0.95em;
   padding: 0.5em 1em;
   flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .HelpPageTitle {
   font-size: 105%;
@@ -74,9 +82,8 @@ let css = `
   text-align: center;
 }
 .HelpPageContent {
-  overflow-x: hidden;
-  overflow-y: auto;
   white-space: normal;
+  font-size: 0.95em;
 }
 .HelpContents {
   display: grid;
@@ -101,11 +108,40 @@ document.head.appendChild(styleElement);
 
 let oldClientX, oldClientY;
 let showingHelp = false;
+let Size = 'short-thin'; // short-thin, tall-wide, tall-thin, short-wide
+let Position = 'middle-center'; // top-left, ... , bottom-right / top,middle,right;left,center,right plus manual
+let DefaultSizeThin = '24em';
+let DefaultSizeWide = '37.5em';
+let DefaultSizeShort = '21em';
+let DefaultSizeTall = '60em';
+let showHelpFirstTime = true;
 
 function showHelp(topic) {
+  function AppLayoutChangedHandler(e) {
+    console.log('AppLayoutChangedHandler');
+    if (showingHelp) {
+      localUpdate();
+    }
+  }
+  if (showHelpFirstTime)  {
+    showHelpFirstTime = false;
+    window.addEventListener('AppLayoutChanged', AppLayoutChangedHandler, false);
+  }
   const helpDiv = document.querySelector('.Help');
   if (!helpDiv) return;
   showingHelp = true;
+  let onPosition = e => {
+    e.preventDefault();
+    showPositionMenu(document.querySelector('.HelpHeaderPosition'), () => {
+      localUpdate();
+    });
+  };
+  let onSize = e => {
+    e.preventDefault();
+    showSizeMenu(document.querySelector('.HelpHeaderSize'), () => {
+      localUpdate();
+    });
+  };
   let onClose = e => {
     e.preventDefault();
     hideHelp();
@@ -159,7 +195,9 @@ function showHelp(topic) {
     render(html`
       <div class=HelpHeader @mousedown=${dragMouseDown}>
         <span class=HelpHeaderIcon></span>Help
-        <span class=HelpHeaderClose @click=${onClose}></span>
+        <span class=HelpHeaderClose title=${localization.help['closeIconDesc']} @click=${onClose}></span>
+        <span class=HelpHeaderPosition title=${localization.help['positionIconDesc']} @click=${onPosition}></span>
+        <span class=HelpHeaderSize title=${localization.help['sizeIconDesc']} @click=${onSize}></span>
       </div>
       <div class=HelpContent>${content}</div>
       ${footer}
@@ -175,15 +213,40 @@ function showHelp(topic) {
     });
     helpDiv.style.visibility = 'hidden';
     helpDiv.style.display = 'flex';
+    let [sizey, sizex] = Size.split('-');
+    helpDiv.style.width = sizex === 'wide' ? DefaultSizeWide : DefaultSizeThin;
+    helpDiv.style.height = sizey === 'tall' ? DefaultSizeTall : DefaultSizeShort;
+    let iw = window.innerWidth;
+    let ih = window.innerHeight;
     setTimeout(() => {
-      // setTimeout to allow browser to lay out the help content so that everything has a size
-      let bounds = helpDiv.getBoundingClientRect();
-      let left = Math.max((window.innerWidth - bounds.width) / 2, 0);
-      let topSection = mainAppPercentWhenSmall() / 100;
-      let top = Math.max((window.innerHeight*topSection - bounds.height) / 2, 0); // force to top part
-      helpDiv.style.left = left + 'px';
-      helpDiv.style.top = top + 'px';
-      helpDiv.style.visibility = 'visible';
+      // First setTimeout to allow browser to lay out the help content so that everything has a size
+      // so we can shrink if too big
+      let topDiv = document.querySelector('.appmaincontent');
+      let boundsHelpDiv = helpDiv.getBoundingClientRect();
+      let boundsTopDiv = topDiv ? topDiv.getBoundingClientRect() : {x:0, left:0, y:0, top:0, right:iw, width:iw, bottom:ih, height:ih};
+      helpDiv.style.width = Math.min(boundsHelpDiv.width, boundsTopDiv.width) + 'px';
+      helpDiv.style.height = Math.min(boundsHelpDiv.height, boundsTopDiv.height) + 'px';
+      setTimeout(() => {
+        // Second setTimeout to allow browser to lay out the help content in case sizes change
+        // and now place the helpDiv in the right place
+        let [posy, posx] = Position.split('-');
+        boundsHelpDiv = helpDiv.getBoundingClientRect();
+        if (posy === 'bottom') {
+          helpDiv.style.top = (boundsTopDiv.height - boundsHelpDiv.height) + 'px';
+        } else if (posy === 'middle') {
+          helpDiv.style.top = ((boundsTopDiv.height - boundsHelpDiv.height)/2) + 'px';
+        } else {
+          helpDiv.style.top = '0px';
+        }
+        if (posx === 'right') {
+          helpDiv.style.left = (boundsTopDiv.width - boundsHelpDiv.width) + 'px';
+        } else if (posx === 'center') {
+          helpDiv.style.left = ((boundsTopDiv.width - boundsHelpDiv.width)/2) + 'px';
+        } else {
+          helpDiv.style.left = '0px';
+        }
+        helpDiv.style.visibility = 'visible';
+      }, 0);
     }, 0);
   };
 
@@ -303,4 +366,121 @@ let closeDragElement = e => {
     helpDiv.style.left = left + 'px';
     helpDiv.style.top = top + 'px';
   }
+};
+
+function showSizeMenu(refNode, hideCB) {
+	let params = {
+		content: HelpSizeMenu,
+		refNode,
+		refX: 'middle',
+		refY: 'bottom',
+		popupX: 'right',
+		popupY: 'top',
+    underlayOpacity: 0.4,
+		hideCallback: () => { hideCB(); },
+	};
+	let popupRootElement = showPopup(params);
+}
+
+let HelpSizeMenu = (parentElement, customControlsData) => {
+  let onClick = e => {
+    e.preventDefault();
+		e.stopPropagation();
+    let HelpMenuId = e.currentTarget.HelpMenuId;
+    let [y, x] = Size.split('-');
+    if (HelpMenuId === 'max' || HelpMenuId === 'tall') {
+      y = 'tall';
+    } else if (HelpMenuId === 'min' || HelpMenuId === 'short') {
+      y = 'short';
+    }
+    if (HelpMenuId === 'max' || HelpMenuId === 'wide') {
+      x = 'wide';
+    } else if (HelpMenuId === 'min' || HelpMenuId === 'thin') {
+      x = 'thin';
+    }
+    Size = y+'-'+x;
+		hidePopup(customControlsData);
+  };
+  render(html`<div class="HelpSizeMenu popupMenu">
+  <div class=popupMenuTitle>${localization.help['Size']}</div>
+		<ul class=popupMenuUL>
+      <li><a class="popupMenuItem" href="" .HelpMenuId=${'max'} @click=${onClick}>
+				<span class=popupMenuLabel>${localization.help['max']}</span>
+			</a></li>
+      <li><a class="popupMenuItem" href="" .HelpMenuId=${'min'} @click=${onClick}>
+				<span class=popupMenuLabel>${localization.help['min']}</span>
+			</a></li>
+      <li class="popupMenuItem popupMenuSeparator"></li>
+      <li><a class="popupMenuItem" href="" .HelpMenuId=${'tall'} @click=${onClick}>
+				<span class=popupMenuLabel>${localization.help['tall']}</span>
+			</a></li>
+      <li><a class="popupMenuItem" href="" .HelpMenuId=${'short'} @click=${onClick}>
+        <span class=popupMenuLabel>${localization.help['short']}</span>
+      </a></li>
+      <li class="popupMenuItem popupMenuSeparator"></li>
+      <li><a class="popupMenuItem" href="" .HelpMenuId=${'wide'} @click=${onClick}>
+        <span class=popupMenuLabel>${localization.help['wide']}</span>
+      </a></li>
+      <li><a class="popupMenuItem" href="" .HelpMenuId=${'thin'} @click=${onClick}>
+        <span class=popupMenuLabel>${localization.help['thin']}</span>
+      </a></li>
+		</ul>
+	</div>`, parentElement);
+};
+
+function showPositionMenu(refNode, hideCB) {
+	let params = {
+		content: HelpPositionMenu,
+		refNode,
+		refX: 'middle',
+		refY: 'bottom',
+		popupX: 'right',
+		popupY: 'top',
+    underlayOpacity: 0.4,
+		hideCallback: () => { hideCB(); },
+	};
+	let popupRootElement = showPopup(params);
+}
+
+// v-align top, middle, bottom, h-align left, center, right,
+// biggest, smallest, taller, shorter, wider, thinner
+let HelpPositionMenu = (parentElement, customControlsData) => {
+  let onClick = e => {
+    e.preventDefault();
+		e.stopPropagation();
+    let HelpMenuId = e.currentTarget.HelpMenuId;
+    let [y, x] = Position.split('-');
+    if (['top', 'middle', 'bottom'].indexOf(HelpMenuId) >= 0) {
+      Position = Position === 'manual' ? HelpMenuId+'-center' : HelpMenuId+'-'+x;
+    } else if (['left', 'center', 'right'].indexOf(HelpMenuId) >= 0) {
+      Position = Position === 'manual' ? 'middle-'+HelpMenuId : y+'-'+HelpMenuId;
+    }
+		hidePopup(customControlsData);
+  };
+  render(html`<div class="HelpPositionMenu popupMenu">
+  <div class=popupMenuTitle>${localization.help['Position']}</div>
+		<ul class=popupMenuUL>
+      <li class="popupMenuItem popupMenuSection">${localization.help['vertical']}</li>
+      <li><a class="popupMenuItem popupMenuItemIndented" href="" .HelpMenuId=${'top'} @click=${onClick}>
+				<span class=popupMenuLabel>${localization.help['top']}</span>
+			</a></li>
+      <li><a class="popupMenuItem popupMenuItemIndented" href="" .HelpMenuId=${'middle'} @click=${onClick}>
+				<span class=popupMenuLabel>${localization.help['middle']}</span>
+			</a></li>
+      <li><a class="popupMenuItem popupMenuItemIndented" href="" .HelpMenuId=${'bottom'} @click=${onClick}>
+				<span class=popupMenuLabel>${localization.help['bottom']}</span>
+			</a></li>
+      <li class="popupMenuItem popupMenuSeparator"></li>
+      <li class="popupMenuItem popupMenuSection">${localization.help['horizontal']}</li>
+      <li><a class="popupMenuItem popupMenuItemIndented" href="" .HelpMenuId=${'left'} @click=${onClick}>
+        <span class=popupMenuLabel>${localization.help['left']}</span>
+      </a></li>
+      <li><a class="popupMenuItem popupMenuItemIndented" href="" .HelpMenuId=${'center'} @click=${onClick}>
+        <span class=popupMenuLabel>${localization.help['center']}</span>
+      </a></li>
+      <li><a class="popupMenuItem popupMenuItemIndented" href="" .HelpMenuId=${'right'} @click=${onClick}>
+        <span class=popupMenuLabel>${localization.help['right']}</span>
+      </a></li>
+		</ul>
+	</div>`, parentElement);
 };
