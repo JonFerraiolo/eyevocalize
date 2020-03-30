@@ -40,16 +40,26 @@ let css = `
   background-repeat: no-repeat;
   margin: 0 0.1em 0 0;
 }
-.HelpHeaderPosition, .HelpHeaderSize, .HelpHeaderClose {
-  float: right;
+.HelpHeaderPosition, .HelpHeaderSize, .HelpHeaderClose, .HelpPageContentIcon1, .HelpPageContentIcon2 {
   display: inline-block;
   width: 1.5em;
   height: 1.5em;
   background-size: 1em 1em;
   background-position: 50% 50%;
   background-repeat: no-repeat;
+}
+.HelpHeaderPosition, .HelpHeaderSize, .HelpHeaderClose {
+  float: right;
   margin: 0 0.1em 0 0;
   cursor: pointer;
+}
+.HelpPageContentIcon1, .HelpPageContentIcon2 {
+  vertical-align: bottom;
+}
+.HelpPageContentIcon2 {
+  width: 3em;
+  height: 3em;
+  background-size: 3em 3em;
 }
 .HelpHeaderPosition {
   background-image: url('./images/position.svg');
@@ -211,6 +221,16 @@ function showHelp(topic) {
         render(buildGoto(helpPageId), topicElem);
       }
     });
+    // replace all <icon>Foo</icon> with the markup equivalent of
+    // <icon class="HelpPageContentIcon1" style="background-image:url(... Foo.svg)"></icon>
+    let iconElems = helpDiv.querySelectorAll('icon1,icon2');
+    iconElems.forEach(iconElem => {
+      let iconName = iconElem.IconName || iconElem.innerText;
+      iconElem.innerText = '';
+      iconElem.IconName = iconName;
+      iconElem.classList.add(iconElem.tagName === 'icon2' ? 'HelpPageContentIcon2' : 'HelpPageContentIcon1');
+      iconElem.style.backgroundImage = 'url(./images/'+iconName+'.svg)';
+    });
     helpDiv.style.visibility = 'hidden';
     helpDiv.style.display = 'flex';
     let [sizey, sizex] = Size.split('-');
@@ -266,6 +286,10 @@ function showHelp(topic) {
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.IntroductionContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Features')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.FeaturesContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Type-to-speak')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.TtsContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Builtins')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.BuiltinsContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Shortcuts')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.ShortcutsContentsDesc)}</span>
         </div>
@@ -281,14 +305,30 @@ function showHelp(topic) {
     },
     Features: {
       prev: 'Introduction',
-      next: 'Shortcuts',
+      next: 'Type-to-speak',
       value: html`
         ${buildTitle('Features')}
         <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.FeaturesContent)}</div>
       `,
     },
-    Shortcuts: {
+    "Type-to-speak": {
       prev: 'Features',
+      next: 'Builtins',
+      value: html`
+        ${buildTitle('Type-to-speak')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.TtsContent)}</div>
+      `,
+    },
+    Builtins: {
+      prev: 'Type-to-speak',
+      next: 'Shortcuts',
+      value: html`
+        ${buildTitle('Builtins')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.BuiltinsContent)}</div>
+      `,
+    },
+    Shortcuts: {
+      prev: 'Builtins',
       next: null,
       value: html`
         ${buildTitle('Shortcuts')}

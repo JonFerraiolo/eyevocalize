@@ -23,7 +23,7 @@ const Localization = {
       <p>EyeVocalize features:</p>
       <ul>
         <li><topic>Type-to-speak</topic>: Type text, then press Return (or click the speak icon) to cause the typed words to be spoken using voice synthesis</li>
-        <li><topic>Builtsin</topic>: A built-in library of common expressions, such as yes, no, please, thank you, hello, goodbye, etc.</li>
+        <li><topic>Builtins</topic>: A built-in library of common expressions, such as yes, no, please, thank you, hello, goodbye, etc.</li>
         <li><topic>Favorites</topic>: Ability to define your own favorites for phrases that you use repeatedly </li>
         <li><topic>Clipboard</topic>: Ability to prepare text in advance and store on the Clipboard for one-click speaking at just the right time </li>
         <li><topic>History</topic>: EyeVocalize saves your history of vocalizations so you can search for things you said in the past and repeat again </li>
@@ -32,6 +32,22 @@ const Localization = {
         <li><topic>Sync</topic>: If you have multiple eye gaze systems like me, and you allow EyeVocalize to back up your data, EyeVocalize will sync your data across all of your systems and browsers.  </li>
         <li><topic>Shortcuts</topic>: For advanced users, EyeVocalize has various keyboard shortcuts to accelerate your use of the application.  </li>
       </ul>
+    `,
+    "Type-to-speak": `Type-to-speak`,
+    TtsContentsDesc: `Type what you want to say`,
+    TtsContent: `
+      <p>On the main screen of the application, you should see a <strong>Compose</strong> text input box with a type-in cursor.</p>
+      <p>Bring up the onscreen keyboard from your eye gaze system. (For example, I have a Tobii Dynavox PC Eye Mini. The onscreen keyboard is part of their Windows Control software.) </p>
+      <p>Type what you want to say. </p>
+      <p>Press Return to cause speech synthesis to vocalize using the current system voice. </p>
+    `,
+    Builtins: `Builtins`,
+    BuiltinsContentsDesc: `Common expressions for all users`,
+    BuiltinsContent: `
+      <p>On the right side of the application, you should see the EyeVocalize builtin expressions.</p>
+      <p>These are mostly one word expressions such as yes, no, hello and goodbye. </p>
+      <p>Just click on one of the buttons to speak that expression. </p>
+      <p>On the Builtins title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you can hide either particular builtin buttons or an entire category. </p>
     `,
     Shortcuts: `Shortcuts`,
     ShortcutsContentsDesc: `Keyboard shortcuts`,
