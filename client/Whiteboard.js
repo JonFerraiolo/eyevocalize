@@ -9,7 +9,7 @@ import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } fro
 import { slideInAddFavoriteScreen } from './MyPhrases.js';
 
 let css = `
-.ClipboardTitleIcon {
+.WhiteboardTitleIcon {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -19,19 +19,19 @@ let css = `
   background-position: 0% 0%;
   background-repeat: no-repeat;
 }
-.editClipboard .skinnyScreenChild {
+.editWhiteboard .skinnyScreenChild {
   display: flex;
   flex-direction: column;
 }
-.editClipboard .ScreenInstructions {
+.editWhiteboard .ScreenInstructions {
   text-align: center;
   font-size: 90%;
 }
-.editClipboardPhraseRows {
+.editWhiteboardPhraseRows {
   flex: 1;
   overflow: auto;
 }
-.editClipboardNewMyPhrase {
+.editWhiteboardNewMyPhrase {
   display: inline-block;
   width: 1.4em;
   height: 1.4em;
@@ -45,34 +45,34 @@ let styleElement = document.createElement('style');
 styleElement.appendChild(document.createTextNode(css));
 document.head.appendChild(styleElement);
 
-let Clipboard;
+let Whiteboard;
 
-export function initializeClipboard(props) {
+export function initializeWhiteboard(props) {
   let { currentVersion } = props;
-  let initialClipboard = { version: currentVersion, timestamp: 0, expanded: true, items: [] };
-  let ClipboardString = localStorage.getItem("Clipboard");
+  let initialWhiteboard = { version: currentVersion, timestamp: 0, expanded: true, items: [] };
+  let WhiteboardString = localStorage.getItem("Whiteboard");
   try {
-    Clipboard = (typeof ClipboardString === 'string') ? JSON.parse(ClipboardString) : initialClipboard;
+    Whiteboard = (typeof WhiteboardString === 'string') ? JSON.parse(WhiteboardString) : initialWhiteboard;
   } catch(e) {
-    Clipboard = initialClipboard;
+    Whiteboard = initialWhiteboard;
   }
-  if (typeof Clipboard.version != 'number'|| Clipboard.version < currentVersion) {
-    Clipboard = initialClipboard;
+  if (typeof Whiteboard.version != 'number'|| Whiteboard.version < currentVersion) {
+    Whiteboard = initialWhiteboard;
   }
-  localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
+  localStorage.setItem("Whiteboard", JSON.stringify(Whiteboard));
 }
 
-export function ClipboardGetPending(clientLastSync) {
-  if (!Clipboard.pending) return null;
-  delete Clipboard.pending;
-  return Clipboard.timestamp > clientLastSync ? Clipboard : null;
+export function WhiteboardGetPending(clientLastSync) {
+  if (!Whiteboard.pending) return null;
+  delete Whiteboard.pending;
+  return Whiteboard.timestamp > clientLastSync ? Whiteboard : null;
 }
 
-export function ClipboardSync(thisSyncServerTimestamp, newData) {
-  if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Clipboard.timestamp) {
-    Clipboard = newData;
+export function WhiteboardSync(thisSyncServerTimestamp, newData) {
+  if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Whiteboard.timestamp) {
+    Whiteboard = newData;
     updateLocalStorage({ timestamp: newData.timestamp });
-    let event = new CustomEvent("ServerInitiatedSyncClipboard", { detail: null } );
+    let event = new CustomEvent("ServerInitiatedSyncWhiteboard", { detail: null } );
     window.dispatchEvent(event);
   }
 }
@@ -83,55 +83,55 @@ function updateStorage()  {
 }
 
 function updateLocalStorage(overrides) {
-  Clipboard.timestamp = Date.now();
-  Clipboard = Object.assign({}, Clipboard, overrides || {});
-  localStorage.setItem("Clipboard", JSON.stringify(Clipboard));
+  Whiteboard.timestamp = Date.now();
+  Whiteboard = Object.assign({}, Whiteboard, overrides || {});
+  localStorage.setItem("Whiteboard", JSON.stringify(Whiteboard));
 }
 
-// Add phrase to Clipboard without speaking
-export function addToClipboard(phrase) {
-  Clipboard.items.unshift(phrase);
+// Add phrase to Whiteboard without speaking
+export function addToWhiteboard(phrase) {
+  Whiteboard.items.unshift(phrase);
   updateStorage();
 };
 
-function replaceClipboardEntry(index, phrase) {
-  Clipboard.items[index] = Object.assign({}, phrase);
+function replaceWhiteboardEntry(index, phrase) {
+  Whiteboard.items[index] = Object.assign({}, phrase);
   updateStorage();
 };
 
-function traverseItems(aClipboard, func) {
-  aClipboard.items.forEach((item, itIndex) => {
-    func(item, aClipboard, itIndex);
+function traverseItems(aWhiteboard, func) {
+  aWhiteboard.items.forEach((item, itIndex) => {
+    func(item, aWhiteboard, itIndex);
   });
 };
 
-// Add text to Clipboard without speaking
-export function AddTextToClipboard(text) {
+// Add text to Whiteboard without speaking
+export function AddTextToWhiteboard(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	if (text.length > 0) {
 		TextEntryRowSetText('');
 		let phrase = { type: 'text', text, timestamp: Date.now() };
-    addToClipboard(phrase);
+    addToWhiteboard(phrase);
     updateMain();
 	}
 }
 
-function onClipboardChange() {
+function onWhiteboardChange() {
   updateStorage();
 }
 
 
-function slideInAddEntryToClipboardScreen(props) {
+function slideInAddEntryToWhiteboardScreen(props) {
   props = props || {};
   let { phrase } = props;
   let params = {
     renderFunc: EditPhrase,
     renderFuncParams: {
-      title: 'Add Entry to Clipboard',
+      title: 'Add Entry to Whiteboard',
       doItButtonLabel: 'Add Entry',
       doItCallback: function(phrase) {
-        // add phrase to Clipboard, go back to parent screen
-        addToClipboard(phrase);
+        // add phrase to Whiteboard, go back to parent screen
+        addToWhiteboard(phrase);
         updateMain();
         secondLevelScreenHide();
       },
@@ -145,30 +145,30 @@ function slideInAddEntryToClipboardScreen(props) {
   secondLevelScreenShow(params);
 };
 
-let updateClipboardFirstTime = true;
+let updateWhiteboardFirstTime = true;
 
-export function updateClipboard(parentElement, props) {
-  if (updateClipboardFirstTime) {
-    updateClipboardFirstTime = false;
-    window.addEventListener('ServerInitiatedSyncClipboard', function(e) {
-      console.log('updateClipboard ServerInitiatedSyncClipboard custom event listener entered ');
+export function updateWhiteboard(parentElement, props) {
+  if (updateWhiteboardFirstTime) {
+    updateWhiteboardFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncWhiteboard', function(e) {
+      console.log('updateWhiteboard ServerInitiatedSyncWhiteboard custom event listener entered ');
       localUpdate();
     });
   }
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
-    slideInAddEntryToClipboardScreen();
+    slideInAddEntryToWhiteboardScreen();
   };
   let onClickEdit = e => {
     e.preventDefault();
-    onEditClipboard();
+    onEditWhiteboard();
   };
-  let ClipboardTitle = buildTitleWithCollapseExpandArrows(Clipboard, "Clipboard", "ClipboardTitleIcon");
+  let WhiteboardTitle = buildTitleWithCollapseExpandArrows(Whiteboard, "Whiteboard", "WhiteboardTitleIcon");
   let localUpdate = () => {
-    let filteredClipboard = JSON.parse(JSON.stringify(Clipboard));  // deep clone
+    let filteredWhiteboard = JSON.parse(JSON.stringify(Whiteboard));  // deep clone
     if (searchTokens.length > 0) {
-      filteredClipboard.items = filteredClipboard.items.filter(phrase => {
+      filteredWhiteboard.items = filteredWhiteboard.items.filter(phrase => {
         return searchTokens.some(token => {
           return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
                   (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
@@ -177,11 +177,11 @@ export function updateClipboard(parentElement, props) {
     }
     render(html`
       <div class=PhrasesSectionLabel>
-        ${ClipboardTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
+        ${WhiteboardTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
       </div>
-      ${filteredClipboard.expanded ?
-        html`<div class=ClipboardContent>
-          ${filteredClipboard.items.map(phrase =>
+      ${filteredWhiteboard.expanded ?
+        html`<div class=WhiteboardContent>
+          ${filteredWhiteboard.items.map(phrase =>
             html`
               <div class=PhraseRow>
                 <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
@@ -194,30 +194,30 @@ export function updateClipboard(parentElement, props) {
   localUpdate();
 }
 
-let editClipboardActive = false;
+let editWhiteboardActive = false;
 
-function onEditClipboard() {
-  editClipboardActive = true;
+function onEditWhiteboard() {
+  editWhiteboardActive = true;
   let renderFuncParams = { };
-  secondLevelScreenShow({ renderFunc: editClipboard, renderFuncParams });
+  secondLevelScreenShow({ renderFunc: editWhiteboard, renderFuncParams });
 }
 
-function onEditClipboardReturn() {
-  editClipboardActive = false;
+function onEditWhiteboardReturn() {
+  editWhiteboardActive = false;
   updateMain();
   secondLevelScreenHide();
 }
 
-let editClipboardFirstTime = true;
+let editWhiteboardFirstTime = true;
 
-export function editClipboard(parentElement, props) {
-  if (editClipboardFirstTime) {
-    editClipboardFirstTime = false;
-    window.addEventListener('ServerInitiatedSyncClipboard', function(e) {
-      if (editClipboardActive && parentElement) {
-        console.log('editClipboard ServerInitiatedSyncClipboard custom event listener entered ');
-        let ClipboardContent = parentElement.querySelector('.ClipboardContent');
-        if (ClipboardContent) {
+export function editWhiteboard(parentElement, props) {
+  if (editWhiteboardFirstTime) {
+    editWhiteboardFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncWhiteboard', function(e) {
+      if (editWhiteboardActive && parentElement) {
+        console.log('editWhiteboard ServerInitiatedSyncWhiteboard custom event listener entered ');
+        let WhiteboardContent = parentElement.querySelector('.WhiteboardContent');
+        if (WhiteboardContent) {
           initializeSelection();
           localUpdate();
         }
@@ -238,17 +238,17 @@ export function editClipboard(parentElement, props) {
       lastClickItemIndex = phraseIndex;
     } else if (shift && !meta && !control && lastClickItemIndex != null) {
       // shift click is range selection
-      localClipboard.items.forEach(item => {
+      localWhiteboard.items.forEach(item => {
         item.selected = false;
       });
       let f = (lastClickItemIndex > phraseIndex) ? phraseIndex : lastClickItemIndex;
       let l = (lastClickItemIndex > phraseIndex) ? lastClickItemIndex : phraseIndex;
       for (let i=f; i<=l; i++) {
-        localClipboard.items[i].selected = true;
+        localWhiteboard.items[i].selected = true;
       }
     } else if (!control && !meta && (!shift || lastClickItemIndex === null)) {
       // simple click deselects everything else but the item getting the click
-      localClipboard.items.forEach(item => {
+      localWhiteboard.items.forEach(item => {
         item.selected = false;
       });
       phrase.selected = true;
@@ -258,7 +258,7 @@ export function editClipboard(parentElement, props) {
   };
   let onClickSelectAll = e => {
     e.preventDefault();
-    localClipboard.items.forEach(item => {
+    localWhiteboard.items.forEach(item => {
       item.selected = true;
     });
     localUpdate();
@@ -266,7 +266,7 @@ export function editClipboard(parentElement, props) {
   };
   let onClickDeselectAll = e => {
     e.preventDefault();
-    localClipboard.items.forEach(item => {
+    localWhiteboard.items.forEach(item => {
       item.selected = false;
     });
     localUpdate();
@@ -277,12 +277,12 @@ export function editClipboard(parentElement, props) {
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
-        title: 'Add New Entry To Clipboard',
-        doItButtonLabel: 'Add to Clipboard',
+        title: 'Add New Entry To Whiteboard',
+        doItButtonLabel: 'Add to Whiteboard',
         doItCallback: function(phrase) {
-          // add phrase to Clipboard, go back to parent screen
-          addToClipboard(phrase);
-          localClipboard = JSON.parse(JSON.stringify(Clipboard));  // deep clone
+          // add phrase to Whiteboard, go back to parent screen
+          addToWhiteboard(phrase);
+          localWhiteboard = JSON.parse(JSON.stringify(Whiteboard));  // deep clone
           initializeSelection();
           localUpdate();
           thirdLevelScreenHide();
@@ -298,19 +298,19 @@ export function editClipboard(parentElement, props) {
   };
   let onClickEditItem = e => {
     e.preventDefault();
-    let index = localClipboard.items.findIndex(phrase => phrase.selected);
-    let phrase = Clipboard.items[index];
+    let index = localWhiteboard.items.findIndex(phrase => phrase.selected);
+    let phrase = Whiteboard.items[index];
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
         phrase,
-        title: 'Edit Entry From Clipboard',
+        title: 'Edit Entry From Whiteboard',
         doItButtonLabel: 'Update Entry',
         doItCallback: function(phrase) {
-          // add phrase to Clipboard, go back to parent screen
-          replaceClipboardEntry(index, phrase);
-          localClipboard = JSON.parse(JSON.stringify(Clipboard));  // deep clone
-          localClipboard.items[index].selected = true;
+          // add phrase to Whiteboard, go back to parent screen
+          replaceWhiteboardEntry(index, phrase);
+          localWhiteboard = JSON.parse(JSON.stringify(Whiteboard));  // deep clone
+          localWhiteboard.items[index].selected = true;
           localUpdate();
           thirdLevelScreenHide();
         },
@@ -324,118 +324,118 @@ export function editClipboard(parentElement, props) {
   };
   let onClickRemoveSelected = e => {
     e.preventDefault();
-    localClipboard.items = localClipboard.items.filter(item => !item.selected);
-    Clipboard = JSON.parse(JSON.stringify(localClipboard));  // deep clone
-    traverseItems(Clipboard, deleteTemporaryProperties);
-    onClipboardChange();
+    localWhiteboard.items = localWhiteboard.items.filter(item => !item.selected);
+    Whiteboard = JSON.parse(JSON.stringify(localWhiteboard));  // deep clone
+    traverseItems(Whiteboard, deleteTemporaryProperties);
+    onWhiteboardChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickAddToMyPhrases = e => {
     e.preventDefault();
-    let index = localClipboard.items.findIndex(phrase => phrase.selected);
-    let phrase = Clipboard.items[index];
+    let index = localWhiteboard.items.findIndex(phrase => phrase.selected);
+    let phrase = Whiteboard.items[index];
     slideInAddFavoriteScreen({ slideInLevel: 'third', phrase });
   };
   let onClickMoveUp = e => {
     e.preventDefault();
-    for (let i=1, n=localClipboard.items.length; i<n; i++) {
-      let item = localClipboard.items[i];
-      if (item.selected && !localClipboard.items[i-1].selected) {
-        [ localClipboard.items[i-1], localClipboard.items[i] ] = [ localClipboard.items[i], localClipboard.items[i-1] ];  // swap
+    for (let i=1, n=localWhiteboard.items.length; i<n; i++) {
+      let item = localWhiteboard.items[i];
+      if (item.selected && !localWhiteboard.items[i-1].selected) {
+        [ localWhiteboard.items[i-1], localWhiteboard.items[i] ] = [ localWhiteboard.items[i], localWhiteboard.items[i-1] ];  // swap
       }
     }
-    Clipboard = JSON.parse(JSON.stringify(localClipboard));  // deep clone
-    traverseItems(Clipboard, deleteTemporaryProperties);
-    onClipboardChange();
+    Whiteboard = JSON.parse(JSON.stringify(localWhiteboard));  // deep clone
+    traverseItems(Whiteboard, deleteTemporaryProperties);
+    onWhiteboardChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickMoveDown = e => {
     e.preventDefault();
-    for (let n=localClipboard.items.length, i=n-2; i>=0; i--) {
-      let item = localClipboard.items[i];
-      if (item.selected && !localClipboard.items[i+1].selected) {
-        [ localClipboard.items[i+1], localClipboard.items[i] ] = [ localClipboard.items[i], localClipboard.items[i+1] ];  // swap
+    for (let n=localWhiteboard.items.length, i=n-2; i>=0; i--) {
+      let item = localWhiteboard.items[i];
+      if (item.selected && !localWhiteboard.items[i+1].selected) {
+        [ localWhiteboard.items[i+1], localWhiteboard.items[i] ] = [ localWhiteboard.items[i], localWhiteboard.items[i+1] ];  // swap
       }
     }
-    Clipboard = JSON.parse(JSON.stringify(localClipboard));  // deep clone
-    traverseItems(Clipboard, deleteTemporaryProperties);
-    onClipboardChange();
+    Whiteboard = JSON.parse(JSON.stringify(localWhiteboard));  // deep clone
+    traverseItems(Whiteboard, deleteTemporaryProperties);
+    onWhiteboardChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickMoveToTop = e => {
     e.preventDefault();
-    for (let n=localClipboard.items.length, toPosition=0, fromPosition=1; fromPosition<n; fromPosition++) {
-      let toItem = localClipboard.items[toPosition];
-      let fromItem = localClipboard.items[fromPosition];
+    for (let n=localWhiteboard.items.length, toPosition=0, fromPosition=1; fromPosition<n; fromPosition++) {
+      let toItem = localWhiteboard.items[toPosition];
+      let fromItem = localWhiteboard.items[fromPosition];
       if (fromItem.selected && !toItem.selected) {
-        localClipboard.items.splice(fromPosition, 1);
-        localClipboard.items.splice(toPosition, 0, fromItem);
+        localWhiteboard.items.splice(fromPosition, 1);
+        localWhiteboard.items.splice(toPosition, 0, fromItem);
       }
-      if (localClipboard.items[toPosition].selected) {
+      if (localWhiteboard.items[toPosition].selected) {
         toPosition++;
       }
     }
-    Clipboard = JSON.parse(JSON.stringify(localClipboard));  // deep clone
-    traverseItems(Clipboard, deleteTemporaryProperties);
-    onClipboardChange();
+    Whiteboard = JSON.parse(JSON.stringify(localWhiteboard));  // deep clone
+    traverseItems(Whiteboard, deleteTemporaryProperties);
+    onWhiteboardChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickMoveToBottom = e => {
     e.preventDefault();
-    for (let n=localClipboard.items.length, toPosition=n-1, fromPosition=n-2; fromPosition>=0; fromPosition--) {
-      let toItem = localClipboard.items[toPosition];
-      let fromItem = localClipboard.items[fromPosition];
+    for (let n=localWhiteboard.items.length, toPosition=n-1, fromPosition=n-2; fromPosition>=0; fromPosition--) {
+      let toItem = localWhiteboard.items[toPosition];
+      let fromItem = localWhiteboard.items[fromPosition];
       if (fromItem.selected && !toItem.selected) {
-        localClipboard.items.splice(fromPosition, 1);
-        localClipboard.items.splice(toPosition, 0, fromItem);
+        localWhiteboard.items.splice(fromPosition, 1);
+        localWhiteboard.items.splice(toPosition, 0, fromItem);
       }
-      if (localClipboard.items[toPosition].selected) {
+      if (localWhiteboard.items[toPosition].selected) {
         toPosition--;
       }
     }
-    Clipboard = JSON.parse(JSON.stringify(localClipboard));  // deep clone
-    traverseItems(Clipboard, deleteTemporaryProperties);
-    onClipboardChange();
+    Whiteboard = JSON.parse(JSON.stringify(localWhiteboard));  // deep clone
+    traverseItems(Whiteboard, deleteTemporaryProperties);
+    onWhiteboardChange();
     localUpdate();
     lastClickItemIndex = null;
 
   };
   let initializeSelection = () => {
-    localClipboard.items.forEach((item, index) => {
+    localWhiteboard.items.forEach((item, index) => {
       item.selected = false;
     });
     lastClickItemIndex = null;
   };
   let localUpdate = () => {
-    localClipboard.items.forEach(item => {
+    localWhiteboard.items.forEach(item => {
       item.cls = item.selected ? 'selected' : '';
       item.checkmark = item.selected ? html`<span class=checkmark>&#x2714;</span>` : '';
     });
-    let enableEditItem = localClipboard.items.reduce((accumulator, item) => {
+    let enableEditItem = localWhiteboard.items.reduce((accumulator, item) => {
       if (item.selected) {
         accumulator++;
       }
       return accumulator;
     }, 0) === 1;
     let enableAddToMyPhrases = enableEditItem;
-    let enableRemoveSelected = localClipboard.items.some(item => item.selected);
-    let enableMoveUp = localClipboard.items.some((item, index, arr) =>
+    let enableRemoveSelected = localWhiteboard.items.some(item => item.selected);
+    let enableMoveUp = localWhiteboard.items.some((item, index, arr) =>
       item.selected && (index > 0 && !arr[index-1].selected));
-    let enableMoveDown = localClipboard.items.some((item, index, arr) =>
+    let enableMoveDown = localWhiteboard.items.some((item, index, arr) =>
       item.selected && (index < arr.length-1 && !arr[index+1].selected));
     render(html`
-    <div class="Clipboard editClipboard skinnyScreenParent">
+    <div class="Whiteboard editWhiteboard skinnyScreenParent">
       <div class=skinnyScreenChild>
-        ${buildSlideRightTitle("Manage Clipboard", onEditClipboardReturn)}
+        ${buildSlideRightTitle("Manage Whiteboard", onEditWhiteboardReturn)}
         <div class=ScreenInstructions>
           (Click to select, control-click to toggle, shift-click for range)
         </div>
-        <div class=editClipboardPhraseRows>
-          ${localClipboard.items.map((phrase, index) => {
+        <div class=editWhiteboardPhraseRows>
+          ${localWhiteboard.items.map((phrase, index) => {
             return html`
               <div class=PhraseRow>
                 <button @click=${onItemClick} .phraseObject=${phrase} .phraseIndex=${index} class=${phrase.cls}>
@@ -458,7 +458,7 @@ export function editClipboard(parentElement, props) {
             title="Delete selected items">Delete</button>
           <button @click=${onClickAddToMyPhrases} ?disabled=${!enableAddToMyPhrases}
             title="Make selected item into a favorite">
-            <span class=editClipboardNewMyPhrase></span></button>
+            <span class=editWhiteboardNewMyPhrase></span></button>
           <button @click=${onClickMoveUp} ?disabled=${!enableMoveUp}
             title="Move selected items up one position">
             <span class=arrowButton>&#x1f851;</span></button>
@@ -475,7 +475,7 @@ export function editClipboard(parentElement, props) {
       </div>
     </div>`, parentElement);
   };
-  let localClipboard = JSON.parse(JSON.stringify(Clipboard));  // deep clone
+  let localWhiteboard = JSON.parse(JSON.stringify(Whiteboard));  // deep clone
   initializeSelection();
   localUpdate();
 }

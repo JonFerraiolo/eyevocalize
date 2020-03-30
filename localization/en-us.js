@@ -25,7 +25,7 @@ const Localization = {
         <li><topic>Type-to-speak</topic>: Type text, then press Return (or click the speak icon) to cause the typed words to be spoken using voice synthesis</li>
         <li><topic>Builtins</topic>: A built-in library of common expressions, such as yes, no, please, thank you, hello, goodbye, etc.</li>
         <li><topic>Favorites</topic>: Ability to define your own favorites for phrases that you use repeatedly </li>
-        <li><topic>Clipboard</topic>: Ability to prepare text in advance and store on the Clipboard for one-click speaking at just the right time </li>
+        <li><topic>Whiteboard</topic>: Ability to prepare text in advance and store on the Whiteboard for one-click speaking at just the right time </li>
         <li><topic>History</topic>: EyeVocalize saves your history of vocalizations so you can search for things you said in the past and repeat again </li>
         <li><topic>Video and Audio</topic>: For fun, you can play Web audio clips or YouTube clips, such as "Houston, we have a problem" </li>
         <li><topic>Cloud Backup</topic>: If you sign up and login, which are recommended, EyeVocalize By default will back up your history, clipboard, favorites and some other settings to the EyeVocalize server.</li>

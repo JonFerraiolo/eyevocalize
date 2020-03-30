@@ -133,7 +133,7 @@ new ideas
   each new phrase saved forever, at least for now
   each phrase gets an int index auto increment
   each built in only saved once in database
-  each revision of history, AddTextToClipboard, favorites has new phrases plus updated arrays with array of integers, which are phrase ids
+  each revision of history, AddTextToWhiteboard, favorites has new phrases plus updated arrays with array of integers, which are phrase ids
   Change the data structures on the client to match the server
   Have server APIs that match client local storage options, such as addToHistory
 
@@ -177,7 +177,7 @@ localStorage
 history, last sync timestamp, deleted timestamp, entries after last server sync removed only by auto delete
 client maintains an associative array of all deletions
 
-AddTextToClipboard, full list with timestamp back to last server sync
+AddTextToWhiteboard, full list with timestamp back to last server sync
 favorites, full list, saved history back to last server sync
 settings, same
 need to figure out built in favorites!!!
@@ -206,7 +206,7 @@ click the Speak icon (show icon)
 * to add your own favorite, type text into the composition box and press the add favorite icon
 (show icon)
 * to prepare some text to Vocalize later type text into the composition box and click the
-Add to Clipboard icon (show icon)
+Add to Whiteboard icon (show icon)
 * to choose a different voice or change speaking speed, click the Settings icon (show icon)
 You can close this help screen by pressing the X at the top right.
 You can move this box by dragging the title bar or pressing one of the arrow icons.
@@ -247,7 +247,7 @@ using voice synthesis
 thank you, toilet please, etc.
 * you can define your own favorites for phrases that you use repeatedly
 * you can prepare text in advance and
-store on the Clipboard for one-click speaking at just the right time
+store on the Whiteboard for one-click speaking at just the right time
 * for fun, you can play Web audio clips or YouTube clips, such as
 "Houston, we have a problem"
 

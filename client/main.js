@@ -6,7 +6,7 @@ import { popupShowing } from './popup.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize, getSyncMyData, SettingsGetPending, SettingsSync } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
-import { initializeClipboard, ClipboardGetPending, ClipboardSync, AddTextToClipboard, editClipboard } from './Clipboard.js';
+import { initializeWhiteboard, WhiteboardGetPending, WhiteboardSync, AddTextToWhiteboard, editWhiteboard } from './Whiteboard.js';
 import { initializeHistory, HistoryGetPending, HistorySync, playLastHistoryItem } from './History.js';
 import { initializeFavorites, FavoritesGetPending, FavoritesSync,  editFavorites } from './MyPhrases.js';
 import { initializeBuiltins, HiddenBuiltinsGetPending, HiddenBuiltinsSync, editBuiltins } from './MyPhrases.js';
@@ -186,7 +186,7 @@ function main() {
   let currentVersion = 4;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
-  initializeClipboard(initializationProps);
+  initializeWhiteboard(initializationProps);
   initializeHistory(initializationProps);
 	initializeFavorites(initializationProps);
 	initializeBuiltins(initializationProps);
@@ -271,7 +271,7 @@ function main() {
 				try {
 					let serverSyncData = JSON.parse(serverSyncDataJson);
 					let { thisSyncServerTimestamp, updates } = serverSyncData;
-					ClipboardSync(thisSyncServerTimestamp, updates && updates.Clipboard);
+					WhiteboardSync(thisSyncServerTimestamp, updates && updates.Whiteboard);
 					HistorySync(thisSyncServerTimestamp, updates && updates.History);
 					FavoritesSync(thisSyncServerTimestamp, updates && updates.Favorites);
 					HiddenBuiltinsSync(thisSyncServerTimestamp, updates && updates.HiddenBuiltins);
@@ -320,7 +320,7 @@ function main() {
         // just pass through to default processing, which will add a newline
       } else if (!shift && (control || meta)) {
         e.preventDefault();
-        AddTextToClipboard();
+        AddTextToWhiteboard();
       } else {
         e.preventDefault();
         speak();
@@ -370,7 +370,7 @@ export function sync() {
 		lastSync,
 		thisSyncClientTimestamp: Date.now(),
 		updates: {
-			Clipboard: ClipboardGetPending(lastSync),
+			Whiteboard: WhiteboardGetPending(lastSync),
 			History: HistoryGetPending(lastSync),
 			Favorites: FavoritesGetPending(lastSync),
 			HiddenBuiltins: HiddenBuiltinsGetPending(lastSync),

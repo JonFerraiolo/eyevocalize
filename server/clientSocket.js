@@ -69,8 +69,8 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
     if (client.lastSync < minLastSyncConnected) minLastSyncConnected = client.lastSync;
   }
   let thisSyncServerTimestamp = Date.now();
-  let ClipboardPromise = syncMiscDataSync(email, 'Clipboard', connectionsByEmail[email],
-    clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Clipboard);
+  let WhiteboardPromise = syncMiscDataSync(email, 'Whiteboard', connectionsByEmail[email],
+    clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Whiteboard);
   let HistoryPromise = syncHistory(email, connectionsByEmail[email], minLastSyncConnected,
     thisSyncClientTimestamp, thisSyncServerTimestamp, clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.History);
   let FavoritesPromise = syncMiscDataSync(email, 'Favorites', connectionsByEmail[email],
@@ -79,7 +79,7 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
     clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.HiddenBuiltins);
   let SettingsPromise = syncMiscDataSync(email, 'Settings', connectionsByEmail[email],
     clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Settings);
-  Promise.all([ClipboardPromise, HistoryPromise, FavoritesPromise, HiddenBuiltinsPromise, SettingsPromise]).then(values => {
+  Promise.all([WhiteboardPromise, HistoryPromise, FavoritesPromise, HiddenBuiltinsPromise, SettingsPromise]).then(values => {
     updateClients(socket, email, thisSyncServerTimestamp, values, fn);
   }, () => {
     logger.error('updateTopicTables Promise.all topic promises rejected');
@@ -98,7 +98,7 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
   const logger = global.logger;
   logger.info('updateClients entered');
   logger.info('updateClients values='+JSON.stringify(values));
-  let returnClipboard = values[0];
+  let returnWhiteboard = values[0];
   let returnHistory = values[1];
   let returnFavorites = values[2];
   let returnHiddenBuiltins = values[3];
@@ -119,7 +119,7 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
         let serverInitiatedSyncDataJson = JSON.stringify({
           thisSyncServerTimestamp,
           updates: {
-            Clipboard: returnClipboard[clientId] || null,
+            Whiteboard: returnWhiteboard[clientId] || null,
             History: returnHistory[clientId] || null,
             Favorites: returnFavorites[clientId] || null,
             HiddenBuiltins: returnHiddenBuiltins[clientId] || null,

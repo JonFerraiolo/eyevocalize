@@ -1,6 +1,6 @@
 
 import { speak } from './vocalize.js';
-import { AddTextToClipboard } from './Clipboard.js';
+import { AddTextToWhiteboard } from './Whiteboard.js';
 import { slideInAddFavoriteScreen } from './MyPhrases.js';
 import { search, clear, getAppMinOrMax, setAppMinOrMax } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
@@ -70,7 +70,7 @@ let css = `
   background-image: url('./images/noun_talk_1614342.svg');
   background-position: 0px 0.2em;
 }
-.TextEntryClipboard {
+.TextEntryWhiteboard {
   background-image: url('./images/noun_sticky notes_2355407.svg');
   background-size: 2.5em 2.5em;
   background-position: 0.2em 0.5em;
@@ -143,9 +143,9 @@ export function updateTextEntryRow(parentElement, props) {
     speak(document.getElementById('TextEntryRowTextArea').value);
     TextEntryRowSetFocus();
   }
-  let onClipboard = e => {
+  let onWhiteboard = e => {
     e.preventDefault();
-    AddTextToClipboard(document.getElementById('TextEntryRowTextArea').value);
+    AddTextToWhiteboard(document.getElementById('TextEntryRowTextArea').value);
     TextEntryRowSetFocus();
   }
   let onClear = e => {
@@ -206,8 +206,8 @@ export function updateTextEntryRow(parentElement, props) {
             title='Vocalize the words in the text entry box using speech synthesis'></button
           ><button class="TextEntryIcon TextEntryAddMyPhrase" @click=${onAddMyPhrase}
             title='Save these words as a new favorite'></button
-          ><button class="TextEntryIcon TextEntryClipboard" @click=${onClipboard}
-            title='Save these words in the "Clipboard", the storage area for things you might need to say soon'></button
+          ><button class="TextEntryIcon TextEntryWhiteboard" @click=${onWhiteboard}
+            title='Save these words in the "Whiteboard", the storage area for things you might need to say soon'></button
           ><button class="TextEntryIcon TextEntrySearch" @click=${search}
             title='Filter the clipboard, the history and your favorites using the search words typed into the text entry box'></button
         ></span

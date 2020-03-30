@@ -1,7 +1,7 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
 import { speak, playAudio, playYoutube } from './vocalize.js';
-import { updateClipboard } from './Clipboard.js';
+import { updateWhiteboard } from './Whiteboard.js';
 import { updateHistory } from './History.js';
 import { updateFavorites } from './MyPhrases.js';
 import { updateBuiltins } from './MyPhrases.js';
@@ -14,7 +14,7 @@ let css = `
   display: flex;
   flex-direction: row;
 }
-.ClipboardAndHistory, #FavoritesContainer, #BuiltinsContainer {
+.WhiteboardAndHistory, #FavoritesContainer, #BuiltinsContainer {
   min-height: 0px;
   height: 100%;
   display: inline-block;
@@ -23,19 +23,19 @@ let css = `
   overflow-x: hidden;
   overflow-y: auto;
 }
-.ClipboardAndHistory {
+.WhiteboardAndHistory {
   display: inline-flex;
   flex-direction: column;
   flex: 1;
   overflow: hidden;
 }
-#ClipboardContainer, #HistoryContainer {
+#WhiteboardContainer, #HistoryContainer {
   min-height: 25%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
-#ClipboardContainer {
+#WhiteboardContainer {
   flex: 0 0 auto;
   height: auto;
   max-height: 75%;
@@ -43,12 +43,12 @@ let css = `
 #HistoryContainer {
   flex: 1 1;
 }
-.ClipboardContent, .HistoryContent {
+.WhiteboardContent, .HistoryContent {
   overflow-x: hidden;
   overflow-y: auto;
   min-height: 25%;
 }
-.ClipboardContent {
+.WhiteboardContent {
   flex: 1 1;
 }
 .HistoryContent {
@@ -94,7 +94,7 @@ let css = `
 .skinnyScreenChild .PhraseRow {
   padding: 0 1.5em;
 }
-.HistoryContent button, .ClipboardContent button {
+.HistoryContent button, .WhiteboardContent button {
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -194,19 +194,19 @@ export function updatePhrases(parentElement, props) {
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
     [];
-  let ClipboardProps = { searchTokens };
+  let WhiteboardProps = { searchTokens };
   let HistoryProps = { searchTokens };
   let MyPhrasesProps = { searchTokens };
   render(html`
   <div class=Phrases>
-    <div class=ClipboardAndHistory>
-      <div id=ClipboardContainer></div>
+    <div class=WhiteboardAndHistory>
+      <div id=WhiteboardContainer></div>
       <div id=HistoryContainer></div>
     </div>
     <div id=FavoritesContainer></div>
     <div id=BuiltinsContainer></div>
   </div>`, parentElement);
-  updateClipboard(document.getElementById('ClipboardContainer'), ClipboardProps);
+  updateWhiteboard(document.getElementById('WhiteboardContainer'), WhiteboardProps);
   updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
   updateFavorites(document.getElementById('FavoritesContainer'), MyPhrasesProps);
   updateBuiltins(document.getElementById('BuiltinsContainer'), MyPhrasesProps);
