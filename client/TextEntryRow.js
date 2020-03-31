@@ -71,9 +71,9 @@ let css = `
   background-position: 0px 0.2em;
 }
 .TextEntryWhiteboard {
-  background-image: url('./images/noun_sticky notes_2355407.svg');
+  background-image: url('./images/stickynote.svg');
   background-size: 2.5em 2.5em;
-  background-position: 0.2em 0.5em;
+  background-position: 0.2em 50%;
 }
 .TextEntryAddMyPhrase {
   background-image: url('./images/heart.svg');

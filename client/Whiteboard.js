@@ -11,12 +11,12 @@ import { slideInAddFavoriteScreen } from './MyPhrases.js';
 let css = `
 .WhiteboardTitleIcon {
   display: inline-block;
-  width: 1em;
+  width: 1.25em;
   height: 1em;
   margin-right: 0.4em;
-  background-image: url('./images/noun_sticky notes_2355407.svg');
-  background-size: 1.1em 1.5em;
-  background-position: 0% 0%;
+  background-image: url('./images/stickynote.svg');
+  background-size: 1.25em 1.1em;
+  background-position: 0em 10%;
   background-repeat: no-repeat;
 }
 .editWhiteboard .skinnyScreenChild {

@@ -57,9 +57,9 @@ let css = `
   vertical-align: bottom;
 }
 .HelpPageContentIcon2 {
-  width: 3em;
-  height: 3em;
-  background-size: 3em 3em;
+  width: 2em;
+  height: 2em;
+  background-size: 2em 2em;
 }
 .HelpHeaderPosition {
   background-image: url('./images/position.svg');
@@ -228,7 +228,7 @@ function showHelp(topic) {
       let iconName = iconElem.IconName || iconElem.innerText;
       iconElem.innerText = '';
       iconElem.IconName = iconName;
-      iconElem.classList.add(iconElem.tagName === 'icon2' ? 'HelpPageContentIcon2' : 'HelpPageContentIcon1');
+      iconElem.classList.add(iconElem.tagName.toLowerCase() === 'icon2' ? 'HelpPageContentIcon2' : 'HelpPageContentIcon1');
       iconElem.style.backgroundImage = 'url(./images/'+iconName+'.svg)';
     });
     helpDiv.style.visibility = 'hidden';
@@ -288,6 +288,8 @@ function showHelp(topic) {
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.FeaturesContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Type-to-speak')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.TtsContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Whiteboard')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.WhiteboardContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Builtins')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.BuiltinsContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Shortcuts')}</span>
@@ -313,14 +315,22 @@ function showHelp(topic) {
     },
     "Type-to-speak": {
       prev: 'Features',
-      next: 'Builtins',
+      next: 'Whiteboard',
       value: html`
         ${buildTitle('Type-to-speak')}
         <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.TtsContent)}</div>
       `,
     },
-    Builtins: {
+    Whiteboard: {
       prev: 'Type-to-speak',
+      next: 'Builtins',
+      value: html`
+        ${buildTitle('Whiteboard')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.WhiteboardContent)}</div>
+      `,
+    },
+    Builtins: {
+      prev: 'Whiteboard',
       next: 'Shortcuts',
       value: html`
         ${buildTitle('Builtins')}

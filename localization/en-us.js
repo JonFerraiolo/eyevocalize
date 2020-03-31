@@ -41,6 +41,15 @@ const Localization = {
       <p>Type what you want to say. </p>
       <p>Press Return to cause speech synthesis to vocalize using the current system voice. </p>
     `,
+    Whiteboard: `Whiteboard`,
+    WhiteboardContentsDesc: `Store expressions for the future`,
+    WhiteboardContent: `
+      <p>The Whiteboard is on the left side of the application.</p>
+      <p>You can type expressions and store them on the Whiteboard for saying later. </p>
+      <p>To store something on the Whiteboard, type words into the <strong>Compose</strong> text input box at the top of the application, and then either click on the <icon2>stickynote</icon2> sticky note icon or press Control-Return.  </p>
+      <p>On the Whiteboard title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you can hide add, edit, delete or reorder the items in the Whiteboard. </p>
+      <p>The Whiteboard title bar also has an <icon1>addicon</icon1> plus icon, which gives you another way to add an item to the Whiteboard. </p>
+    `,
     Builtins: `Builtins`,
     BuiltinsContentsDesc: `Common expressions for all users`,
     BuiltinsContent: `
