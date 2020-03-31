@@ -99,7 +99,7 @@ let css = `
 }
 .TextEntrySettings {
   width: 2em;
-  background-image: url('./images/Font_Awesome_5_solid_cog.svg');
+  background-image: url('./images/gear.svg');
   background-size: 1.5em 1.5em;
   background-position: 50% 50%;
   border: none;

@@ -46,9 +46,21 @@ const Localization = {
     WhiteboardContent: `
       <p>The Whiteboard is on the left side of the application.</p>
       <p>You can type expressions and store them on the Whiteboard for saying later. </p>
-      <p>To store something on the Whiteboard, type words into the <strong>Compose</strong> text input box at the top of the application, and then either click on the <icon2>stickynote</icon2> sticky note icon or press Control-Return.  </p>
-      <p>On the Whiteboard title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you can hide add, edit, delete or reorder the items in the Whiteboard. </p>
+      <p>To store something on the Whiteboard, type words into the <strong>Compose</strong> text input box at the top of the application, and then either click on the <icon2>stickynote</icon2> sticky note icon or press <strong>Control-Return</strong>.  </p>
+      <p>To vocalize any of the entries in the Whiteboard, click on them. </p>
+      <p>On the Whiteboard title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you can add, edit, delete, reorder or make <topic>Favorites</topic> of the items in the Whiteboard. </p>
       <p>The Whiteboard title bar also has an <icon1>addicon</icon1> plus icon, which gives you another way to add an item to the Whiteboard. </p>
+    `,
+    History: `History`,
+    HistoryContentsDesc: `Your history of vocalizations`,
+    HistoryContent: `
+      <p>The History is on the left side of the application under the Whiteboard.</p>
+      <p>Everything you vocalize is recorded in the History. </p>
+      <p>To repeat a vocalization, click on the entry within the History.  </p>
+      <p><strong>Control-period</strong> (Control plus the "." character) will repeat the most recent vocalization.  </p>
+      <p>On the History title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you go to the <strong>Manage History</strong> screen where you can search, delete and copy entries from the History to the system clipboard. </p>
+      <p>On the Manage History screen, there is also a <strong>Scroll To</strong> button. This is useful for copying a sequence of vocalizations to the system clipboard. The usual sequence is to search for an entry, select that entry, click the <strong>Scroll To</strong> button to show the contemporaneous entries, multi-select desired entries and then click the <strong>Copy</strong> to copy the entries to the system clipboard, reordered in the order they were originally spoken. </p>
+      <p>There is a History section on the <topic>Settings</topic> screen, available from the <icon2>gear</icon2> gear icon at the top of the application. </p>
     `,
     Builtins: `Builtins`,
     BuiltinsContentsDesc: `Common expressions for all users`,

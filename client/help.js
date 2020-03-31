@@ -59,7 +59,7 @@ let css = `
 .HelpPageContentIcon2 {
   width: 2em;
   height: 2em;
-  background-size: 2em 2em;
+  background-size: 1.75em 1.75em;
 }
 .HelpHeaderPosition {
   background-image: url('./images/position.svg');
@@ -238,6 +238,10 @@ function showHelp(topic) {
     helpDiv.style.height = sizey === 'tall' ? DefaultSizeTall : DefaultSizeShort;
     let iw = window.innerWidth;
     let ih = window.innerHeight;
+    let HelpContentElem = helpDiv.querySelector('.HelpContent');
+    if (HelpContentElem) {
+      HelpContentElem.scrollTop = 0;
+    }
     setTimeout(() => {
       // First setTimeout to allow browser to lay out the help content so that everything has a size
       // so we can shrink if too big
@@ -290,6 +294,8 @@ function showHelp(topic) {
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.TtsContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Whiteboard')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.WhiteboardContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('History')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.HistoryContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Builtins')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.BuiltinsContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Shortcuts')}</span>
@@ -323,14 +329,22 @@ function showHelp(topic) {
     },
     Whiteboard: {
       prev: 'Type-to-speak',
-      next: 'Builtins',
+      next: 'History',
       value: html`
         ${buildTitle('Whiteboard')}
         <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.WhiteboardContent)}</div>
       `,
     },
-    Builtins: {
+    History: {
       prev: 'Whiteboard',
+      next: 'Builtins',
+      value: html`
+        ${buildTitle('History')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.HistoryContent)}</div>
+      `,
+    },
+    Builtins: {
+      prev: 'History',
       next: 'Shortcuts',
       value: html`
         ${buildTitle('Builtins')}
