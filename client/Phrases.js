@@ -4,7 +4,6 @@ import { speak, playAudio, playYoutube } from './vocalize.js';
 import { updateWhiteboard } from './Whiteboard.js';
 import { updateHistory } from './History.js';
 import { updateFavorites } from './MyPhrases.js';
-import { updateBuiltins } from './MyPhrases.js';
 import { updateMain } from './main.js';
 import { TextEntryRowSetText, TextEntryRowSetFocus } from './TextEntryRow.js';
 
@@ -14,12 +13,12 @@ let css = `
   display: flex;
   flex-direction: row;
 }
-.WhiteboardAndHistory, #FavoritesContainer, #BuiltinsContainer {
+.WhiteboardAndHistory, #FavoritesContainer {
   min-height: 0px;
   height: 100%;
   display: inline-block;
 }
-#FavoritesContainer, #BuiltinsContainer {
+#FavoritesContainer {
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -55,10 +54,7 @@ let css = `
   flex: 1 1;
 }
 #FavoritesContainer {
-  flex: 2;
-}
-#BuiltinsContainer {
-  flex: 1;
+  flex: 3;
 }
 .PhrasesSectionLabel {
   background: #eee;
@@ -69,8 +65,7 @@ let css = `
   font-size: 0.9em;
 }
 .PhrasesSectionLabel .collapsearrow, .PhrasesSectionLabel .expandarrow,
-    .MyPhrasesCategoryLabel .collapsearrow, .MyPhrasesCategoryLabel .expandarrow,
-    .BuiltinsCategoryLabel .collapsearrow, .BuiltinsCategoryLabel .expandarrow {
+    .MyPhrasesCategoryLabel .collapsearrow, .MyPhrasesCategoryLabel .expandarrow {
   padding: 0 0.5em;
   line-height: 50%;
   vertical-align: -50%;
@@ -213,12 +208,10 @@ export function updatePhrases(parentElement, props) {
       <div id=HistoryContainer></div>
     </div>
     <div id=FavoritesContainer></div>
-    <div id=BuiltinsContainer></div>
   </div>`, parentElement);
   updateWhiteboard(document.getElementById('WhiteboardContainer'), WhiteboardProps);
   updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
   updateFavorites(document.getElementById('FavoritesContainer'), MyPhrasesProps);
-  updateBuiltins(document.getElementById('BuiltinsContainer'), MyPhrasesProps);
 }
 
 export function PhrasesAddDelSync(thisSyncServerTimestamp, updates, Phrases, PhrasesPendingDeletions, PhrasesPendingAdditions) {

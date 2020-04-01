@@ -9,7 +9,6 @@ import { updatePhrases } from './Phrases.js';
 import { initializeWhiteboard, WhiteboardGetPending, WhiteboardSync, AddTextToWhiteboard, editWhiteboard } from './Whiteboard.js';
 import { initializeHistory, HistoryGetPending, HistorySync, playLastHistoryItem } from './History.js';
 import { initializeFavorites, FavoritesGetPending, FavoritesSync,  editFavorites } from './MyPhrases.js';
-import { initializeBuiltins, HiddenBuiltinsGetPending, HiddenBuiltinsSync, editBuiltins } from './MyPhrases.js';
 import { fromRight, fromLeft } from './animSlide.js';
 import { speak, playAudio } from './vocalize.js';
 import { html, render } from './lib/lit-html/lit-html.js';
@@ -189,7 +188,6 @@ function main() {
   initializeWhiteboard(initializationProps);
   initializeHistory(initializationProps);
 	initializeFavorites(initializationProps);
-	initializeBuiltins(initializationProps);
 
 	updateMain();
 	let autoLoginPromise = new Promise((resolve, reject) => {
@@ -274,7 +272,6 @@ function main() {
 					WhiteboardSync(thisSyncServerTimestamp, updates && updates.Whiteboard);
 					HistorySync(thisSyncServerTimestamp, updates && updates.History);
 					FavoritesSync(thisSyncServerTimestamp, updates && updates.Favorites);
-					HiddenBuiltinsSync(thisSyncServerTimestamp, updates && updates.HiddenBuiltins);
 					SettingsSync(thisSyncServerTimestamp, updates && updates.Settings);
 					window.eyevocalizeLastSync = Date.now();
 					localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
@@ -373,7 +370,6 @@ export function sync() {
 			Whiteboard: WhiteboardGetPending(lastSync),
 			History: HistoryGetPending(lastSync),
 			Favorites: FavoritesGetPending(lastSync),
-			HiddenBuiltins: HiddenBuiltinsGetPending(lastSync),
 			Settings: SettingsGetPending(lastSync),
 		}
 	};

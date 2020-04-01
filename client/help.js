@@ -298,8 +298,6 @@ function showHelp(topic) {
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.HistoryContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Favorites')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.FavoritesContentsDesc)}</span>
-          <span class=HelpContentsName>${buildGoto('Builtins')}</span>
-          <span class=HelpContentsDesc>${unsafeHTML(localization.help.BuiltinsContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Shortcuts')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.ShortcutsContentsDesc)}</span>
         </div>
@@ -347,22 +345,14 @@ function showHelp(topic) {
     },
     Favorites: {
       prev: 'History',
-      next: 'Builtins',
+      next: 'Favorites',
       value: html`
         ${buildTitle('Favorites')}
         <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.FavoritesContent)}</div>
       `,
     },
-    Builtins: {
-      prev: 'Favorites',
-      next: 'Shortcuts',
-      value: html`
-        ${buildTitle('Builtins')}
-        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.BuiltinsContent)}</div>
-      `,
-    },
     Shortcuts: {
-      prev: 'Builtins',
+      prev: 'Favorites',
       next: null,
       value: html`
         ${buildTitle('Shortcuts')}

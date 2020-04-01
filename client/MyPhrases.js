@@ -31,9 +31,6 @@ let css = `
 #FavoritesContainer .MyPhrasesTitleIcon {
   background-image: url('./images/heart.svg');
 }
-#BuiltinsContainer .MyPhrasesTitleIcon {
-  background-image: url('./images/diamond.svg');
-}
 .MyPhrasesCategoryLabel {
   font-size: 90%;
   color: #888;
@@ -270,8 +267,6 @@ styleElement.appendChild(document.createTextNode(css));
 document.head.appendChild(styleElement);
 
 let Favorites;
-let Builtins;
-let HiddenBuiltins;
 
 export function initializeFavorites(props) {
   let { currentVersion } = props;
@@ -286,6 +281,9 @@ export function initializeFavorites(props) {
       ]},
       { categories: [
           { label: 'Category 2', expanded: true, items: [] },
+      ]},
+      { categories: [
+          { label: 'Category 3', expanded: true, items: [] },
       ]},
     ],
   } : {
@@ -373,26 +371,6 @@ export function initializeFavorites(props) {
           { type: 'text', label: 'testing', text: 'Please ignore what comes out of the computer for the next couple of minutes. I am just testing the software. '},
         ]},
       ]},
-    ]
-  };
-  let FavoritesString = localStorage.getItem("Favorites");
-  try {
-    Favorites = (typeof FavoritesString === 'string') ? JSON.parse(FavoritesString) : initialFavorites;
-  } catch(e) {
-    Favorites = initialFavorites;
-  }
-  if (typeof Favorites.version != 'number'|| Favorites.version < currentVersion) {
-    Favorites = initialFavorites;
-  }
-  localStorage.setItem("Favorites", JSON.stringify(Favorites));
-};
-
-export function initializeBuiltins(props) {
-  let { currentVersion } = props;
-  Builtins = {
-    version: currentVersion,
-    lastChooseCategory: { columnIndex: 0, categoryIndex: 0, categoryLabel: null },
-    columns: [
       { categories: [
         { label: 'Basic', expanded: true, items: [
           { type: 'text', label: 'nevermind', text: 'Sorry. Mistake. Ignore what I just said.'},
@@ -431,29 +409,22 @@ export function initializeBuiltins(props) {
       ]},
     ]
   };
-  let initialHiddenBuiltins = { version: currentVersion, timestamp: 0, items: [], };
-  let HiddenBuiltinsString = localStorage.getItem("HiddenBuiltins");
+  let FavoritesString = localStorage.getItem("Favorites");
   try {
-    HiddenBuiltins = (typeof HiddenBuiltinsString === 'string') ? JSON.parse(HiddenBuiltinsString) : initialHiddenBuiltins;
+    Favorites = (typeof FavoritesString === 'string') ? JSON.parse(FavoritesString) : initialFavorites;
   } catch(e) {
-    HiddenBuiltins = initialHiddenBuiltins;
+    Favorites = initialFavorites;
   }
-  if (typeof HiddenBuiltins.version != 'number'|| HiddenBuiltins.version < currentVersion) {
-    HiddenBuiltins = initialHiddenBuiltins;
+  if (typeof Favorites.version != 'number'|| Favorites.version < currentVersion) {
+    Favorites = initialFavorites;
   }
-  localStorage.setItem("HiddenBuiltins", JSON.stringify(HiddenBuiltins));
+  localStorage.setItem("Favorites", JSON.stringify(Favorites));
 };
 
 export function FavoritesGetPending(clientLastSync) {
   if (!Favorites.pending) return null;
   delete Favorites.pending;
   return Favorites.timestamp > clientLastSync ? Favorites : null;
-}
-
-export function HiddenBuiltinsGetPending(clientLastSync) {
-  if (!HiddenBuiltins.pending) return null;
-  delete HiddenBuiltins.pending;
-  return HiddenBuiltins.timestamp > clientLastSync ? HiddenBuiltins : null;
 }
 
 export function FavoritesSync(thisSyncServerTimestamp, newData) {
@@ -466,23 +437,8 @@ export function FavoritesSync(thisSyncServerTimestamp, newData) {
   }
 }
 
-export function HiddenBuiltinsSync(thisSyncServerTimestamp, newData) {
-  if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > HiddenBuiltins.timestamp) {
-    console.log('HiddenBuiltinsSync. newData.timestamp='+newData.timestamp+', HiddenBuiltins.timestamp='+HiddenBuiltins.timestamp);
-    HiddenBuiltins = newData;
-    updateLocalStorageHiddenBuiltins({ timestamp: newData.timestamp });
-    let event = new CustomEvent("ServerInitiatedSyncHiddenBuiltins", { detail: null } );
-    window.dispatchEvent(event);
-  }
-}
-
 function updateStorageFavorites()  {
   updateLocalStorageFavorites({ pending: true });
-  sync();
-}
-
-function updateStorageHiddenBuiltins()  {
-  updateLocalStorageHiddenBuiltins({ pending: true });
   sync();
 }
 
@@ -490,51 +446,6 @@ function updateLocalStorageFavorites(overrides) {
   Favorites.timestamp = Date.now();
   Favorites = Object.assign({}, Favorites, overrides || {});
   localStorage.setItem("Favorites", JSON.stringify(Favorites));
-}
-
-function updateLocalStorageHiddenBuiltins(overrides) {
-  HiddenBuiltins.timestamp = Date.now();
-  HiddenBuiltins = Object.assign({}, HiddenBuiltins, overrides || {});
-  localStorage.setItem("HiddenBuiltins", JSON.stringify(HiddenBuiltins));
-}
-
-// transfer hidden flags HiddenBuiltins to from the given MyPhrases data structure
-function transferHiddenTo(aMyPhrases) {
-  HiddenBuiltins.items.forEach(item => {
-    let tokens = item.split('_');
-    if (tokens.length  < 2) return;
-    let [ col, cat, itm ] = tokens;
-    let columnIndex = parseInt(col);
-    if (isNaN(columnIndex) || columnIndex < 0 || columnIndex >= aMyPhrases.columns.length) return;
-    let column = aMyPhrases.columns[columnIndex];
-    let category = column.categories.find(category => category.label === cat);
-    if (!category) return;
-    if (tokens.length === 2) {
-      category.hidden = true;
-    } else {
-      let item = category.items.find(item => item.label === itm);
-      if (!item) return;
-      item.hidden = true;
-    }
-  });
-}
-
-// transfer hidden flags from the given MyPhrases data structure to HiddenBuiltins
-function transferHiddenFrom(aMyPhrases) {
-  HiddenBuiltins.items = [];
-  aMyPhrases.columns.forEach((column, colIndex) => {
-    column.categories.forEach((category, catIndex) => {
-      if (category.hidden) {
-        HiddenBuiltins.items.push(colIndex+'_'+category.label);
-      }
-      category.items.forEach((item, itIndex) => {
-        if (item.hidden) {
-          HiddenBuiltins.items.push(colIndex+'_'+category.label+'_'+item.label);
-        }
-      });
-    });
-  });
-  updateStorageHiddenBuiltins();
 }
 
 // Add phrase to Favorites without speaking
@@ -614,17 +525,11 @@ export function slideInAddFavoriteScreen(props) {
 export function updateFavorites(parentElement, props) {
   updateMyPhrases('Favorites', parentElement, props);
 }
-export function updateBuiltins(parentElement, props) {
-  updateMyPhrases('Builtins', parentElement, props);
-}
-let lastParentFavorites, lastParentHiddenBuiltins;
+let lastParentFavorites;
 let updateFavoritesFirstTime = true;
-let updateHiddenBuiltinsFirstTime = true;
 function updateMyPhrases(Section, parentElement, props) {
   if (Section === 'Favorites') {
     lastParentFavorites = parentElement;
-  } else {
-    lastParentHiddenBuiltins = parentElement;
   }
   if (updateFavoritesFirstTime) {
     updateFavoritesFirstTime = false;
@@ -634,19 +539,6 @@ function updateMyPhrases(Section, parentElement, props) {
       let oldParent = parentElement;
       Section = 'Favorites';
       parentElement = lastParentFavorites;
-      localUpdate();
-      Section = oldSection;
-      parentElement = oldParent;
-    });
-  }
-  if (updateHiddenBuiltinsFirstTime) {
-    updateHiddenBuiltinsFirstTime = false;
-    window.addEventListener('ServerInitiatedSyncHiddenBuiltins', function(e) {
-      console.log('updateHiddenBuiltins ServerInitiatedSyncHiddenBuiltins custom event listener entered ');
-      let oldSection = Section;
-      let oldParent = parentElement;
-      Section = 'HiddenBuiltins';
-      parentElement = lastParentHiddenBuiltins;
       localUpdate();
       Section = oldSection;
       parentElement = oldParent;
@@ -665,17 +557,12 @@ function updateMyPhrases(Section, parentElement, props) {
     e.preventDefault();
     if (Section === 'Favorites') {
       onEditFavorites();
-    } else if (Section === 'Builtins') {
-      onEditBuiltins();
     }
   };
   let localUpdate = () => {
     let filteredMyPhrases;
     if (Section === 'Favorites') {
       filteredMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
-    } else {
-      filteredMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
-      transferHiddenTo(filteredMyPhrases);
     }
     filteredMyPhrases.columns.forEach(column => {
       column.categories.forEach((category, index) => {
@@ -693,7 +580,7 @@ function updateMyPhrases(Section, parentElement, props) {
       });
     });
     filteredMyPhrases.columns.forEach((column, cIndex) => {
-      let MyPhrases = Section === 'Favorites' ? Favorites : Builtins;
+      let MyPhrases = Section === 'Favorites' ? Favorites : null;
       column.categories.forEach(category => {
         let originalDataCategory = MyPhrases.columns[cIndex].categories[category.categoryIndex];
         category.titleContent = buildTitleWithCollapseExpandArrows(originalDataCategory, category.label);
@@ -730,18 +617,11 @@ function updateMyPhrases(Section, parentElement, props) {
 }
 
 let editFavoritesActive = false;
-let editHiddenBuiltinsActive = false;
 
 function onEditFavorites() {
   editFavoritesActive = true;
   let renderFuncParams = { };
   secondLevelScreenShow({ renderFunc: editFavorites, renderFuncParams });
-}
-
-function onEditBuiltins() {
-  editHiddenBuiltinsActive = true;
-  let renderFuncParams = { };
-  secondLevelScreenShow({ renderFunc: editBuiltins, renderFuncParams });
 }
 
 function onEditFavoritesReturn() {
@@ -750,20 +630,10 @@ function onEditFavoritesReturn() {
   secondLevelScreenHide();
 }
 
-function onEditBuiltinsReturn() {
-  editHiddenBuiltinsActive = false;
-  updateMain();
-  secondLevelScreenHide();
-}
-
 let editFavoritesFirstTime = true;
-let editHiddenBuiltinsFirstTime = true;
 let lastWhat;
 export function editFavorites(parentElement, props) {
   editMyPhrases('Favorites', parentElement, props);
-}
-export function editBuiltins(parentElement, props) {
-  editMyPhrases('Builtins', parentElement, props);
 }
 function editMyPhrases(Section, parentElement, props) {
   if (editFavoritesFirstTime) {
@@ -782,23 +652,6 @@ function editMyPhrases(Section, parentElement, props) {
       }
     });
   }
-  if (editHiddenBuiltinsFirstTime) {
-    editHiddenBuiltinsFirstTime = false;
-    window.addEventListener('ServerInitiatedSyncHiddenBuiltins', function(e) {
-      if (editHiddenBuiltinsActive && parentElement) {
-        console.log('editHiddenBuiltins ServerInitiatedSyncHiddenBuiltins custom event listener entered ');
-        let MyPhrases = parentElement.querySelector('.MyPhrases');
-        if (MyPhrases) {
-          Section = 'Builtins';
-          editWhat = lastWhat;
-          localMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
-          transferHiddenTo(localMyPhrases);
-          initializeSelection();
-          localUpdate();
-        }
-      }
-    });
-  }
   let editWhat = lastWhat = 'items';
   let lastClickItemIndex = null, lastClickCategoryIndex = null, lastClickColumnIndex = null;
   let editCategoryNameColumnIndex = null, editCategoryNameCategoryIndex = null;
@@ -807,8 +660,6 @@ function editMyPhrases(Section, parentElement, props) {
       Favorites = JSON.parse(JSON.stringify(localMyPhrases)); // deep clone
       traverseColumnsCategoriesItems(Favorites, deleteTemporaryProperties);
       updateStorageFavorites();
-    } else {
-      updateStorageHiddenBuiltins();
     }
     localUpdate();
   });
@@ -925,9 +776,6 @@ function editMyPhrases(Section, parentElement, props) {
           addToFavorites(phrase, columnIndex, categoryIndex);
           if (Section === 'Favorites') {
             localMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
-          } else {
-            localMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
-            transferHiddenTo(localMyPhrases);
           }
           initializeSelection();
           localUpdate();
@@ -971,9 +819,6 @@ function editMyPhrases(Section, parentElement, props) {
             replaceFavoritesEntry(columnIndex, categoryIndex, itemIndex, phrase);
             if (Section === 'Favorites') {
               localMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
-            } else {
-              localMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
-              transferHiddenTo(localMyPhrases);
             }
             localMyPhrases.columns[columnIndex].categories[categoryIndex].items[itemIndex].selected = true;
             localUpdate();
@@ -1158,48 +1003,6 @@ function editMyPhrases(Section, parentElement, props) {
     lastClickItemIndex = null;
     editCategoryNameColumnIndex = editCategoryNameCategoryIndex = null;
   };
-  let onClickShowSelected = e => {
-    e.preventDefault();
-    if (editWhat === 'items') {
-      traverseColumnsCategoriesItems(localMyPhrases, item => {
-        if (item.selected) {
-          delete item.hidden;
-        }
-      });
-    } else {
-      // should only be here if a single empty category is selected and
-      // and the column has more than one category
-      let columnIndex, categoryIndex;
-      traverseColumnsCategories(localMyPhrases, (category, origObj, colIndex, catIndex) => {
-        if (category.selected) {
-          delete category.hidden;
-        }
-      });
-    }
-    transferHiddenFrom(localMyPhrases);
-    localUpdate();
-  };
-  let onClickHideSelected = e => {
-    e.preventDefault();
-    if (editWhat === 'items') {
-      traverseColumnsCategoriesItems(localMyPhrases, item => {
-        if (item.selected) {
-          item.hidden = true;
-        }
-      });
-    } else {
-      // should only be here if a single empty category is selected and
-      // and the column has more than one category
-      let columnIndex, categoryIndex;
-      traverseColumnsCategories(localMyPhrases, (category, origObj, colIndex, catIndex) => {
-        if (category.selected) {
-          category.hidden = true;
-        }
-      });
-    }
-    transferHiddenFrom(localMyPhrases);
-    localUpdate();
-  };
   let onClickNewCategory = e => {
     e.preventDefault();
     editCategoryNameColumnIndex = e.currentTarget.myphrasesColumnIndex;
@@ -1226,9 +1029,6 @@ function editMyPhrases(Section, parentElement, props) {
     }
     if (Section === 'Favorites') {
       localMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
-    } else {
-      localMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
-      transferHiddenTo(localMyPhrases);
     }
     initializeSelection();
     localUpdate();
@@ -1297,8 +1097,6 @@ function editMyPhrases(Section, parentElement, props) {
     // enableSelectAll is true only if editWhat==items and at least one item is selected
     let enableRemoveSelected = false;
     let enableSelectAll = false;
-    let enableShow = false;
-    let enableHide = false;
     localMyPhrases.columns.forEach(column => {
       if (editWhat === 'items') {
         column.categories.forEach(category => {
@@ -1306,23 +1104,11 @@ function editMyPhrases(Section, parentElement, props) {
             enableRemoveSelected = true;
             enableSelectAll = true;
           }
-          if (category.items.some(item => (item.selected && item.hidden))) {
-            enableShow = true;
-          }
-          if (category.items.some(item => (item.selected && !item.hidden))) {
-            enableHide = true;
-          }
         });
       } else if (editWhat === 'categories') {
         column.categories.forEach(category => {
           if (category.selected && column.categories.length > 1 && category.items.length === 0) {
             enableRemoveSelected = true;
-          }
-          if (category.selected && category.hidden) {
-            enableShow = true;
-          }
-          if (category.selected && !category.hidden) {
-            enableHide = true;
           }
         });
       }
@@ -1388,27 +1174,20 @@ function editMyPhrases(Section, parentElement, props) {
               <span class=arrowButton>&#x2b73;</span></button>
           </div>
       `;
-    } else {
-      buttonRowHtml = html`
-        <div class=ButtonRow>
-          <button @click=${onClickShowSelected} ?disabled=${!enableShow} title="Show selected builtin items">Show</button>
-          <button @click=${onClickHideSelected} ?disabled=${!enableHide} title="Hide selected builtin items">Hide</button>
-        </div>
-      `;
     }
     // FIXME css might be added multiple times
     render(html`
     <div class="MyPhrases EditMyPhrases skinnyScreenParent">
       <div class="EditMyPhrasesChild skinnyScreenChild">
-        ${buildSlideRightTitle("Manage "+(Section === 'Favorites' ? 'Favorites' : 'Builtins'), onEditFavoritesReturn)}
+        ${buildSlideRightTitle("Manage "+(Section === 'Favorites' ? 'Favorites' : 'null'), onEditFavoritesReturn)}
         <div class=TabControlRadioButtons>
           <label>Edit what:</label>
-          ${buildEditWhatRadioButton('EditMyPhrasesEditWhatItems', 'items', "Individual "+(Section === 'Favorites' ? 'Favorites' : 'Builtins'))}
+          ${buildEditWhatRadioButton('EditMyPhrasesEditWhatItems', 'items', "Individual "+(Section === 'Favorites' ? 'Favorites' : 'null'))}
           ${buildEditWhatRadioButton('EditMyPhrasesEditWhatCategories', 'categories', 'Categories')}
         </div>
         <div class="EditMyPhrasesData ${editWhat === 'items' ? 'EditWhatItems' : 'EditWhatCategories' }">
           <div class=ScreenInstructions>
-            ${editWhat === 'items' ? '(Click individual '+(Section === 'Favorites' ? 'Favorites' : 'Builtins')+' below to select.)' :
+            ${editWhat === 'items' ? '(Click individual '+(Section === 'Favorites' ? 'Favorites' : 'null')+' below to select.)' :
               '(Click individual categories to select.)'}
           </div>
           <div class=MyPhrasesColumns>
@@ -1463,9 +1242,6 @@ function editMyPhrases(Section, parentElement, props) {
   let localMyPhrases;
   if (Section === 'Favorites') {
     localMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
-  } else {
-    localMyPhrases = JSON.parse(JSON.stringify(Builtins));  // deep clone
-    transferHiddenTo(localMyPhrases);
   }
   initializeSelection();
   localUpdate();

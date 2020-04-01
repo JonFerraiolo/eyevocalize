@@ -75,11 +75,9 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
     thisSyncClientTimestamp, thisSyncServerTimestamp, clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.History);
   let FavoritesPromise = syncMiscDataSync(email, 'Favorites', connectionsByEmail[email],
     clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Favorites);
-  let HiddenBuiltinsPromise = syncMiscDataSync(email, 'HiddenBuiltins', connectionsByEmail[email],
-    clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.HiddenBuiltins);
   let SettingsPromise = syncMiscDataSync(email, 'Settings', connectionsByEmail[email],
     clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Settings);
-  Promise.all([WhiteboardPromise, HistoryPromise, FavoritesPromise, HiddenBuiltinsPromise, SettingsPromise]).then(values => {
+  Promise.all([WhiteboardPromise, HistoryPromise, FavoritesPromise, SettingsPromise]).then(values => {
     updateClients(socket, email, thisSyncServerTimestamp, values, fn);
   }, () => {
     logger.error('updateTopicTables Promise.all topic promises rejected');
@@ -101,8 +99,7 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
   let returnWhiteboard = values[0];
   let returnHistory = values[1];
   let returnFavorites = values[2];
-  let returnHiddenBuiltins = values[3];
-  let returnSettings = values[4];
+  let returnSettings = values[3];
   let clientPromises = [];
   logger.info('updateClients before for in ');
   for (let clientId in connectionsByEmail[email]) {
@@ -122,7 +119,6 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
             Whiteboard: returnWhiteboard[clientId] || null,
             History: returnHistory[clientId] || null,
             Favorites: returnFavorites[clientId] || null,
-            HiddenBuiltins: returnHiddenBuiltins[clientId] || null,
             Settings: returnSettings[clientId] || null,
           }
         });

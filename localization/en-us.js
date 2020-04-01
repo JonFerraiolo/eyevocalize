@@ -23,7 +23,6 @@ const Localization = {
       <p>EyeVocalize features:</p>
       <ul>
         <li><topic>Type-to-speak</topic>: Type text, then press Return (or click the speak icon) to cause the typed words to be spoken using voice synthesis</li>
-        <li><topic>Builtins</topic>: A built-in library of common expressions, such as yes, no, please, thank you, hello, goodbye, etc.</li>
         <li><topic>Favorites</topic>: Ability to define your own favorites for phrases that you use repeatedly </li>
         <li><topic>Whiteboard</topic>: Ability to prepare text in advance and store on the Whiteboard for one-click speaking at just the right time </li>
         <li><topic>History</topic>: EyeVocalize saves your history of vocalizations so you can search for things you said in the past and repeat again </li>
@@ -72,14 +71,6 @@ const Localization = {
       <p>You can import a collection of Favorites using the <icon1>import</icon1> import icon on the Favorites title bar. For example, there is a collection of Favorites called "ALS" on the EyeVocalize website that you might want to import if you have ALS like me. You can import from an EyeVocalize collection, or from a URL or your local file system if the target file is the correct format. </p>
       <p>On the Favorites title bar is a <icon1>addicon</icon1> plus icon, which is one way to define a new favorite. You can also create favorites by typing text into the <strong>Compose</strong> text box and clicking the <icon2>heart</icon2> heart icon at the top of the application. </p>
       <p>On the Favorites title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you go to the <strong>Manage Favorites</strong> screen where you can add, edit, delete and reorder both individual favorites but also the categories.  </p>
-    `,
-    Builtins: `Builtins`,
-    BuiltinsContentsDesc: `Common expressions for all users`,
-    BuiltinsContent: `
-      <p>On the right side of the application, you should see the EyeVocalize builtin expressions.</p>
-      <p>These are mostly one word expressions such as yes, no, hello and goodbye. </p>
-      <p>Just click on one of the buttons to speak that expression. </p>
-      <p>On the Builtins title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you can hide either particular builtin buttons or an entire category. </p>
     `,
     Shortcuts: `Shortcuts`,
     ShortcutsContentsDesc: `Keyboard shortcuts`,
