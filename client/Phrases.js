@@ -111,6 +111,14 @@ let css = `
   background-repeat: no-repeat;
   padding: 0 0.6em;
 }
+.rightsideicon.import {
+  background-image: url(images/import.svg);
+  width: 1em;
+  height: 1em;
+  background-size: 0.8em 0.8em;
+  vertical-align: middle;
+  margin-right: 0.25em;
+}
 .rightsideicon.addicon {
   background-image: url(images/addicon.svg);
   width: 0.75em;
@@ -143,10 +151,11 @@ export function deleteTemporaryProperties(phrase) {
 };
 
 export function rightSideIcons(params) {
-  let { onClickAdd, onClickEdit } = params;
+  let { onClickImport, onClickAdd, onClickEdit } = params;
+  let imp = onClickImport ? html`<a href="" @click=${onClickImport} class="rightsideicon import"></a>` : '';
   let add = onClickAdd ? html`<a href="" @click=${onClickAdd} class="rightsideicon addicon"></a>` : '';
   let edit = onClickEdit ? html`<a href="" @click=${onClickEdit} class="rightsideicon editicon"></a>` : '';
-  return html`<span class=rightsideicons>${add}${edit}</span>`;
+  return html`<span class=rightsideicons>${imp}${add}${edit}</span>`;
 };
 
 export function playPhrase(phrase) {

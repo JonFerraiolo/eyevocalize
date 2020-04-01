@@ -653,6 +653,10 @@ function updateMyPhrases(Section, parentElement, props) {
     });
   }
   let { searchTokens } = props;
+  let onClickImport = e => {
+    e.preventDefault();
+    debugger;
+  };
   let onClickAdd = e => {
     e.preventDefault();
     slideInAddFavoriteScreen();
@@ -698,7 +702,10 @@ function updateMyPhrases(Section, parentElement, props) {
     render(html`
     <div class=MyPhrases>
       <div class=PhrasesSectionLabel><span class=MyPhrasesTitleIcon
-        ></span>${Section}${rightSideIcons({ onClickAdd: Section === 'Favorites' ? onClickAdd : null, onClickEdit } )}</div>
+        ></span>${Section}${rightSideIcons({
+          onClickImport: Section === 'Favorites' ? onClickImport : null,
+          onClickAdd: Section === 'Favorites' ? onClickAdd : null,
+          onClickEdit } )}</div>
       <div class=MyPhrasesColumns>
         ${filteredMyPhrases.columns.map(column => html`
           <div class=MyPhrasesColumn>

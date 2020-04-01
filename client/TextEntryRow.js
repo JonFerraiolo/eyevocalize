@@ -67,7 +67,7 @@ let css = `
   margin-right: 1em;
 }
 .TextEntrySpeak {
-  background-image: url('./images/noun_talk_1614342.svg');
+  background-image: url('./images/speak.svg');
   background-position: 0px 0.2em;
 }
 .TextEntryWhiteboard {

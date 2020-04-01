@@ -39,7 +39,7 @@ const Localization = {
       <p>On the main screen of the application, you should see a <strong>Compose</strong> text input box with a type-in cursor.</p>
       <p>Bring up the onscreen keyboard from your eye gaze system. (For example, I have a Tobii Dynavox PC Eye Mini. The onscreen keyboard is part of their Windows Control software.) </p>
       <p>Type what you want to say. </p>
-      <p>Press Return to cause speech synthesis to vocalize using the current system voice. </p>
+      <p>Press Return or click the <icon2>speak</icon2> speak icon to cause speech synthesis to vocalize using the current system voice. </p>
     `,
     Whiteboard: `Whiteboard`,
     WhiteboardContentsDesc: `Store expressions for the future`,
@@ -61,6 +61,17 @@ const Localization = {
       <p>On the History title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you go to the <strong>Manage History</strong> screen where you can search, delete and copy entries from the History to the system clipboard. </p>
       <p>On the Manage History screen, there is also a <strong>Scroll To</strong> button. This is useful for copying a sequence of vocalizations to the system clipboard. The usual sequence is to search for an entry, select that entry, click the <strong>Scroll To</strong> button to show the contemporaneous entries, multi-select desired entries and then click the <strong>Copy</strong> to copy the entries to the system clipboard, reordered in the order they were originally spoken. </p>
       <p>There is a History section on the <topic>Settings</topic> screen, available from the <icon2>gear</icon2> gear icon at the top of the application. </p>
+    `,
+    Favorites: `Favorites`,
+    FavoritesContentsDesc: `Your favorite vocalizations`,
+    FavoritesContent: `
+      <p>Your list of Favorites takes up three columns of the application.</p>
+      <p>Favorites are things you say regularly that you want to be only a single click away.</p>
+      <p>To vocalize a favorite, simply click on that  entry.  </p>
+      <p>When you open the application initially, you will see a minimal list of default Favorites. Sometime soon after you start to use EyeVocalize, set aside a block of time to build your list of things you say regularly and add those things to your Favorites.   </p>
+      <p>You can import a collection of Favorites using the <icon1>import</icon1> import icon on the Favorites title bar. For example, there is a collection of Favorites called "ALS" on the EyeVocalize website that you might want to import if you have ALS like me. You can import from an EyeVocalize collection, or from a URL or your local file system if the target file is the correct format. </p>
+      <p>On the Favorites title bar is a <icon1>addicon</icon1> plus icon, which is one way to define a new favorite. You can also create favorites by typing text into the <strong>Compose</strong> text box and clicking the <icon2>heart</icon2> heart icon at the top of the application. </p>
+      <p>On the Favorites title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you go to the <strong>Manage Favorites</strong> screen where you can add, edit, delete and reorder both individual favorites but also the categories.  </p>
     `,
     Builtins: `Builtins`,
     BuiltinsContentsDesc: `Common expressions for all users`,
