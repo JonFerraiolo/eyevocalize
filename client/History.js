@@ -183,7 +183,6 @@ export function playLastHistoryItem() {
   if (History.items.length > 0) {
     let phrase = History.items[0];
     playPhrase(phrase);
-    addToHistory(phrase);
   }
 };
 
