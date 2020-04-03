@@ -1,6 +1,6 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
-import { speak, playAudio, playYoutube } from './vocalize.js';
+import { speak, playYoutube } from './vocalize.js';
 import { updateWhiteboard } from './Whiteboard.js';
 import { updateHistory } from './History.js';
 import { updateFavorites } from './MyPhrases.js';
@@ -157,8 +157,6 @@ export function playPhrase(phrase) {
   let { type } = phrase;
   if (type === 'youtube') {
     playYoutube(phrase);
-  } else if (type === 'audio') {
-    playAudio(phrase);
   } else {
     let { text } = phrase;
     speak(text);

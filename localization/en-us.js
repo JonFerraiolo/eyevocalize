@@ -26,7 +26,7 @@ const Localization = {
         <li><topic>Favorites</topic>: Ability to define your own favorites for phrases that you use repeatedly </li>
         <li><topic>Whiteboard</topic>: Ability to prepare text in advance and store on the Whiteboard for one-click speaking at just the right time </li>
         <li><topic>History</topic>: EyeVocalize saves your history of vocalizations so you can search for things you said in the past and repeat again </li>
-        <li><topic>Video and Audio</topic>: For fun, you can play Web audio clips or YouTube clips, such as "Houston, we have a problem" </li>
+        <li><topic>Video</topic>: For fun, you can play YouTube clips, such as "Houston, we have a problem" </li>
         <li><topic>Cloud Backup</topic>: If you sign up and login, which are recommended, EyeVocalize By default will back up your history, clipboard, favorites and some other settings to the EyeVocalize server.</li>
         <li><topic>Sync</topic>: If you have multiple eye gaze systems like me, and you allow EyeVocalize to back up your data, EyeVocalize will sync your data across all of your systems and browsers.  </li>
         <li><topic>Shortcuts</topic>: For advanced users, EyeVocalize has various keyboard shortcuts to accelerate your use of the application.  </li>
@@ -96,18 +96,17 @@ const Localization = {
     center: `center`,
     right: `right`,
   },
-  // only translate the label and text property values
+  // only translate the values of the label: and text: properties
   initialFavorites: {
     columns: [
       { categories: [
         	{ label: 'Clips', expanded: true, items: [
             { type: 'youtube', label: 'johnny1', videoId: 'WZKmsA8bzao', startAt: 25.5, endAt: 39 },
             { type: 'youtube', label: 'johnny2', videoId: 'gpCUMdfRa9w', startAt: 67, endAt: 71 },
-        		{ type: 'audio', label: 'Disappointed!', url: 'http://www.montypython.net/sounds/wanda/disappointed.wav'},
-        		{ type: 'audio', label: 'Inconceivable!', url: 'http://www.moviesoundclips.net/download.php?id=2900&ft=mp3'},
-            { type: 'audio', label: 'Excellent!', url: 'http://www.billandted.org/sounds/ea/eaexcellent.mp3'},
             { type: 'youtube', label: 'gehrig1', videoId: 'qswig8dcEAY', startAt: 5, endAt: 16 },
             { type: 'youtube', label: 'gehrig2', videoId: 'OyT4mPBe4YQ', startAt: 150, endAt: 165 },
+            { type: 'youtube', label: 'excellent', videoId: 'AKecz2ak78Y', startAt: 0, endAt: 4 },
+            { type: 'youtube', label: 'inconceivable', videoId: 'Z3sLhnDJJn0', startAt: 5.4, endAt: 8.7 },
             { type: 'youtube', label: 'home', videoId: 'RPs2Y4FdGzM', startAt: 143, endAt: 153 },
             { type: 'youtube', label: 'tara', videoId: 'c_WkyalPOEI', startAt: 32, endAt: 999 },
             { type: 'youtube', label: 'kind', videoId: 'l4V8OHy0su0', startAt: 50, endAt: 60 },
@@ -128,6 +127,7 @@ const Localization = {
             { type: 'youtube', label: 'mad', videoId: 'tUY05_ZwFzg', startAt: 0, endAt: 999 },
             { type: 'youtube', label: 'failure', videoId: 'V2f-MZ2HRHQ', startAt: 2, endAt: 999 },
             { type: 'youtube', label: 'betcha', videoId: 'fv9XtSiqEDA', startAt: 0, endAt: 999 },
+            { type: 'youtube', label: 'disappointed', videoId: 'R97TsVDC1BY', startAt: 12, endAt: 20 },
             { type: 'youtube', label: 'fraud', videoId: 'AC9z7LIQX_A', startAt: 0, endAt: 999 },
             { type: 'youtube', label: 'bro', videoId: 'QkkLUP-gm4Q', startAt: 114, endAt: 119 },
             { type: 'text', label: 'hello', text: "You had me at hello"},
@@ -216,5 +216,5 @@ const Localization = {
         ]},
       ]},
     ]
-  },  
+  },
 }

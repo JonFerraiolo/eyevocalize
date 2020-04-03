@@ -73,9 +73,6 @@ export function EditPhrase(parentElement, params) {
     enableTest = enableDoit = false;
     if (type === 'text') {
       enableTest = enableDoit = text.trim().length > 0 && (!textLabelRequired || label.trim().length > 0);
-    } else if (type === 'audio') {
-      enableTest = regexUrl.test(url);
-      enableDoit = enableTest && label.trim().length > 0;
     } else if (type === 'youtube') {
       enableTest = regexVideoId.test(videoId) &&
         (startAt.length === 0 || regexSeconds.test(startAt)) &&
@@ -125,9 +122,8 @@ export function EditPhrase(parentElement, params) {
   };
   let makePhrase = () => {
     let timestamp = Date.now();
-    let phrase = type === 'audio' ? { type, label, url, timestamp } :
-      (type === 'youtube' ? { type, label, videoId, startAt, endAt, timestamp } :
-      { type, text, label, timestamp });
+    let phrase = type === 'youtube' ? { type, label, videoId, startAt, endAt, timestamp } :
+      { type, text, label, timestamp };
     return phrase;
   };
   let buildTypeRadioButton = (id, value, label) => {
@@ -143,18 +139,7 @@ export function EditPhrase(parentElement, params) {
   };
   let localUpdate = () => {
     let phraseData;
-    if (type === 'audio') {
-      phraseData = html`
-        <div class=EditPhraseInputBlock>
-          <label for=EditPhraseLabel>Label:</label>
-          <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
-        </div>
-        <div class=EditPhraseInputBlock>
-          <label for=EditPhraseURl>URL for the audio clip:</label>
-          <textarea id=EditPhraseURl @input=${onInput} pattern=${patternUrl} .editPhraseField=${'url'}></textarea>
-        </div>
-      `;
-    } else if (type === 'youtube') {
+    if (type === 'youtube') {
       phraseData = html`
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseLabel>Label:</label>
@@ -192,7 +177,6 @@ export function EditPhrase(parentElement, params) {
           <div class=EditPhraseContent>
             <div class=TabControlRadioButtons>
               ${buildTypeRadioButton('EditPhraseTypeText', 'text', 'Spoken text')}
-              ${buildTypeRadioButton('EditPhraseTypeAudio', 'audio', 'Web audio')}
               ${buildTypeRadioButton('EditPhraseTypeYoutube', 'youtube', 'YouTube video')}
             </div>
             <div class=TabControlRadioData>
@@ -210,10 +194,7 @@ export function EditPhrase(parentElement, params) {
     </div>`, parentElement);
     // for some mysterious reason, lit-html doesn't always update
     // the value of textarea  and input elements even if you provide a .value property
-    if (type === 'audio') {
-      document.getElementById('EditPhraseLabel').value = label;
-      document.getElementById('EditPhraseURl').value = url;
-    } else if (type === 'youtube') {
+    if (type === 'youtube') {
       document.getElementById('EditPhraseLabel').value = label;
       document.getElementById('EditPhraseVideoId').value = videoId;
       document.getElementById('EditPhraseStartAt').value = startAt;

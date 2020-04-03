@@ -36,23 +36,6 @@ export function speak(text) {
 	}
 };
 
-// play audio from a URL
-export function playAudio(phrase) {
-  let { url } = phrase;
-	if (url && url.length > 0) {
-		var audio = new Audio(url);
-		audio.play();
-		TextEntryRowSetText('');
-		addToHistory(Object.assign({}, phrase, { timestamp: Date.now() }));
-    updateMain();
-		vocalizePopup('Playing Web audio:', phrase.label || '', () => {
-			audio.pause();
-		}, () => {
-			return !audio.paused && !audio.ended;
-		});
-	}
-};
-
 // play YouTube video from a videoId
 export function playYoutube(phrase) {
 	playYoutubeVideo(phrase);

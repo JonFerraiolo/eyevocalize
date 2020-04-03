@@ -10,7 +10,7 @@ import { initializeWhiteboard, WhiteboardGetPending, WhiteboardSync, AddTextToWh
 import { initializeHistory, HistoryGetPending, HistorySync, playLastHistoryItem } from './History.js';
 import { initializeFavorites, FavoritesGetPending, FavoritesSync,  editFavorites } from './MyPhrases.js';
 import { fromRight, fromLeft } from './animSlide.js';
-import { speak, playAudio } from './vocalize.js';
+import { speak } from './vocalize.js';
 import { html, render } from './lib/lit-html/lit-html.js';
 import { styleMap } from './lib/lit-html/directives/style-map.js';
 
