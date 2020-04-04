@@ -51,18 +51,18 @@ function vocalizePopup(title, content, cancelCB, inProcessCB) {
 		hideCallback: () => {
 			if (popupUp) {
 				cancelCB();
-				render(html``, popupRootElement);
+				render(html``, showPopupReturnData.popupOverlay);
 				popupUp = false;
 			}
 			updateMain();
 		}
 	};
 	let popupUp = true;
-	let popupRootElement = showPopup(params);
+	let showPopupReturnData = showPopup(params);
 	let interval = setInterval(function () {
 		if (!popupUp || !inProcessCB()) {
 			clearInterval(interval);
-			hidePopup();
+			hidePopup(showPopupReturnData);
 		}
 	}, 10);
 }

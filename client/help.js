@@ -432,6 +432,8 @@ let closeDragElement = e => {
   }
 };
 
+let showPopupReturnData;
+
 function showSizeMenu(refNode, hideCB) {
 	let params = {
 		content: HelpSizeMenu,
@@ -443,7 +445,7 @@ function showSizeMenu(refNode, hideCB) {
     underlayOpacity: 0.4,
 		hideCallback: () => { hideCB(); },
 	};
-	let popupRootElement = showPopup(params);
+	showPopupReturnData = showPopup(params);
 }
 
 let HelpSizeMenu = (parentElement, customControlsData) => {
@@ -463,7 +465,7 @@ let HelpSizeMenu = (parentElement, customControlsData) => {
       x = 'thin';
     }
     Size = y+'-'+x;
-		hidePopup(customControlsData);
+		hidePopup(showPopupReturnData, customControlsData);
   };
   render(html`<div class="HelpSizeMenu popupMenu">
   <div class=popupMenuTitle>${localization.help['Size']}</div>
@@ -503,7 +505,7 @@ function showPositionMenu(refNode, hideCB) {
     underlayOpacity: 0.4,
 		hideCallback: () => { hideCB(); },
 	};
-	let popupRootElement = showPopup(params);
+	showPopupReturnData = showPopup(params);
 }
 
 // v-align top, middle, bottom, h-align left, center, right,
@@ -519,7 +521,7 @@ let HelpPositionMenu = (parentElement, customControlsData) => {
     } else if (['left', 'center', 'right'].indexOf(HelpMenuId) >= 0) {
       Position = Position === 'manual' ? 'middle-'+HelpMenuId : y+'-'+HelpMenuId;
     }
-		hidePopup(customControlsData);
+		hidePopup(showPopupReturnData, customControlsData);
   };
   render(html`<div class="HelpPositionMenu popupMenu">
   <div class=popupMenuTitle>${localization.help['Position']}</div>

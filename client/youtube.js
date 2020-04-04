@@ -64,12 +64,12 @@ export function playYoutubeVideo(phrase) {
       hideCallback: () => {
         if (!cleanupAlreadyDone) {
           stopYoutubeVideo();
-          render(html``, popupRootElement);
+          render(html``, showPopupReturnData.popupOverlay);
           cleanupAlreadyDone = true;
         }
       }
     };
-    let popupRootElement = showPopup(params);
+    let showPopupReturnData = showPopup(params);
     let youtubeParams = {
       playerDivId: 'youtubePlayerDiv',
       width: 300,
@@ -78,9 +78,9 @@ export function playYoutubeVideo(phrase) {
       startAt,
       endAt,
       doneCallback: function() {
-        render(html``, popupRootElement);
+        render(html``, showPopupReturnData.popupOverlay);
         cleanupAlreadyDone = true;
-        hidePopup();
+        hidePopup(showPopupReturnData);
       }
     };
     invokeYoutubePlayAPI(youtubeParams);

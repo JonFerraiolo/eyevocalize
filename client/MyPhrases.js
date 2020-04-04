@@ -267,6 +267,7 @@ styleElement.appendChild(document.createTextNode(css));
 document.head.appendChild(styleElement);
 
 let Favorites;
+let showPopupReturnData;
 
 export function initializeFavorites(props) {
   let { currentVersion } = props;
@@ -1171,11 +1172,11 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
     Favorites.lastChooseCategory.categoryLabel = Favorites.columns[selCol].categories[selCat].label;
     customControlsData.columnIndex = selCol;
     customControlsData.categoryIndex = selCat;
-    hidePopup(customControlsData);
+    hidePopup(showPopupReturnData, customControlsData);
   };
   let onClickCancel = e => {
     e.preventDefault();
-    hidePopup(customControlsData);
+    hidePopup(showPopupReturnData, customControlsData);
   };
   let doneWithNewCategoryName = () => {
     let elem = document.getElementById('MyPhrasesChooseCategoryNewCategory');
@@ -1251,9 +1252,9 @@ export function MyPhrasesChooseCategoryPopupShow(hideCallbackParams) {
     clickAwayToClose: false,
     underlayOpacity: 0.85,
     hideCallback: hideCallbackParams => {
-      render(html``, popupRootElement);
+      render(html``, showPopupReturnData.popupOverlay);
       buildChooseCategoryControl(hideCallbackParams.parentElement, hideCallbackParams);
     },
   };
-  let popupRootElement = showPopup(params);
+  showPopupReturnData = showPopup(params);
 };

@@ -1,8 +1,8 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
 
-let popupUnderlay, popupOverlay, hideCallback;
-let popupIsShowing = false;
+let popupStackCount = 0;
+let popupStack =[];
 
 /**
  * Show a popup.
@@ -21,7 +21,7 @@ let popupIsShowing = false;
  * @param {boolean} [params.clickAwayToClose] Clicking on background closes the popup (default: true)
  * @param {boolean} [params.underlayOpacity] Opacity value for underlay (default: .6)
  * @param {function} [params.hideCallback] Callback to call when the popup comes down
- * @returns {Element} popupOverlay root element
+ * @returns {object} object that must be passed back when calling hidePopup, includes popupOverlay root element
  */
 export function showPopup(params) {
 	let clickAwayToClose, underlayOpacity;
@@ -36,7 +36,13 @@ export function showPopup(params) {
 	var offsetY = params.offsetY || 0;
 	clickAwayToClose = typeof params.clickAwayToClose == 'boolean' ? params.clickAwayToClose : true;
 	underlayOpacity = typeof params.underlayOpacity == 'undefined' ? '.6' : params.underlayOpacity;
-	hideCallback = params.hideCallback;
+	let hideCallback = params.hideCallback;
+  if (!popupStack[popupStackCount]) {
+    popupStack[popupStackCount] = { popupOverlay: null, popupUnderlay: null, popupStackCount };
+  }
+  let showPopupReturnData = popupStack[popupStackCount];
+  showPopupReturnData.hideCallback = hideCallback;
+  let { popupOverlay, popupUnderlay } = showPopupReturnData;
 	if (!popupUnderlay) {
 		popupUnderlay = document.createElement('div');
 		popupUnderlay.className = 'popupUnderlay';
@@ -46,22 +52,24 @@ export function showPopup(params) {
 		popupUnderlay.style.top = '0px';
 		popupUnderlay.style.bottom = '0px';
 		popupUnderlay.style.backgroundColor = 'white';
-		popupUnderlay.style.zIndex = '99999998';
+		popupUnderlay.style.zIndex = (10000000+popupStackCount*2).toString();
 		popupUnderlay.addEventListener('click', function(e) {
 			e.stopPropagation();
 			if (clickAwayToClose) {
-				hidePopup();
+				hidePopup(showPopupReturnData);
 			}
 		}.bind(this), false);
 		document.body.appendChild(popupUnderlay);
+    showPopupReturnData.popupUnderlay = popupUnderlay;
 	}
 	popupUnderlay.style.opacity = underlayOpacity;
 	if (!popupOverlay) {
 		popupOverlay = document.createElement('div');
 		popupOverlay.className = 'popupOverlay';
 		popupOverlay.style.position = 'absolute';
-		popupOverlay.style.zIndex = '99999999';
+		popupOverlay.style.zIndex = (10000000+popupStackCount*2+1).toString();
 		document.body.appendChild(popupOverlay);
+    showPopupReturnData.popupOverlay = popupOverlay;
 	}
 	popupUnderlay.style.display = '';
 	popupOverlay.style.display = '';
@@ -106,20 +114,21 @@ export function showPopup(params) {
 		popupOverlay.style.top = y + 'px';
 		popupOverlay.style.opacity = 1;
 	}, 0);
-  popupIsShowing = true;
-	return popupOverlay;
+  popupStackCount++;
+	return showPopupReturnData;
 }
 
-export function hidePopup(hideCallbackParams) {
-  popupIsShowing = false;
+export function hidePopup(showPopupReturnData, hideCallbackParams) {
+  let { popupOverlay, popupUnderlay, hideCallback } = showPopupReturnData;
+  popupStackCount--;
 	popupUnderlay.style.display = 'none';
 	popupOverlay.style.display = 'none';
 	if (hideCallback) {
 		hideCallback(hideCallbackParams);
-		hideCallback = null;
+		showPopupReturnData.hideCallback = null;
 	}
 }
 
 export function popupShowing() {
-  return popupIsShowing;
+  return popupStackCount > 0;
 }

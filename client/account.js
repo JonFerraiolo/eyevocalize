@@ -43,6 +43,8 @@ let styleElement = document.createElement('style');
 styleElement.appendChild(document.createTextNode(css));
 document.head.appendChild(styleElement);
 
+let showPopupReturnData;
+
 export function showAccountMenu(refNode, hideCB) {
 	let params = {
 		content: AccountMenu,
@@ -53,7 +55,7 @@ export function showAccountMenu(refNode, hideCB) {
 		popupY: 'top',
 		hideCallback: () => { hideCB(); },
 	};
-	let popupRootElement = showPopup(params);
+	showPopupReturnData = showPopup(params);
 }
 
 const fetchPostOptionsTemplate = {
@@ -67,7 +69,7 @@ let AccountMenu = (parentElement, customControlsData) => {
   let onClickLogout = e => {
     e.preventDefault();
 		e.stopPropagation();
-		hidePopup(customControlsData);
+		hidePopup(showPopupReturnData, customControlsData);
 		let fetchPostOptions = JSON.parse(JSON.stringify(fetchPostOptionsTemplate));
 		let payload = {};
 		fetchPostOptions.body = JSON.stringify(payload);
@@ -92,7 +94,7 @@ let AccountMenu = (parentElement, customControlsData) => {
   let onClickAccountSettings = e => {
     e.preventDefault();
 		e.stopPropagation();
-    hidePopup(customControlsData);
+    hidePopup(showPopupReturnData, customControlsData);
 		slideInSettingsScreen({ initialSection: 'Account' });
   };
   render(html`<div class="AccountMenu popupMenu">
@@ -116,7 +118,7 @@ export function showCloseAccountPopup() {
 		popupY: 'top',
 		offsetY: 10,
 	};
-	let popupRootElement = showPopup(params);
+	showPopupReturnData = showPopup(params);
 }
 
 let CloseAccountDialog = (parentElement, customControlsData) => {
@@ -157,7 +159,7 @@ let CloseAccountDialog = (parentElement, customControlsData) => {
 		}
     e.preventDefault();
 		e.stopPropagation();
-    hidePopup(customControlsData);
+    hidePopup(showPopupReturnData, customControlsData);
   };
 	let onKeyDown = e => {
 		if (e.key === 'Enter') {
