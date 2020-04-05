@@ -1,6 +1,9 @@
 // us-en strings for the Web site
 
 const Localization = {
+  common: {
+    Cancel: `Cancel`,
+  },
   help: {
     Contents: `Contents`,
     Introduction: `Introduction`,
@@ -95,6 +98,9 @@ const Localization = {
     left: `left`,
     center: `center`,
     right: `right`,
+  },
+  ImportFavorites: {
+    'Import Favorites': `Import Favorites`,
   },
   // only translate the values of the label: and text: properties
   initialFavorites: {

@@ -6,6 +6,7 @@ import { updateMain, buildSlideRightTitle, sync, localization,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { EditPhrase } from './EditPhrase.js';
 import { buildChooseCategoryControl, MyPhrasesChooseCategoryPopupShow } from './ChooseCategory.js';
+import { ImportFavoritesPopupShow } from './ImportFavorites.js';
 
 let css = `
 .MyPhrases {
@@ -358,7 +359,16 @@ function updateMyPhrases(Section, parentElement, props) {
   let { searchTokens } = props;
   let onClickImport = e => {
     e.preventDefault();
-    debugger;
+    //FIXME
+    let customControlsData = {
+      doItCallback: () => {
+        debugger;
+      },
+      cancelCallback: () => {
+        debugger;
+      },
+    };
+    ImportFavoritesPopupShow(customControlsData);
   };
   let onClickAdd = e => {
     e.preventDefault();
