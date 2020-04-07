@@ -171,6 +171,17 @@ const Localization = {
 
   // only translate values of label:, desc:, category:, text: properties
   builtinFavoritesCollections: [
+    { label: 'Additions - Basic', desc: 'Suggested additions to the Basic group of favorites', column: 3, category: 'Basic', items: [
+      { type: 'text', label: 'vgood', text: "very good"},
+      { type: 'text', label: 'perfect', text: "perfect"},
+      { type: 'text', label: 'wonful', text: "wonderful"},
+      { type: 'text', label: 'lol', text: "L O L"},
+    ]},
+    { label: 'Additions - Pleasantries', desc: 'Suggested additions to the Pleasantries group of favorites', column: 3, category: 'Pleasantries', items: [
+      { type: 'text', label: 'g-aft', text: 'good afternoon'},
+      { type: 'text', label: 'g-eve', text: 'good evening'},
+      { type: 'text', label: 'g-night', text: 'good night'},
+    ]},
     { label: 'ALS Care Requests', desc: 'Caregiver requests that an ALS patient might make', column: 2, category: 'Care Requests', items: [
       { type: 'text', label: 'air', text: 'Can I have air?'},
       { type: 'text', label: 'mask', text: 'Can you please fix my breathing mask?'},
@@ -204,17 +215,6 @@ const Localization = {
     { label: 'ALS Clips', desc: 'ALS-specific YouTube video clips', column: 1, category: 'Clips', items: [
       { type: 'youtube', label: 'gehrig1', videoId: 'qswig8dcEAY', startAt: 5, endAt: 16 },
       { type: 'youtube', label: 'gehrig2', videoId: 'OyT4mPBe4YQ', startAt: 150, endAt: 165 },
-    ]},
-    { label: 'Additions - Basic', desc: 'Suggested additions to the Basic group of favorites', column: 3, category: 'Basic', items: [
-      { type: 'text', label: 'vgood', text: "very good"},
-      { type: 'text', label: 'perfect', text: "perfect"},
-      { type: 'text', label: 'wonful', text: "wonderful"},
-      { type: 'text', label: 'lol', text: "L O L"},
-    ]},
-    { label: 'Additions - Pleasantries', desc: 'Suggested additions to the Pleasantries group of favorites', column: 3, category: 'Pleasantries', items: [
-      { type: 'text', label: 'g-aft', text: 'good afternoon'},
-      { type: 'text', label: 'g-eve', text: 'good evening'},
-      { type: 'text', label: 'g-night', text: 'good night'},
     ]},
     { label: 'Jon clips', desc: 'Jon clips', column: 1, category: 'Clips', items: [
       { type: 'youtube', label: 'johnny1', videoId: 'WZKmsA8bzao', startAt: 25.5, endAt: 39 },

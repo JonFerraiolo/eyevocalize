@@ -82,10 +82,9 @@ let css = `
 	grid-column-start: 3;
 	grid-column-end: 5;
 }
-.ImportFavoritesNoItemsSelected {
+.ImportFavoritesItemInitialEmpty {
 	grid-column-start: 1;
-	grid-column-end: 7;
-	text-align: center;
+	grid-column-end: 3;
 }
 `;
 let styleElement = document.createElement('style');
@@ -191,9 +190,17 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 						${(() => { // using funky (func)() to create an expression out of func
 							if (collection.expanded) {
 								return html`
-									<div class=ImportFavoritesNoItemsSelectedRow>
-										<span class=ImportFavoritesNoItemsSelected>No items selected</span>
-									</div>
+									${collection.items.map((item, itemIndex) => {
+										return html`
+											<div class=ImportFavoritesItemRow>
+												<span class=ImportFavoritesItemInitialEmpty></span>
+												<span class=ImportFavoritesItemCheckbox><input type=checkbox></input></span>
+												<span class=ImportFavoritesItemLabel>${item.label}</span>
+												<span class=ImportFavoritesItemDetail>${item.text}</span>
+												<span class=ImportFavoritesItemPlay>${target}</span>
+											</div>
+										`;
+									})}
 								`;
 							} else {
 								return '';
