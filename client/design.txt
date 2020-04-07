@@ -14,12 +14,12 @@ Import from  EyeVocalize.com
 
 Select which items to import
 [_] > collection name  [target]
-      [_] label, desc, text [Test]
+      [_] label, text [Test]
 (items with strike through have already been imported)
 
 Import Cancel Make Skinny
 
-modal popup That takes up 90% Of height of topDiv, center when we'wide 
+modal popup That takes up 90% Of height of topDiv, center when we'wide
 skinny is as wide as history column, drops desc and text columns , shoved to left when skinny
 
 ======

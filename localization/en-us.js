@@ -3,6 +3,11 @@
 const Localization = {
   common: {
     Cancel: `Cancel`,
+    From: `From`,
+    'local file': `local file`,
+    Size: `Size`,
+    thin: `thin`,
+    wide: `wide`,
   },
   help: {
     Contents: `Contents`,
@@ -101,6 +106,7 @@ const Localization = {
   },
   ImportFavorites: {
     'Import Favorites': `Import Favorites`,
+    instructions: `Select which items to import.`,
   },
   // only translate the values of the label: and text: properties
   initialFavorites: {
