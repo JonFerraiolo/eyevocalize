@@ -95,25 +95,6 @@ let showPopupReturnData;
 
 let ImportFavoritesDialog = (parentElement, customControlsData) => {
 	let Favorites = getFavorites();
-	/*
-  let newCategoryJustCreated = null;
-  let onClickExistingCategory = e => {
-    e.preventDefault();
-    let target = e.currentTarget;
-    selCol = target.MyPhrasesColumn;
-    selCat = target.MyPhrasesCategory;
-    localUpdate();
-  };
-  let onClickNewCategory = e => {
-    e.preventDefault();
-    newCategoryJustCreated = e.currentTarget.MyPhrasesColumn;
-    localUpdate();
-    setTimeout(() => {
-      let elem = document.getElementById('ImportFavoritesNewCategory');
-      elem.focus();
-    }, 0);
-  };
-	*/
 	let onChangeFrom = e => {
 		e.preventDefault();
 		fromIndex = e.currentTarget.selectedIndex;
@@ -121,19 +102,56 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 	};
 	let onClickExpandCollapse = e => {
 		e.preventDefault();
+		e.stopPropagation();
 		let collection = data[e.currentTarget.CollectionIndex];
 		collection.expanded = !collection.expanded;
 		localUpdate();
 	};
+	let setSelectionCollection = (collection, bool) => {
+		if (!collection.alreadyImported) {
+			collection.selected = bool;
+			collection.items.forEach(item => {
+				if (!item.alreadyImported) {
+					item.selected = bool;
+				}
+			});
+		}
+	};
+	let selectCollection = collection => {
+		setSelectionCollection(collection, true);
+	};
+	let deselectCollection = collection => {
+		setSelectionCollection(collection, false);
+	};
+	let onClickCollectionRow = e => {
+		e.preventDefault();
+		let collection = data[e.currentTarget.CollectionIndex];
+		if (!collection.alreadyImported) {
+			if (collection.selected) {
+				deselectCollection(collection);
+			} else {
+				selectCollection(collection);
+			}
+			localUpdate();
+		}
+	};
+	let onClickItemRow = e => {
+		e.preventDefault();
+		let item = data[e.currentTarget.CollectionIndex].items[e.currentTarget.ItemIndex];
+		if (!item.alreadyImported) {
+			item.selected = !item.selected;
+			localUpdate();
+		}
+	};
+	let onClickSelectAll = e => {
+		e.preventDefault();
+		data.forEach(collection => {
+			selectCollection(collection);
+		});
+		localUpdate();
+	};
   let onClickDoit = e => {
     e.preventDefault();
-		/* FIXME
-    Favorites.lastImportFavorites.columnIndex = selCol;
-    Favorites.lastImportFavorites.categoryIndex = selCat;
-    Favorites.lastImportFavorites.categoryLabel = Favorites.columns[selCol].categories[selCat].label;
-    customControlsData.columnIndex = selCol;
-    customControlsData.categoryIndex = selCat;
-		*/
     hidePopup(showPopupReturnData, customControlsData);
 		customControlsData.doItCallback();
   };
@@ -143,16 +161,21 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 		customControlsData.cancelCallback();
   };
 	let initializeData = ()  => {
-		let initializeExpanded = () => {
+		let prepareNewData = () => {
 			data.forEach(collection => {
 				collection.expanded = false;
+				collection.selected = false;
+				collection.indeterminate = false;
+				collection.items.forEach(item => {
+					item.selected = false;
+				});
 			});
 		};
 		if (fromValue === 'EyeVocalize.com') {
 			if (builtinsData === null) {
 				builtinsData = JSON.parse(JSON.stringify(localization.builtinFavoritesCollections)); // deep clone
 				data = builtinsData;
-				initializeExpanded();
+				prepareNewData();
 			} else {
 				data = builtinsData;
 			}
@@ -180,8 +203,10 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 					let target = 'target';
 					let triangle = collection.expanded ? html`&#x25bc;` : html`&#x25b6;`; // &#x25bc; Down &#x25b6; Right
 					return html`
-						<div class=ImportFavoritesCollectionRow>
-							<span class=ImportFavoritesCollectionCheckbox><input type=checkbox></input></span>
+						<div class=ImportFavoritesCollectionRow @click=${onClickCollectionRow} .CollectionIndex=${collectionIndex}>
+							<label class=ImportFavoritesCollectionCheckbox>
+								<input .CollectionIndex=${collectionIndex} type=checkbox></input>
+							</label>
 							<span class=ImportFavoritesCollectionExpandCollapse .CollectionIndex=${collectionIndex} @click=${onClickExpandCollapse}>${triangle}</span>
 							<span class=ImportFavoritesCollectionLabel>${collection.label}</span>
 							<span class=ImportFavoritesCollectionDesc>${collection.desc}</span>
@@ -192,9 +217,11 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 								return html`
 									${collection.items.map((item, itemIndex) => {
 										return html`
-											<div class=ImportFavoritesItemRow>
+											<div class=ImportFavoritesItemRow .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} @click=${onClickItemRow}>
 												<span class=ImportFavoritesItemInitialEmpty></span>
-												<span class=ImportFavoritesItemCheckbox><input type=checkbox></input></span>
+												<label class=ImportFavoritesItemCheckbox>
+													<input .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} type=checkbox></input>
+												</label>
 												<span class=ImportFavoritesItemLabel>${item.label}</span>
 												<span class=ImportFavoritesItemDetail>${item.text}</span>
 												<span class=ImportFavoritesItemPlay>${target}</span>
@@ -214,48 +241,21 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 				<button @click=${onClickCancel} class=ImportFavoritesCancelButton>${localization.common['Cancel']}</button>
 			</div>
 		</div>`, parentElement);
-		document.getElementById('ImportFavoritesFromSelect').selectedIndex = fromIndex;
+		setTimeout(() => {
+			document.getElementById('ImportFavoritesFromSelect').selectedIndex = fromIndex;
+			parentElement.querySelectorAll('.ImportFavoritesCollectionCheckbox > input').forEach(checkboxElem => {
+				let collectionIndex = checkboxElem.CollectionIndex;
+				checkboxElem.checked = data[collectionIndex].selected;
+				checkboxElem.indeterminate = data[collectionIndex].indeterminate;
+			});
+			parentElement.querySelectorAll('.ImportFavoritesItemCheckbox > input').forEach(checkboxElem => {
+				let collectionIndex = checkboxElem.CollectionIndex;
+				let itemIndex = checkboxElem.ItemIndex;
+				checkboxElem.checked = data[collectionIndex].items[itemIndex].selected;
+			});
+		}, 0);
 	};
 	localUpdate();
-
-		/* FIXME
-    render(html`<div class=ImportFavorites>
-      <div class=ImportFavoritesTitle>Choose a Favorites Category</div>
-      <div class=ImportFavoritesChooser>
-        <div class=ImportFavoritesList>
-          ${Favorites.columns.map((column, columnIndex) => html`
-            <span class=ImportFavoritesColumn>
-              ${column.categories.map((category, categoryIndex) => html`
-                <div @click=${onClickExistingCategory} .MyPhrasesCategory=${categoryIndex} .MyPhrasesColumn=${columnIndex}
-                  class="ImportFavoritesListItem ${columnIndex === selCol && categoryIndex === selCat ? 'selected' : ''}">
-                  ${columnIndex === selCol && categoryIndex === selCat ? html`<span class=checkmark>&#x2714;</span>` : ''}
-                  <span class=CategoryName>${category.label}</span>
-                </div>
-              `)}
-              ${newCategoryJustCreated === columnIndex ? html`
-                <div @click=${onClickNewCategory} .MyPhrasesColumn=${columnIndex}
-                  class="ImportFavoritesListItem ImportFavoritesListItemInput">
-                  <input id=ImportFavoritesNewCategory class=CategoryName placeholder="Enter new category"
-                    @keydown=${onKeyDown} @blur=${onNewBlur}></input>
-                </div>
-                ` : ''}
-              <div class=spacer>&nbsp;</div>
-              ${newCategoryJustCreated != null ? '' : html`
-                <div @click=${onClickNewCategory} .MyPhrasesColumn=${columnIndex}
-                  class="ImportFavoritesListItem ImportFavoritesListItemNew">
-                  <span class=CategoryName>New ...</span>
-                </div>
-                `}
-            </span>
-          `)}
-        </div>
-      </div>
-      <div class=ImportFavoritesButtonRow>
-        <button @click=${onClickDoit} class=ImportFavoritesDoitButton>Select Category</button>
-        <button @click=${onClickCancel} class=ImportFavoritesCancelButton>Cancel</button>
-      </div>
-    </div>`, parentElement);
-		*/
 };
 
 export function ImportFavoritesPopupShow(hideCallbackParams) {

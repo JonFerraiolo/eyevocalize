@@ -171,18 +171,18 @@ const Localization = {
 
   // only translate values of label:, desc:, category:, text: properties
   builtinFavoritesCollections: [
-    { label: 'Additions - Basic', desc: 'Suggested additions to the Basic group of favorites', column: 3, category: 'Basic', items: [
+    { label: 'Basic', desc: 'Additions to the Basic group', column: 3, category: 'Basic', items: [
       { type: 'text', label: 'vgood', text: "very good"},
       { type: 'text', label: 'perfect', text: "perfect"},
       { type: 'text', label: 'wonful', text: "wonderful"},
       { type: 'text', label: 'lol', text: "L O L"},
     ]},
-    { label: 'Additions - Pleasantries', desc: 'Suggested additions to the Pleasantries group of favorites', column: 3, category: 'Pleasantries', items: [
+    { label: 'Pleasantries', desc: 'Additions to the Pleasantries group', column: 3, category: 'Pleasantries', items: [
       { type: 'text', label: 'g-aft', text: 'good afternoon'},
       { type: 'text', label: 'g-eve', text: 'good evening'},
       { type: 'text', label: 'g-night', text: 'good night'},
     ]},
-    { label: 'ALS Care Requests', desc: 'Caregiver requests that an ALS patient might make', column: 2, category: 'Care Requests', items: [
+    { label: 'ALS Requests', desc: 'Caregiver requests (Advanced ALS)', column: 2, category: 'Care Requests', items: [
       { type: 'text', label: 'air', text: 'Can I have air?'},
       { type: 'text', label: 'mask', text: 'Can you please fix my breathing mask?'},
       { type: 'text', label: 'nebulizer', text: 'Time for nebulizer and feeding'},
@@ -195,7 +195,7 @@ const Localization = {
       { type: 'text', label: 'tubing', text: 'Please pull the blue tubing, you know, the tubing that goes from the breathing machine to my face mask, please pull it outside of the bed as much as possible. '},
       { type: 'text', label: 'itch', text: 'Can you please scratch something for me? '},
     ]},
-    { label: 'ALS Care Adjustments', desc: 'Caregiver adjustments that an ALS patient might need', column: 2, category: 'Care Adjustments', items: [
+    { label: 'ALS Adjustments', desc: 'Caregiver adjustments (Advanced ALS)', column: 2, category: 'Care Adjustments', items: [
       { type: 'text', label: 'hands', text: 'Please move my hands. They are uncomfortable.'},
       { type: 'text', label: 'laptop', text: 'Can you please adjust the position of the computer?'},
       { type: 'text', label: 'strap', text: 'Can you please adjust the head strap?'},
