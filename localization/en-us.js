@@ -8,6 +8,10 @@ const Localization = {
     Size: `Size`,
     thin: `thin`,
     wide: `wide`,
+    'Select all': `Select all`,
+    'Deselect all': `Deselect all`,
+    'Expand all': `Expand all`,
+    'Collapse all': `Collapse all`,
   },
   help: {
     Contents: `Contents`,
@@ -106,7 +110,7 @@ const Localization = {
   },
   ImportFavorites: {
     'Import Favorites': `Import Favorites`,
-    instructions: `Select which items to import.`,
+    instructions: `Click on any part of a row to select.`,
   },
   // only translate the values of the label: and text: properties
   initialFavorites: {

@@ -1,6 +1,6 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
-import { getFavorites } from './MyPhrases.js';
+import { getFavorites, traverseColumnsCategoriesItems } from './MyPhrases.js';
 import { localization } from './main.js';
 import { showPopup, hidePopup } from './popup.js';
 
@@ -86,6 +86,12 @@ let css = `
 	grid-column-start: 1;
 	grid-column-end: 3;
 }
+.ImportFavoritesCollectionRow.selected, .ImportFavoritesItemRow.selected {
+	font-weight: bold;
+}
+.ImportFavoritesCollectionRow.imported, .ImportFavoritesItemRow.imported {
+	text-decoration: line-through;
+}
 `;
 let styleElement = document.createElement('style');
 styleElement.appendChild(document.createTextNode(css));
@@ -94,7 +100,6 @@ document.head.appendChild(styleElement);
 let showPopupReturnData;
 
 let ImportFavoritesDialog = (parentElement, customControlsData) => {
-	let Favorites = getFavorites();
 	let onChangeFrom = e => {
 		e.preventDefault();
 		fromIndex = e.currentTarget.selectedIndex;
@@ -150,6 +155,27 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 		});
 		localUpdate();
 	};
+	let onClickDeselectAll = e => {
+		e.preventDefault();
+		data.forEach(collection => {
+			deselectCollection(collection);
+		});
+		localUpdate();
+	};
+	let onClickExpandAll = e => {
+		e.preventDefault();
+		data.forEach(collection => {
+			collection.expanded = true;
+		});
+		localUpdate();
+	};
+	let onClickCollapseAll = e => {
+		e.preventDefault();
+		data.forEach(collection => {
+			collection.expanded = false;
+		});
+		localUpdate();
+	};
   let onClickDoit = e => {
     e.preventDefault();
     hidePopup(showPopupReturnData, customControlsData);
@@ -160,33 +186,46 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
     hidePopup(showPopupReturnData, customControlsData);
 		customControlsData.cancelCallback();
   };
-	let initializeData = ()  => {
-		let prepareNewData = () => {
-			data.forEach(collection => {
-				collection.expanded = false;
-				collection.selected = false;
-				collection.indeterminate = false;
-				collection.items.forEach(item => {
-					item.selected = false;
+	let prepareNewData = () => {
+		let Favorites = getFavorites();
+		data.forEach(collection => {
+			collection.expanded = false;
+			collection.selected = false;
+			collection.indeterminate = false;
+			let anyNotYetImported = false;
+			collection.items.forEach(item => {
+				item.selected = false;
+				let anyMatches = false;
+				traverseColumnsCategoriesItems(Favorites, itm => {
+					if (itm.type === 'text' && item.type === 'text' &&
+						itm.label === item.label && itm.text === item.text) {
+						anyMatches = true;
+					} else if (itm.type === 'youtube' && item.type === 'youtube' &&
+						itm.label === item.label && itm.videoId === item.videoId &&
+						itm.startAt === item.startAt && itm.endAt === item.endAt) {
+							anyMatches = true;
+						}
 				});
+				item.alreadyImported = anyMatches;
+				if (!anyMatches) {
+					anyNotYetImported = true;
+				}
 			});
-		};
-		if (fromValue === 'EyeVocalize.com') {
-			if (builtinsData === null) {
-				builtinsData = JSON.parse(JSON.stringify(localization.builtinFavoritesCollections)); // deep clone
-				data = builtinsData;
-				prepareNewData();
-			} else {
-				data = builtinsData;
-			}
-		}
+			collection.alreadyImported = !anyNotYetImported;
+		});
 	};
+	let urlData = null;
+	let localData = null;
 	let fromIndex = 0;
 	let fromValue = 'EyeVocalize.com';
-	let builtinsData = null;
-	let data;
-	initializeData();
+	let builtinsData = JSON.parse(JSON.stringify(localization.builtinFavoritesCollections)); // deep clone
+	let data = builtinsData;
+	prepareNewData();
   let localUpdate = () => {
+		let SelectAll = localization.common['Select all'];
+		let DeselectAll = localization.common['Deselect all'];
+		let ExpandAll = localization.common['Expand all'];
+		let CollapseAll = localization.common['Collapse all'];
 		render(html`<div class=ImportFavorites>
 			<div class=ImportFavoritesTitle>${localization.ImportFavorites['Import Favorites']}</div>
 			<div class=ImportFavoritesInstructions>${localization.ImportFavorites['instructions']}</div>
@@ -202,8 +241,10 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 				${data.map((collection, collectionIndex) => {
 					let target = 'target';
 					let triangle = collection.expanded ? html`&#x25bc;` : html`&#x25b6;`; // &#x25bc; Down &#x25b6; Right
+					let collectionClass = "ImportFavoritesCollectionRow" +
+						(collection.selected ? " selected" : "") + (collection.alreadyImported ? " imported" : "");
 					return html`
-						<div class=ImportFavoritesCollectionRow @click=${onClickCollectionRow} .CollectionIndex=${collectionIndex}>
+						<div class=${collectionClass} @click=${onClickCollectionRow} .CollectionIndex=${collectionIndex}>
 							<label class=ImportFavoritesCollectionCheckbox>
 								<input .CollectionIndex=${collectionIndex} type=checkbox></input>
 							</label>
@@ -216,8 +257,10 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 							if (collection.expanded) {
 								return html`
 									${collection.items.map((item, itemIndex) => {
+										let itemClass = "ImportFavoritesItemRow" +
+											(item.selected ? " selected" : "") + (item.alreadyImported ? " imported" : "");
 										return html`
-											<div class=ImportFavoritesItemRow .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} @click=${onClickItemRow}>
+											<div class=${itemClass} .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} @click=${onClickItemRow}>
 												<span class=ImportFavoritesItemInitialEmpty></span>
 												<label class=ImportFavoritesItemCheckbox>
 													<input .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} type=checkbox></input>
@@ -236,6 +279,13 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 					`;
 				})}
 			</div>
+			<div class=ImportFavoritesSelectExpandRow>
+				<a href="" title=${SelectAll} @click=${onClickSelectAll}>${SelectAll}</a>
+				<a href="" title=${DeselectAll} @click=${onClickDeselectAll}>${DeselectAll}</a>
+				<a href="" title=${ExpandAll} @click=${onClickExpandAll}>${ExpandAll}</a>
+				<a href="" title=${CollapseAll} @click=${onClickCollapseAll}>${CollapseAll}</a>
+			</div>
+
 			<div class=ImportFavoritesButtonRow>
 				<button @click=${onClickDoit} class=ImportFavoritesDoitButton>${localization.ImportFavorites['Import Favorites']}</button>
 				<button @click=${onClickCancel} class=ImportFavoritesCancelButton>${localization.common['Cancel']}</button>

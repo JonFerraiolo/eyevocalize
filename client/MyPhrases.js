@@ -283,7 +283,7 @@ function traverseColumnsCategories(aMyPhrases, func) {
 
 // invoke a function for each phrase stored in a MyPhrases data structure
 // five arguments are passed to the func (see below)
-function traverseColumnsCategoriesItems(aMyPhrases, func) {
+export function traverseColumnsCategoriesItems(aMyPhrases, func) {
   aMyPhrases.columns.forEach((column, colIndex) => {
     column.categories.forEach((category, catIndex) => {
       category.items.forEach((item, itIndex) => {
