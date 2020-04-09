@@ -112,81 +112,69 @@ const Localization = {
     'Import Favorites': `Import Favorites`,
     instructions: `Click on any part of a row to select.`,
   },
-  // only translate the values of the label: and text: properties
-  initialFavorites: {
-    columns: [
-      { categories: [
-        	{ label: 'Clips', expanded: true, items: [
-            { type: 'youtube', label: 'excellent', videoId: 'AKecz2ak78Y', startAt: 0, endAt: 4 },
-            { type: 'youtube', label: 'betcha', videoId: 'fv9XtSiqEDA', startAt: 0, endAt: 999 },
-            { type: 'youtube', label: 'houston', videoId: 'Bti9_deF5gs', startAt: 25, endAt: 150 },
-            { type: 'youtube', label: 'home', videoId: 'RPs2Y4FdGzM', startAt: 143, endAt: 153 },
-            { type: 'youtube', label: 'pretty', videoId: 'lT8qgvgk1rU', startAt: 98, endAt: 106 },
-            { type: 'youtube', label: 'crying', videoId: 'Xx8cCDthsuk', startAt: 50, endAt: 56 },
-            { type: 'youtube', label: 'gin', videoId: '09g2PzusuzI', startAt: 24, endAt: 32 },
-            { type: 'youtube', label: 'bumpy', videoId: 'yKHUGvde7KU', startAt: 3, endAt: 10 },
-            { type: 'youtube', label: 'tara', videoId: 'c_WkyalPOEI', startAt: 32, endAt: 999 },
-            { type: 'youtube', label: 'kind', videoId: 'l4V8OHy0su0', startAt: 50, endAt: 60.5 },
-            { type: 'youtube', label: 'stupid', videoId: 'cJe6-afGz0Q', startAt: 4, endAt: 999 },
-            { type: 'youtube', label: 'ppgood', videoId: 'ZUOVRJ4wJ7g', startAt: 27.5, endAt: 999 },
-        	]},
-        ]
-      },
-      { categories: [
-        { label: 'Opposites', expanded: true, items: [
-          { type: 'text', label: 'up', text: 'Please move it up. '},
-          { type: 'text', label: 'down', text: 'Please move it down. '},
-          { type: 'text', label: 'left', text: 'Please move it to my left. '},
-          { type: 'text', label: 'right', text: 'Please move it to my right. '},
-          { type: 'text', label: 'in', text: 'Please push it in. '},
-          { type: 'text', label: 'out', text: 'Please push it out. '},
-          { type: 'text', label: 'forward', text: 'Please move it forward. '},
-          { type: 'text', label: 'backward', text: 'Please move it Backward. '},
-          { type: 'text', label: 'tighter', text: 'Please make it tighter. '},
-          { type: 'text', label: 'looser', text: 'Please make it looser. '},
-          { type: 'text', label: 'little', text: 'Only a small amount. '},
-          { type: 'text', label: 'a lot', text: 'Quite a lot. '},
-          { type: 'text', label: 'hurry', text: 'Please hurry!'},
-          { type: 'text', label: 'no rush', text: 'Take your time. Not urgent'},
-        ]},
-      ]},
-      { categories: [
-        { label: 'Basic', expanded: true, items: [
-          { type: 'text', label: 'nevermind', text: 'Sorry. Mistake. Ignore what I just said.'},
-          { type: 'text', label: 'help', text: 'Please come and help me'},
-          { type: 'text', label: 'yes', text: 'yes'},
-          { type: 'text', label: 'no', text: 'no'},
-          { type: 'text', label: 'OK', text: 'OK'},
-          { type: 'text', label: 'good', text: "good"},
-          { type: 'text', label: 'still', text: "still not right"},
-          { type: 'text', label: 'gaze trouble', text: "I am having trouble with my eye gaze at the moment, so I may not be able to answer questions. Maybe try asking me questions that have yes and no answers. "},
-        ]},
-        { label: 'Pleasantries', expanded: true, items: [
-          { type: 'text', label: 'please', text: 'Please.'},
-          { type: 'text', label: 'thankyou', text: 'Thank you.'},
-          { type: 'text', label: 'hello', text: 'hello'},
-          { type: 'text', label: 'goodbye', text: 'goodbye'},
-          { type: 'text', label: 'g-morn', text: 'good morning'},
-          { type: 'text', label: 'howRU', text: 'how are you'},
-        ]},
-      ]},
-    ]
-  },
 
   // only translate values of label:, desc:, category:, text: properties
   builtinFavoritesCollections: [
-    { label: 'Basic', desc: 'Additions to the Basic group', column: 3, category: 'Basic', items: [
+    { label: 'Basic (1)', desc: `Default basic vocalizations`, default: true, column: 3, category: 'Basic', items: [
+      { type: 'text', label: 'nevermind', text: 'Sorry. Mistake. Ignore what I just said.'},
+      { type: 'text', label: 'help', text: 'Please come and help me'},
+      { type: 'text', label: 'yes', text: 'yes'},
+      { type: 'text', label: 'no', text: 'no'},
+      { type: 'text', label: 'OK', text: 'OK'},
+      { type: 'text', label: 'good', text: "good"},
+      { type: 'text', label: 'still', text: "still not right"},
+      { type: 'text', label: 'gaze trouble', text: "I am having trouble with my eye gaze at the moment, so I may not be able to answer questions. Maybe try asking me questions that have yes and no answers. "},
+    ]},
+    { label: 'Pleasantries (1)', desc: `Default Pleasantries`, default: true, column: 3, category: 'Pleasantries', items: [
+      { type: 'text', label: 'please', text: 'Please.'},
+      { type: 'text', label: 'thankyou', text: 'Thank you.'},
+      { type: 'text', label: 'hello', text: 'hello'},
+      { type: 'text', label: 'goodbye', text: 'goodbye'},
+      { type: 'text', label: 'g-morn', text: 'good morning'},
+      { type: 'text', label: 'howRU', text: 'how are you'},
+    ]},
+    { label: 'Opposites (1)', desc: `Default list of opposite terms`, default: true, column: 2, category: 'Opposites', items: [
+      { type: 'text', label: 'up', text: 'Please move it up. '},
+      { type: 'text', label: 'down', text: 'Please move it down. '},
+      { type: 'text', label: 'left', text: 'Please move it to my left. '},
+      { type: 'text', label: 'right', text: 'Please move it to my right. '},
+      { type: 'text', label: 'in', text: 'Please push it in. '},
+      { type: 'text', label: 'out', text: 'Please push it out. '},
+      { type: 'text', label: 'forward', text: 'Please move it forward. '},
+      { type: 'text', label: 'backward', text: 'Please move it Backward. '},
+      { type: 'text', label: 'tighter', text: 'Please make it tighter. '},
+      { type: 'text', label: 'looser', text: 'Please make it looser. '},
+      { type: 'text', label: 'little', text: 'Only a small amount. '},
+      { type: 'text', label: 'a lot', text: 'Quite a lot. '},
+      { type: 'text', label: 'hurry', text: 'Please hurry!'},
+      { type: 'text', label: 'no rush', text: 'Take your time. Not urgent'},
+    ]},
+    { label: 'Clips (1)', desc: 'Default YouTube video clips', default: true, column: 1, category: 'Clips', items: [
+      { type: 'youtube', label: 'excellent', videoId: 'AKecz2ak78Y', startAt: 0, endAt: 4 },
+      { type: 'youtube', label: 'betcha', videoId: 'fv9XtSiqEDA', startAt: 0, endAt: 999 },
+      { type: 'youtube', label: 'houston', videoId: 'Bti9_deF5gs', startAt: 25, endAt: 150 },
+      { type: 'youtube', label: 'home', videoId: 'RPs2Y4FdGzM', startAt: 143, endAt: 153 },
+      { type: 'youtube', label: 'pretty', videoId: 'lT8qgvgk1rU', startAt: 98, endAt: 106 },
+      { type: 'youtube', label: 'crying', videoId: 'Xx8cCDthsuk', startAt: 50, endAt: 56 },
+      { type: 'youtube', label: 'gin', videoId: '09g2PzusuzI', startAt: 24, endAt: 32 },
+      { type: 'youtube', label: 'bumpy', videoId: 'yKHUGvde7KU', startAt: 3, endAt: 10 },
+      { type: 'youtube', label: 'tara', videoId: 'c_WkyalPOEI', startAt: 32, endAt: 999 },
+      { type: 'youtube', label: 'kind', videoId: 'l4V8OHy0su0', startAt: 50, endAt: 60.5 },
+      { type: 'youtube', label: 'stupid', videoId: 'cJe6-afGz0Q', startAt: 4, endAt: 999 },
+      { type: 'youtube', label: 'ppgood', videoId: 'ZUOVRJ4wJ7g', startAt: 27.5, endAt: 999 },
+    ]},
+    { label: 'Basic (2)', desc: 'Additional Basic vocalizations', column: 3, category: 'Basic', items: [
       { type: 'text', label: 'vgood', text: "very good"},
       { type: 'text', label: 'perfect', text: "perfect"},
       { type: 'text', label: 'wonful', text: "wonderful"},
       { type: 'text', label: 'lol', text: "L O L"},
     ]},
-    { label: 'Pleasantries', desc: 'Additions to the Pleasantries group', column: 3, category: 'Pleasantries', items: [
+    { label: 'Pleasantries (2)', desc: 'Additional Pleasantries', column: 3, category: 'Pleasantries', items: [
       { type: 'text', label: 'g-aft', text: 'good afternoon'},
       { type: 'text', label: 'g-eve', text: 'good evening'},
       { type: 'text', label: 'g-night', text: 'good night'},
     ]},
-    { label: 'ALS Requests', desc: 'Caregiver requests (Advanced ALS)', column: 2, category: 'Care Requests', items: [
+    { label: 'ALS Requests', desc: 'Caregiver requests (Adv. ALS)', column: 2, category: 'Care Requests', items: [
       { type: 'text', label: 'air', text: 'Can I have air?'},
       { type: 'text', label: 'mask', text: 'Can you please fix my breathing mask?'},
       { type: 'text', label: 'nebulizer', text: 'Time for nebulizer and feeding'},
@@ -199,7 +187,7 @@ const Localization = {
       { type: 'text', label: 'tubing', text: 'Please pull the blue tubing, you know, the tubing that goes from the breathing machine to my face mask, please pull it outside of the bed as much as possible. '},
       { type: 'text', label: 'itch', text: 'Can you please scratch something for me? '},
     ]},
-    { label: 'ALS Adjustments', desc: 'Caregiver adjustments (Advanced ALS)', column: 2, category: 'Care Adjustments', items: [
+    { label: 'ALS Adjustments', desc: 'Caregiver adjustments (Adv. ALS)', column: 2, category: 'Care Adjustments', items: [
       { type: 'text', label: 'hands', text: 'Please move my hands. They are uncomfortable.'},
       { type: 'text', label: 'laptop', text: 'Can you please adjust the position of the computer?'},
       { type: 'text', label: 'strap', text: 'Can you please adjust the head strap?'},

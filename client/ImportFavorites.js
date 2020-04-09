@@ -186,9 +186,10 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
     hidePopup(showPopupReturnData, customControlsData);
 		customControlsData.cancelCallback();
   };
-	let prepareNewData = () => {
+	let prepareNewData = originalData => {
 		let Favorites = getFavorites();
-		data.forEach(collection => {
+		let tempData = JSON.parse(JSON.stringify(originalData)); // deep clone
+		tempData.forEach(collection => {
 			collection.expanded = false;
 			collection.selected = false;
 			collection.indeterminate = false;
@@ -213,14 +214,22 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 			});
 			collection.alreadyImported = !anyNotYetImported;
 		});
+		let returnData = [];
+		tempData.forEach(collection => {
+			if (!collection.alreadyImported) {
+				let newItems = collection.items.filter(item => !item.alreadyImported);
+				collection.items = newItems;
+				returnData.push(collection);
+			}
+		});
+		return returnData;
 	};
 	let urlData = null;
 	let localData = null;
 	let fromIndex = 0;
 	let fromValue = 'EyeVocalize.com';
-	let builtinsData = JSON.parse(JSON.stringify(localization.builtinFavoritesCollections)); // deep clone
+	let builtinsData = prepareNewData(localization.builtinFavoritesCollections);
 	let data = builtinsData;
-	prepareNewData();
   let localUpdate = () => {
 		let SelectAll = localization.common['Select all'];
 		let DeselectAll = localization.common['Deselect all'];

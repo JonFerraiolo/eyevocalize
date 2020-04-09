@@ -216,10 +216,21 @@ export function getFavorites() {
 
 export function initializeFavorites(props) {
   let { currentVersion } = props;
-  let initialFavorites = Object.assign({}, localization.initialFavorites, {
+  let initialFavorites = {
     version: currentVersion,
     timestamp: 0,
     lastChooseCategory: { columnIndex: 0, categoryIndex: 0, categoryLabel: null },
+    columns: [
+      { categories: [] },
+      { categories: [] },
+      { categories: [] },
+    ]
+  };
+  let tempDefaultCollections = localization.builtinFavoritesCollections.filter(collection => collection.default);
+  tempDefaultCollections.forEach(collection => {
+    initialFavorites.columns[collection.column-1].categories.push({
+      label: collection.category, expanded: true, items: collection.items,
+    });
   });
   let FavoritesString = localStorage.getItem("Favorites");
   try {
