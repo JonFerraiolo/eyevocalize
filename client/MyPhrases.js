@@ -370,13 +370,14 @@ function updateMyPhrases(Section, parentElement, props) {
   let { searchTokens } = props;
   let onClickImport = e => {
     e.preventDefault();
-    //FIXME
     let customControlsData = {
       doItCallback: () => {
-        debugger;
+        traverseColumnsCategoriesItems(Favorites, deleteTemporaryProperties);
+        updateStorageFavorites();
+        localUpdate();
       },
       cancelCallback: () => {
-        debugger;
+        localUpdate();
       },
     };
     ImportFavoritesPopupShow(customControlsData);

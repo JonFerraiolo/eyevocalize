@@ -179,6 +179,29 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
   let onClickDoit = e => {
     e.preventDefault();
     hidePopup(showPopupReturnData, customControlsData);
+		let Favorites = getFavorites();
+		data.forEach(collection => {
+			let columnIndex = collection.column;
+			if (isNaN(columnIndex) || !Number.isInteger(columnIndex) || columnIndex < 1 || columnIndex > Favorites.columns.length) {
+				return;
+			}
+			columnIndex--;
+			let column = Favorites.columns[columnIndex];
+			let targetCategory = collection.category;
+			if (typeof targetCategory !== 'string' || targetCategory.length === 0) {
+				return;
+			}
+			let categoryIndex = column.categories.findIndex(category => category.label === targetCategory);
+			collection.items.forEach(item => {
+				if (item.selected) {
+					if (categoryIndex === -1) {
+						categoryIndex = column.categories.length;
+						column.categories.push({ label: targetCategory, expanded: true,  items: [] });
+					}
+					column.categories[categoryIndex].items.push(item);
+				}
+			});
+		});
 		customControlsData.doItCallback();
   };
   let onClickCancel = e => {

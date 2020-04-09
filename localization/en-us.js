@@ -208,7 +208,7 @@ const Localization = {
       { type: 'youtube', label: 'gehrig1', videoId: 'qswig8dcEAY', startAt: 5, endAt: 16 },
       { type: 'youtube', label: 'gehrig2', videoId: 'OyT4mPBe4YQ', startAt: 150, endAt: 165 },
     ]},
-    { label: 'Jon clips', desc: 'Jon clips', column: 1, category: 'Clips', items: [
+    { label: 'Jon clips', desc: 'Jon clips', column: 1, category: 'Jon Clips', items: [
       { type: 'youtube', label: 'johnny1', videoId: 'WZKmsA8bzao', startAt: 25.5, endAt: 39 },
       { type: 'youtube', label: 'johnny2', videoId: 'gpCUMdfRa9w', startAt: 67, endAt: 71 },
       { type: 'youtube', label: 'inconceivable', videoId: 'Z3sLhnDJJn0', startAt: 5.4, endAt: 8.7 },
@@ -228,7 +228,7 @@ const Localization = {
       { type: 'text', label: 'hello', text: "You had me at hello"},
       { type: 'text', label: 'girl', text: "I'm just a girl, standing in front of a boy, asking him to love her"},
     ]},
-    { label: 'Jon Other', desc: 'Jon other', column: 2, category: 'Other', items: [
+    { label: 'Jon Other', desc: 'Jon other', column: 3, category: 'Other', items: [
       { type: 'text', label: 'thanka', text: 'Thank you. You are an angel.'},
       { type: 'text', label: 'Pepe', text: 'Can someone please help Peppay? '},
       { type: 'text', label: 'testing', text: 'Please ignore what comes out of the computer for the next couple of minutes. I am just testing the software. '},
