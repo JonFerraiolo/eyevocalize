@@ -307,14 +307,15 @@ export function traverseColumnsCategoriesItems(aMyPhrases, func) {
 export function slideInAddFavoriteScreen(props) {
   props = props || {};
   let { phrase, slideInLevel } = props;
-  let customControlsData = {};
+  let customControlsData = Object.assign({}, Favorites.lastChooseCategory);
   let params = {
     renderFunc: EditPhrase,
     renderFuncParams: {
       title: 'Add New Favorite',
       doItButtonLabel: 'Add Favorite',
       doItCallback: function(phrase) {
-        let { columnIndex, categoryIndex } = customControlsData;
+        let { columnIndex, categoryIndex, categoryLabel } = customControlsData;
+        Favorites.lastChooseCategory = { columnIndex, categoryIndex, categoryLabel };
         // add phrase to MyPhrases, go back to parent screen
         addToFavorites(phrase, columnIndex, categoryIndex);
         updateMain();
@@ -597,14 +598,15 @@ function editMyPhrases(Section, parentElement, props) {
   let onClickAddItem = e => {
     // should never be called when editWhatis categories
     e.preventDefault();
-    let customControlsData = {};
+    let customControlsData = Object.assign({}, Favorites.lastChooseCategory);
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
         title: 'Add New Entry To Favorites',
         doItButtonLabel: 'Add to Favorites',
         doItCallback: function(phrase) {
-          let { columnIndex, categoryIndex } = customControlsData;
+          let { columnIndex, categoryIndex, categoryLabel } = customControlsData;
+          Favorites.lastChooseCategory = { columnIndex, categoryIndex, categoryLabel };
           // add phrase to MyPhrases, go back to parent screen
           addToFavorites(phrase, columnIndex, categoryIndex);
           if (Section === 'Favorites') {
@@ -630,30 +632,43 @@ function editMyPhrases(Section, parentElement, props) {
   let onClickEditItem = e => {
     e.preventDefault();
     if (editWhat === 'items') {
-      let phrase, columnIndex, categoryIndex, itemIndex;
+      let phrase, columnIndex, categoryIndex, categoryLabel, itemIndex;
       traverseColumnsCategoriesItems(localMyPhrases, (item, origObj, colIndex, catIndex, itIndex) => {
         if (!phrase && item.selected) {
           phrase = item;
           columnIndex = colIndex;
           categoryIndex = catIndex;
+          categoryLabel = localMyPhrases.columns[columnIndex].categories[categoryIndex].label;
           itemIndex = itIndex;
         }
       });
-      let customControlsData = { columnIndex, categoryIndex };
+      let customControlsData = { columnIndex, categoryIndex, categoryLabel };
       let params = {
         renderFunc: EditPhrase,
         renderFuncParams: {
           phrase,
           title: 'Edit Entry From Favorites',
           doItButtonLabel: 'Update Entry',
-          doItCallback: function(phrase) {
-            // add phrase to MyPhrases, go back to parent screen
-            // FIXME  wrong if user changes category
-            replaceFavoritesEntry(columnIndex, categoryIndex, itemIndex, phrase);
+          doItCallback: function(phrase, customControlsData) {
+            // delete old phrase from MyPhrases, add new phrase, go back to parent screen
+            if (customControlsData.columnIndex === columnIndex && customControlsData.categoryIndex === categoryIndex) {
+              makeLocalChangesPermanent();
+              replaceFavoritesEntry(columnIndex, categoryIndex, itemIndex, phrase);
+            } else {
+              traverseColumnsCategories(localMyPhrases, category => {
+                category.items = category.items.filter(item => !item.selected);
+              });
+              makeLocalChangesPermanent();
+              addToFavorites(phrase, customControlsData.columnIndex, customControlsData.categoryIndex);
+            }
             if (Section === 'Favorites') {
               localMyPhrases = JSON.parse(JSON.stringify(Favorites));  // deep clone
             }
-            localMyPhrases.columns[columnIndex].categories[categoryIndex].items[itemIndex].selected = true;
+            if (customControlsData.columnIndex === columnIndex && customControlsData.categoryIndex === categoryIndex) {
+              localMyPhrases.columns[columnIndex].categories[categoryIndex].items[itemIndex].selected = true;
+            }
+            lastClickItemIndex = null;
+            editCategoryNameColumnIndex = editCategoryNameCategoryIndex = null;
             localUpdate();
             thirdLevelScreenHide();
           },

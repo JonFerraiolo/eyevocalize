@@ -72,22 +72,19 @@ let showPopupReturnData;
 
 export let buildChooseCategoryControl = (parentElement, customControlsData) => {
 	let Favorites = getFavorites();
-  let { columnIndex, categoryIndex } = customControlsData;
+  let { columnIndex, categoryIndex, categoryLabel } = customControlsData;
   let onClickChangeCategory = e => {
     e.preventDefault();
     MyPhrasesChooseCategoryPopupShow(customControlsData);
   }
   if (typeof columnIndex != 'number' || typeof categoryIndex != 'number') {
     columnIndex = categoryIndex = 0;
-  } else {
-    columnIndex = Favorites.lastChooseCategory.columnIndex;
-    categoryIndex = Favorites.lastChooseCategory.categoryIndex;
   }
   if (columnIndex < 0 || columnIndex >= Favorites.columns.length ||
     categoryIndex < 0 || categoryIndex >= Favorites.columns[columnIndex].categories.length ||
-    Favorites.lastChooseCategory.categoryLabel != Favorites.columns[columnIndex].categories[categoryIndex].label) {
+    categoryLabel != Favorites.columns[columnIndex].categories[categoryIndex].label) {
     columnIndex = categoryIndex = 0;
-    Favorites.lastChooseCategory.categoryLabel = Favorites.columns[columnIndex].categories[categoryIndex].label;
+    categoryLabel = Favorites.columns[columnIndex].categories[categoryIndex].label;
   }
   customControlsData.parentElement = parentElement;
   customControlsData.columnIndex = columnIndex;
@@ -125,11 +122,9 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
   };
   let onClickDoit = e => {
     e.preventDefault();
-    Favorites.lastChooseCategory.columnIndex = selCol;
-    Favorites.lastChooseCategory.categoryIndex = selCat;
-    Favorites.lastChooseCategory.categoryLabel = Favorites.columns[selCol].categories[selCat].label;
     customControlsData.columnIndex = selCol;
     customControlsData.categoryIndex = selCat;
+    customControlsData.categoryLabel = Favorites.columns[selCol].categories[selCat].label;
     hidePopup(showPopupReturnData, customControlsData);
   };
   let onClickCancel = e => {
@@ -160,8 +155,8 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
       doneWithNewCategoryName();
     }
   };
-  let selCol = Favorites.lastChooseCategory.columnIndex;
-  let selCat = Favorites.lastChooseCategory.categoryIndex;
+  let selCol = customControlsData.columnIndex;
+  let selCat = customControlsData.categoryIndex;
   let localUpdate = () => {
     render(html`<div class=MyPhrasesChooseCategory>
       <div class=MyPhrasesChooseCategoryTitle>Choose a Favorites Category</div>

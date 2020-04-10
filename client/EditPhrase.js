@@ -114,7 +114,7 @@ export function EditPhrase(parentElement, params) {
   let onClickDoit = e => {
     e.preventDefault();
     let phrase = makePhrase();
-    doItCallback(phrase);
+    doItCallback(phrase, customControlsData);
   };
   let onClickCancel = e => {
     e.preventDefault();
