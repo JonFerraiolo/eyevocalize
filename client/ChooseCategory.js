@@ -77,7 +77,8 @@ export let buildChooseCategoryControl = (parentElement, customControlsData) => {
     e.preventDefault();
     MyPhrasesChooseCategoryPopupShow(customControlsData);
   }
-  if (typeof columnIndex != 'number' || typeof categoryIndex != 'number') {
+  if (typeof columnIndex != 'number' || typeof categoryIndex != 'number' ||
+    !Number.isInteger(columnIndex) || !Number.isInteger(categoryIndex)) {
     columnIndex = categoryIndex = 0;
   }
   if (columnIndex < 0 || columnIndex >= Favorites.columns.length ||
@@ -101,7 +102,7 @@ export let buildChooseCategoryControl = (parentElement, customControlsData) => {
   `, parentElement);
 };
 
-let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
+export let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
 	let Favorites = getFavorites();
   let newCategoryJustCreated = null;
   let onClickExistingCategory = e => {
@@ -122,14 +123,16 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
   };
   let onClickDoit = e => {
     e.preventDefault();
+    let showPopupReturnDataChooseCategory = customControlsData.getShowPopupReturnData();;
     customControlsData.columnIndex = selCol;
     customControlsData.categoryIndex = selCat;
     customControlsData.categoryLabel = Favorites.columns[selCol].categories[selCat].label;
-    hidePopup(showPopupReturnData, customControlsData);
+    hidePopup(showPopupReturnDataChooseCategory, customControlsData);
   };
   let onClickCancel = e => {
     e.preventDefault();
-    hidePopup(showPopupReturnData, customControlsData);
+    let showPopupReturnDataChooseCategory = customControlsData.getShowPopupReturnData();;
+    hidePopup(showPopupReturnDataChooseCategory, customControlsData);
   };
   let doneWithNewCategoryName = () => {
 		if (newCategoryJustCreated === null) {
@@ -157,6 +160,7 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
   };
   let selCol = customControlsData.columnIndex;
   let selCat = customControlsData.categoryIndex;
+  let showPopupReturnDataChooseCategory;
   let localUpdate = () => {
     render(html`<div class=MyPhrasesChooseCategory>
       <div class=MyPhrasesChooseCategoryTitle>Choose a Favorites Category</div>
@@ -199,9 +203,12 @@ let FavoritesChooseCategoryDialog = (parentElement, customControlsData) => {
 };
 
 export function MyPhrasesChooseCategoryPopupShow(hideCallbackParams) {
+  let contentFuncParams = Object.assign({}, hideCallbackParams, { getShowPopupReturnData: () => {
+    return showPopupReturnData;
+  }});
   let params = {
     content: FavoritesChooseCategoryDialog,
-    contentFuncParams: hideCallbackParams,
+    contentFuncParams,
     refNode: document.querySelector('.EditPhraseCustomControls'),
     refY: 'top',
     popupY: 'bottom',

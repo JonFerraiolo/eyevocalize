@@ -3,7 +3,7 @@ import { html, render } from './lib/lit-html/lit-html.js';
 import { getFavorites, traverseColumnsCategoriesItems } from './MyPhrases.js';
 import { localization } from './main.js';
 import { showPopup, hidePopup } from './popup.js';
-import { buildChooseCategoryControl } from './ChooseCategory.js';
+import { FavoritesChooseCategoryDialog } from './ChooseCategory.js';
 import { playPhrase } from './Phrases.js';
 
 let css = `
@@ -125,6 +125,39 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 	};
 	let onClickCollectionTarget = e => {
 		e.preventDefault();
+		e.stopPropagation();
+		let Favorites = getFavorites();
+		let collectionIndex = e.currentTarget.CollectionIndex;
+		let collection = data[collectionIndex];
+		let columnIndex = collection.column;
+		if (isNaN(columnIndex) || !Number.isInteger(columnIndex) || columnIndex < 1 || columnIndex > Favorites.columns.length) {
+			columnIndex = 1;
+		}
+		columnIndex--;
+		let categoryLabel = collection.category;
+		let categoryIndex = Favorites.columns[columnIndex].categories.findIndex(category => category.label === categoryLabel);
+		if (categoryIndex === -1) {
+			columnIndex = categoryIndex = 0;
+		}
+		let customControlsData = { columnIndex, categoryIndex, categoryLabel, getShowPopupReturnData: () => {
+			return showPopupReturnDataChooseCategory;
+		}};
+		let params = {
+			content: FavoritesChooseCategoryDialog,
+			contentFuncParams: customControlsData,
+			refNode: parentElement,
+			refY: 'top',
+			popupY: 'bottom',
+			clickAwayToClose: false,
+			underlayOpacity: 0.85,
+			hideCallback: hideCallbackParams => {
+				render(html``, showPopupReturnData.popupOverlay);
+				collection.column = hideCallbackParams.columnIndex + 1;
+				collection.category = hideCallbackParams.categoryLabel;
+				localUpdate();
+			},
+		};
+		let showPopupReturnDataChooseCategory = showPopup(params);
 	};
 	let onClickItemRow = e => {
 		e.preventDefault();
@@ -208,7 +241,7 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 		let Favorites = getFavorites();
 		Favorites.columns.forEach(column => {
 			let categories = column.categories;
-			for (let i=categories.length-1; i--; i>=0) {
+			for (let i=categories.length-1; i>=0; i--) {
 				let category = categories[i];
 				if (category.ifCandidate) {
 					if (category.items.length === 0) {
