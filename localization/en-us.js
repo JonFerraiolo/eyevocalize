@@ -2,9 +2,11 @@
 
 const Localization = {
   common: {
+    'add to': `add to`,
     Cancel: `Cancel`,
     From: `From`,
     'local file': `local file`,
+    name: `name`,
     Size: `Size`,
     thin: `thin`,
     wide: `wide`,
@@ -111,11 +113,12 @@ const Localization = {
   ImportFavorites: {
     'Import Favorites': `Import Favorites`,
     instructions: `Click on any part of a row to select.`,
+    Play: `Play`,
   },
 
-  // only translate values of label:, desc:, category:, text: properties
+  // only translate values of label:, category:, text: properties
   builtinFavoritesCollections: [
-    { label: 'Basic (1)', desc: `Default basic vocalizations`, default: true, column: 3, category: 'Basic', items: [
+    { label: 'Basic', default: true, column: 3, category: 'Basic', items: [
       { type: 'text', label: 'nevermind', text: 'Sorry. Mistake. Ignore what I just said.'},
       { type: 'text', label: 'help', text: 'Please come and help me'},
       { type: 'text', label: 'yes', text: 'yes'},
@@ -125,7 +128,7 @@ const Localization = {
       { type: 'text', label: 'still', text: "still not right"},
       { type: 'text', label: 'gaze trouble', text: "I am having trouble with my eye gaze at the moment, so I may not be able to answer questions. Maybe try asking me questions that have yes and no answers. "},
     ]},
-    { label: 'Pleasantries (1)', desc: `Default Pleasantries`, default: true, column: 3, category: 'Pleasantries', items: [
+    { label: 'Pleasantries', default: true, column: 3, category: 'Pleasantries', items: [
       { type: 'text', label: 'please', text: 'Please.'},
       { type: 'text', label: 'thankyou', text: 'Thank you.'},
       { type: 'text', label: 'hello', text: 'hello'},
@@ -133,7 +136,7 @@ const Localization = {
       { type: 'text', label: 'g-morn', text: 'good morning'},
       { type: 'text', label: 'howRU', text: 'how are you'},
     ]},
-    { label: 'Opposites (1)', desc: `Default list of opposite terms`, default: true, column: 2, category: 'Opposites', items: [
+    { label: 'Opposites', default: true, column: 2, category: 'Opposites', items: [
       { type: 'text', label: 'up', text: 'Please move it up. '},
       { type: 'text', label: 'down', text: 'Please move it down. '},
       { type: 'text', label: 'left', text: 'Please move it to my left. '},
@@ -149,7 +152,7 @@ const Localization = {
       { type: 'text', label: 'hurry', text: 'Please hurry!'},
       { type: 'text', label: 'no rush', text: 'Take your time. Not urgent'},
     ]},
-    { label: 'Clips (1)', desc: 'Default YouTube video clips', default: true, column: 1, category: 'Clips', items: [
+    { label: 'Clips', default: true, column: 1, category: 'Clips', items: [
       { type: 'youtube', label: 'excellent', videoId: 'AKecz2ak78Y', startAt: 0, endAt: 4 },
       { type: 'youtube', label: 'betcha', videoId: 'fv9XtSiqEDA', startAt: 0, endAt: 999 },
       { type: 'youtube', label: 'houston', videoId: 'Bti9_deF5gs', startAt: 25, endAt: 150 },
@@ -163,18 +166,18 @@ const Localization = {
       { type: 'youtube', label: 'stupid', videoId: 'cJe6-afGz0Q', startAt: 4, endAt: 999 },
       { type: 'youtube', label: 'ppgood', videoId: 'ZUOVRJ4wJ7g', startAt: 27.5, endAt: 999 },
     ]},
-    { label: 'Basic (2)', desc: 'Additional Basic vocalizations', column: 3, category: 'Basic', items: [
+    { label: 'Basic additions', column: 3, category: 'Basic', items: [
       { type: 'text', label: 'vgood', text: "very good"},
       { type: 'text', label: 'perfect', text: "perfect"},
       { type: 'text', label: 'wonful', text: "wonderful"},
       { type: 'text', label: 'lol', text: "L O L"},
     ]},
-    { label: 'Pleasantries (2)', desc: 'Additional Pleasantries', column: 3, category: 'Pleasantries', items: [
+    { label: 'Pleasantries additions', column: 3, category: 'Pleasantries', items: [
       { type: 'text', label: 'g-aft', text: 'good afternoon'},
       { type: 'text', label: 'g-eve', text: 'good evening'},
       { type: 'text', label: 'g-night', text: 'good night'},
     ]},
-    { label: 'ALS Requests', desc: 'Caregiver requests (Adv. ALS)', column: 2, category: 'Care Requests', items: [
+    { label: 'ALS Requests', column: 2, category: 'Care Requests', items: [
       { type: 'text', label: 'air', text: 'Can I have air?'},
       { type: 'text', label: 'mask', text: 'Can you please fix my breathing mask?'},
       { type: 'text', label: 'nebulizer', text: 'Time for nebulizer and feeding'},
@@ -187,7 +190,7 @@ const Localization = {
       { type: 'text', label: 'tubing', text: 'Please pull the blue tubing, you know, the tubing that goes from the breathing machine to my face mask, please pull it outside of the bed as much as possible. '},
       { type: 'text', label: 'itch', text: 'Can you please scratch something for me? '},
     ]},
-    { label: 'ALS Adjustments', desc: 'Caregiver adjustments (Adv. ALS)', column: 2, category: 'Care Adjustments', items: [
+    { label: 'ALS Adjustments', column: 2, category: 'Care Adjustments', items: [
       { type: 'text', label: 'hands', text: 'Please move my hands. They are uncomfortable.'},
       { type: 'text', label: 'laptop', text: 'Can you please adjust the position of the computer?'},
       { type: 'text', label: 'strap', text: 'Can you please adjust the head strap?'},
@@ -204,11 +207,11 @@ const Localization = {
       { type: 'text', label: 'feet up', text: 'Can you please elevate my feet a little?'},
       { type: 'text', label: 'plug', text: 'Can you please plug in the computer?'},
     ]},
-    { label: 'ALS Clips', desc: 'ALS-specific YouTube video clips', column: 1, category: 'Clips', items: [
+    { label: 'ALS Clips', column: 1, category: 'Clips', items: [
       { type: 'youtube', label: 'gehrig1', videoId: 'qswig8dcEAY', startAt: 5, endAt: 16 },
       { type: 'youtube', label: 'gehrig2', videoId: 'OyT4mPBe4YQ', startAt: 150, endAt: 165 },
     ]},
-    { label: 'Jon clips', desc: 'Jon clips', column: 1, category: 'Jon Clips', items: [
+    { label: 'Jon clips', column: 1, category: 'Jon Clips', items: [
       { type: 'youtube', label: 'johnny1', videoId: 'WZKmsA8bzao', startAt: 25.5, endAt: 39 },
       { type: 'youtube', label: 'johnny2', videoId: 'gpCUMdfRa9w', startAt: 67, endAt: 71 },
       { type: 'youtube', label: 'inconceivable', videoId: 'Z3sLhnDJJn0', startAt: 5.4, endAt: 8.7 },
@@ -228,7 +231,7 @@ const Localization = {
       { type: 'text', label: 'hello', text: "You had me at hello"},
       { type: 'text', label: 'girl', text: "I'm just a girl, standing in front of a boy, asking him to love her"},
     ]},
-    { label: 'Jon Other', desc: 'Jon other', column: 3, category: 'Other', items: [
+    { label: 'Jon Other', column: 3, category: 'Other', items: [
       { type: 'text', label: 'thanka', text: 'Thank you. You are an angel.'},
       { type: 'text', label: 'Pepe', text: 'Can someone please help Peppay? '},
       { type: 'text', label: 'testing', text: 'Please ignore what comes out of the computer for the next couple of minutes. I am just testing the software. '},

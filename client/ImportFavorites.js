@@ -3,75 +3,30 @@ import { html, render } from './lib/lit-html/lit-html.js';
 import { getFavorites, traverseColumnsCategoriesItems } from './MyPhrases.js';
 import { localization } from './main.js';
 import { showPopup, hidePopup } from './popup.js';
+import { buildChooseCategoryControl } from './ChooseCategory.js';
+import { playPhrase } from './Phrases.js';
 
 let css = `
 .ImportFavorites {
   background: white;
   border: 2px solid black;
   padding: 0.25em 1.5em;
-  font-size: 95%;
+  font-size: 80%;
 }
 .ImportFavoritesTitle {
+	font-size: 1.1em;
   font-weight: 700;
   padding: 0.6em 0;
   text-align: center;
 }
-.ImportFavoritesChooser {
-  font-size: 90%;
-}
-.ImportFavoritesChooser label {
-  font-size: 90%;;
-}
-.ImportFavoritesList {
-  border: 1px solid black;
-  padding: 0.2em;
-  display: flex;
-}
-.ImportFavoritesColumn {
-  vertical-align: top;
-  flex: 1;
-  padding: 0 3em 0 0.5em;
-  border-left: 1px solid #ccc;
-  display: inline-flex;
-  flex-direction: column;
-}
-.ImportFavoritesListItem {
-  padding: 0.2em 0;
-  white-space: nowrap;
-}
-.ImportFavoritesColumn .spacer {
-  flex: 1;
-}
-.ImportFavoritesListItem.ImportFavoritesListItemNew {
-  font-style: italic;
-  border: 1px solid #444;
-  border-radius: 3px;
-  padding: 0.25em;
-  background: #f0f0f0;
-  margin: 1.5em 0 0.75em;
-  font-size: 80%;
-  width: fit-content;
-}
-.ImportFavoritesListItem.selected {
-  font-weight: bold;
-  font-style: italic;
-  background: #ddf;
-  color: #004;
-}
-.ImportFavoritesButtonRow {
-  padding: 1em 0;
-  display: flex;
-  justify-content: space-around;
-}
-
 /* grid columns:
-	collection checkbox, item checkbox, item label, item text or YouTube: videoId, target/Test
-	collection row: checkbox, span=3:collection name - desc, target
-	item row: empty, checkbox, item label, item text, Test
+	collection checkbox, item checkbox, item label, item text or YouTube: videoId, target
+	collection row: checkbox, expand/collapse, span=3:collection name, target
+	item row: empty, empty, checkbox, item label, span=2:item text/videoId+play
 */
 .ImportFavoritesData {
 	display: grid;
-	grid-template-columns: 1.5em 1.5em 1.5em 1fr 3fr 5em;
+	grid-template-columns: 1.5em 1.25em 1.5em 1fr 3fr auto;
 }
 .ImportFavoritesData > * {
 	display: contents; /* the grid should ignore the DIV surrounding each row */
@@ -80,17 +35,45 @@ let css = `
 }
 .ImportFavoritesCollectionLabel {
 	grid-column-start: 3;
-	grid-column-end: 5;
+	grid-column-end: 6;
 }
 .ImportFavoritesItemInitialEmpty {
 	grid-column-start: 1;
 	grid-column-end: 3;
+}
+.ImportFavoritesItemDetail {
+	grid-column-start: 5;
+	grid-column-end: 7;
+	display: grid;
+	grid-template-columns:  1fr auto;
 }
 .ImportFavoritesCollectionRow.selected, .ImportFavoritesItemRow.selected {
 	font-weight: bold;
 }
 .ImportFavoritesCollectionRow.imported, .ImportFavoritesItemRow.imported {
 	text-decoration: line-through;
+}
+.ImportFavoritesCollectionExpandCollapse {
+	text-align: center;
+}
+.ImportFavoritesItemCheckbox {
+	margin-left: -0.3em;
+}
+.ImportFavoritesCollectionTarget {
+	white-space: nowrap;
+}
+.ImportFavoritesCollectionTarget button {
+	white-space: nowrap;
+	width: 9em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: left;
+	padding: 0.1em 0.1em;
+}
+.ImportFavoritesButtonRow {
+  padding: 1em 0;
+  display: flex;
+  justify-content: space-around;
 }
 `;
 let styleElement = document.createElement('style');
@@ -140,6 +123,9 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 			localUpdate();
 		}
 	};
+	let onClickCollectionTarget = e => {
+		e.preventDefault();
+	};
 	let onClickItemRow = e => {
 		e.preventDefault();
 		let item = data[e.currentTarget.CollectionIndex].items[e.currentTarget.ItemIndex];
@@ -147,6 +133,12 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 			item.selected = !item.selected;
 			localUpdate();
 		}
+	};
+	let onClickPlay = e => {
+		e.preventDefault();
+		e.stopPropagation();
+		let item = data[e.currentTarget.CollectionIndex].items[e.currentTarget.ItemIndex];
+		playPhrase(item) ;
 	};
 	let onClickSelectAll = e => {
 		e.preventDefault();
@@ -202,13 +194,32 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 				}
 			});
 		});
+		cleanUpCandidates();
 		customControlsData.doItCallback();
   };
   let onClickCancel = e => {
     e.preventDefault();
     hidePopup(showPopupReturnData, customControlsData);
+		cleanUpCandidates();
 		customControlsData.cancelCallback();
   };
+	let cleanUpCandidates = () => {
+		//  remove all candidate categories that are empty, delete candidate property
+		let Favorites = getFavorites();
+		Favorites.columns.forEach(column => {
+			let categories = column.categories;
+			for (let i=categories.length-1; i--; i>=0) {
+				let category = categories[i];
+				if (category.ifCandidate) {
+					if (category.items.length === 0) {
+						categories.splice(i, 1);
+					} else {
+						delete category.ifCandidate;
+					}
+				}
+			}
+		});
+	};
 	let prepareNewData = originalData => {
 		let Favorites = getFavorites();
 		let tempData = JSON.parse(JSON.stringify(originalData)); // deep clone
@@ -237,6 +248,17 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 			});
 			collection.alreadyImported = !anyNotYetImported;
 		});
+		// Add candidate categories for any collections that don't target an existing category
+		tempData.forEach(collection => {
+			let colIndex = collection.column;
+			if (isNaN(colIndex) || !Number.isInteger(colIndex) || colIndex < 1 || colIndex > Favorites.columns.length) {
+				colIndex = collection.column = 1;
+			}
+			let catIndex = Favorites.columns[colIndex-1].categories.findIndex(category => category.label === collection.category);
+			if (catIndex === -1) {
+				Favorites.columns[colIndex-1].categories.push({ label: collection.category, expanded: true, ifCandidate: true, items: [] });
+			}
+		});
 		let returnData = [];
 		tempData.forEach(collection => {
 			if (!collection.alreadyImported) {
@@ -254,13 +276,13 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 	let builtinsData = prepareNewData(localization.builtinFavoritesCollections);
 	let data = builtinsData;
   let localUpdate = () => {
+		let Favorites = getFavorites();
 		let SelectAll = localization.common['Select all'];
 		let DeselectAll = localization.common['Deselect all'];
 		let ExpandAll = localization.common['Expand all'];
 		let CollapseAll = localization.common['Collapse all'];
 		render(html`<div class=ImportFavorites>
 			<div class=ImportFavoritesTitle>${localization.ImportFavorites['Import Favorites']}</div>
-			<div class=ImportFavoritesInstructions>${localization.ImportFavorites['instructions']}</div>
 			<div class=ImportFavoritesTopControlsRow>
 				<label for="#ImportFavoritesFromSelect">${localization.common['From']}:</label>
 				<select @change=${onChangeFrom} id=ImportFavoritesFromSelect>
@@ -269,9 +291,9 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 					<option value="local file">${localization.common['local file']}</option>
 				</select>
 			</div>
+			<div class=ImportFavoritesInstructions>${localization.ImportFavorites['instructions']}</div>
 			<div class=ImportFavoritesData>
 				${data.map((collection, collectionIndex) => {
-					let target = 'target';
 					let triangle = collection.expanded ? html`&#x25bc;` : html`&#x25b6;`; // &#x25bc; Down &#x25b6; Right
 					let collectionClass = "ImportFavoritesCollectionRow" +
 						(collection.selected ? " selected" : "") + (collection.alreadyImported ? " imported" : "");
@@ -282,8 +304,7 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 							</label>
 							<span class=ImportFavoritesCollectionExpandCollapse .CollectionIndex=${collectionIndex} @click=${onClickExpandCollapse}>${triangle}</span>
 							<span class=ImportFavoritesCollectionLabel>${collection.label}</span>
-							<span class=ImportFavoritesCollectionDesc>${collection.desc}</span>
-							<span class=ImportFavoritesCollectionTarget>${target}</span>
+							<span class=ImportFavoritesCollectionTarget .CollectionIndex=${collectionIndex}></span>
 						</div>
 						${(() => { // using funky (func)() to create an expression out of func
 							if (collection.expanded) {
@@ -298,8 +319,12 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 													<input .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} type=checkbox></input>
 												</label>
 												<span class=ImportFavoritesItemLabel>${item.label}</span>
-												<span class=ImportFavoritesItemDetail>${item.text}</span>
-												<span class=ImportFavoritesItemPlay>${target}</span>
+												<span class=ImportFavoritesItemDetail>
+													${item.type === 'youtube' ? 'youtube:'+item.videoId : item.text}
+													<button class=ImportFavoritesItemPlay .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} @click=${onClickPlay}>
+														${localization.ImportFavorites['Play']}
+													</button>
+												</span>
 											</div>
 										`;
 									})}
@@ -317,12 +342,25 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 				<a href="" title=${ExpandAll} @click=${onClickExpandAll}>${ExpandAll}</a>
 				<a href="" title=${CollapseAll} @click=${onClickCollapseAll}>${CollapseAll}</a>
 			</div>
-
 			<div class=ImportFavoritesButtonRow>
 				<button @click=${onClickDoit} class=ImportFavoritesDoitButton>${localization.ImportFavorites['Import Favorites']}</button>
 				<button @click=${onClickCancel} class=ImportFavoritesCancelButton>${localization.common['Cancel']}</button>
 			</div>
 		</div>`, parentElement);
+		parentElement.querySelectorAll('.ImportFavoritesCollectionTarget').forEach(targetSpan => {
+			let collectionIndex = targetSpan.CollectionIndex;
+			let collection = data[collectionIndex];
+			let columnIndex = collection.column-1;
+			if (columnIndex < 0 || columnIndex >= Favorites.columns.length) columnIndex = 0;
+			let categoryLabel = collection.category;
+			let categoryIndex = Favorites.columns[columnIndex].categories.findIndex(category => category.label === categoryLabel);
+			let customControlsData = { columnIndex, categoryIndex, categoryLabel };
+			render(html`
+				<button .CollectionIndex=${collectionIndex} @click=${onClickCollectionTarget}>
+					(${columnIndex+1}) ${categoryLabel}
+				</button>
+			`, targetSpan);
+		});
 		setTimeout(() => {
 			document.getElementById('ImportFavoritesFromSelect').selectedIndex = fromIndex;
 			parentElement.querySelectorAll('.ImportFavoritesCollectionCheckbox > input').forEach(checkboxElem => {
