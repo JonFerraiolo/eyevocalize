@@ -202,10 +202,10 @@ export let FavoritesChooseCategoryDialog = (parentElement, customControlsData) =
   localUpdate();
 };
 
-export function MyPhrasesChooseCategoryPopupShow(hideCallbackParams) {
-  let contentFuncParams = Object.assign({}, hideCallbackParams, { getShowPopupReturnData: () => {
+export function MyPhrasesChooseCategoryPopupShow(contentFuncParams) {
+  contentFuncParams.getShowPopupReturnData = () => {
     return showPopupReturnData;
-  }});
+  };
   let params = {
     content: FavoritesChooseCategoryDialog,
     contentFuncParams,
