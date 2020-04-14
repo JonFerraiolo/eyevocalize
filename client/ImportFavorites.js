@@ -1,5 +1,6 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
+import { styleMap } from './lib/lit-html/directives/style-map.js';
 import { getFavorites, traverseColumnsCategoriesItems } from './MyPhrases.js';
 import { localization } from './main.js';
 import { showPopup, hidePopup } from './popup.js';
@@ -10,8 +11,10 @@ let css = `
 .ImportFavorites {
   background: white;
   border: 2px solid black;
-  padding: 0.25em 1.5em;
+  padding: 0.25em 0.75em;
   font-size: 80%;
+	display: flex;
+	flex-direction: column;
 }
 .ImportFavoritesTitle {
 	font-size: 1.1em;
@@ -19,31 +22,50 @@ let css = `
   padding: 0.6em 0;
   text-align: center;
 }
+.ImportFavoritesTopControlsRow Label {
+	font-size: 90%;
+}
+.ImportFavoritesInstructions {
+	font-style: italic;
+	font-size: 85%;
+	padding: 0.75em 0 0.9em;
+}
 /* grid columns:
-	collection checkbox, item checkbox, item label, item text or YouTube: videoId, target
 	collection row: checkbox, expand/collapse, span=3:collection name, target
-	item row: empty, empty, checkbox, item label, span=2:item text/videoId+play
+	item row: empty, checkbox, item label, span=2:item text/videoId+play
 */
 .ImportFavoritesData {
 	display: grid;
-	grid-template-columns: 1.5em 1.25em 1.5em 1fr 3fr auto;
+	grid-template-columns: 1.5em 1.25em auto 1fr auto;
+	grid-auto-rows: min-content;
+	row-gap: 0.2em;
+
+	flex: 1;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 .ImportFavoritesData > * {
 	display: contents; /* the grid should ignore the DIV surrounding each row */
 	grid-column-start: 1;
-  grid-column-end: 7;
+  grid-column-end: 6;
 }
 .ImportFavoritesCollectionLabel {
 	grid-column-start: 3;
-	grid-column-end: 6;
+	grid-column-end: 5;
+	padding-right: 0.5em;
 }
 .ImportFavoritesItemInitialEmpty {
 	grid-column-start: 1;
-	grid-column-end: 3;
+	grid-column-end: 2;
+}
+.ImportFavoritesItemLabel {
+	grid-column-start: 3;
+	grid-column-end: 4;
+	padding-right: 0.5em;
 }
 .ImportFavoritesItemDetail {
-	grid-column-start: 5;
-	grid-column-end: 7;
+	grid-column-start: 4;
+	grid-column-end: 6;
 	display: grid;
 	grid-template-columns:  1fr auto;
 }
@@ -62,6 +84,9 @@ let css = `
 .ImportFavoritesCollectionTarget {
 	white-space: nowrap;
 }
+.ImportFavoritesCollectionLabel, .ImportFavoritesItemLabel, .ImportFavoritesItemDetail {
+	font-size: 90%;
+}
 .ImportFavoritesCollectionTarget button {
 	white-space: nowrap;
 	width: 9em;
@@ -69,6 +94,15 @@ let css = `
 	text-overflow: ellipsis;
 	text-align: left;
 	padding: 0.1em 0.1em;
+}
+.ImportFavoritesSelectExpandRow {
+	padding: 1em 0 0.5em;
+  display: flex;
+  justify-content: space-between;
+	font-size: 90%;
+}
+.ImportFavoritesSelectExpandRow > * {
+	margin: 0 0.3em;
 }
 .ImportFavoritesButtonRow {
   padding: 1em 0;
@@ -314,7 +348,15 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 		let DeselectAll = localization.common['Deselect all'];
 		let ExpandAll = localization.common['Expand all'];
 		let CollapseAll = localization.common['Collapse all'];
-		render(html`<div class=ImportFavorites>
+		let appmaincontent = document.querySelector('.appmaincontent');
+		let r = appmaincontent.getBoundingClientRect();
+		console.log('r=');
+		console.dir(r);
+		let dialogWidth = Math.max(r.width/4 + 4, 280);
+		let dialogHeight = Math.max(r.height+2, 280);
+		console.log('dialogWidth='+dialogWidth);
+		console.log('dialogHeight='+dialogHeight);
+		render(html`<div class=ImportFavorites style=${styleMap({width: dialogWidth+'px', height: dialogHeight+'px'})}>
 			<div class=ImportFavoritesTitle>${localization.ImportFavorites['Import Favorites']}</div>
 			<div class=ImportFavoritesTopControlsRow>
 				<label for="#ImportFavoritesFromSelect">${localization.common['From']}:</label>
@@ -416,10 +458,12 @@ export function ImportFavoritesPopupShow(hideCallbackParams) {
     content: ImportFavoritesDialog,
     contentFuncParams: hideCallbackParams,
     refNode: document.querySelector('.appmaincontent'),
-    refY: 'top',
-    popupY: 'bottom',
+		refX: 'left',
+    popupX: 'left',
+		refY: 'top',
+    popupY: 'top',
     clickAwayToClose: false,
-    underlayOpacity: 0.85,
+    underlayOpacity: 0.6,
     hideCallback: hideCallbackParams => {
       render(html``, showPopupReturnData.popupOverlay);
     },
