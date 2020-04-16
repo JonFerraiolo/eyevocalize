@@ -36,6 +36,8 @@ exports.getFavoritesFromURL = function(req, res, next) {
         } else {
           logSendCE(res, 401, null, "getFavoritesFromURL invalid file format for email '" + email + "'", null);
         }
+      }).catch(e => {
+        logSendCE(res, 401, null, "getFavoritesFromURL json parse error for email '" + email + "'", null);
       });
     } else {
       logSendCE(res, 400, null, "getFavoritesFromURL fetch bad status="+resp.status+", email '" + email + "'", null);

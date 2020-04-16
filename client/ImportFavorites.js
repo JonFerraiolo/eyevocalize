@@ -45,6 +45,10 @@ let css = `
 	padding: 1em 0;
 	color: red;
 }
+.ImportFavoritesLoadedFrom {
+	padding: 0.75em 0;
+	font-size: 90%;
+}
 .ImportFavoritesInstructions {
 	font-style: italic;
 	font-size: 85%;
@@ -158,11 +162,12 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 	let onClickUrl = e => {
 		e.preventDefault();
 		e.stopPropagation();
+		let ImportFavoritesUrl = document.getElementById('ImportFavoritesUrl');
 		if (!ImportFavoritesUrl.validity.valid) {
 			urlDataError = localization.common['invalidUrl'];
 			localUpdate();
 		} else {
-			url = document.getElementById('ImportFavoritesUrl').value;
+			url = ImportFavoritesUrl.value;
 			let fetchPostOptions = {
 				method: 'POST',
 				mode: 'same-origin',
@@ -178,6 +183,7 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 						console.dir(payload);
 						urlData = prepareNewData(payload.collections);
 						data = urlData;
+						urlDataError = null;
 						localUpdate();
 					});
 				} else {
@@ -444,10 +450,10 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 						return html`
 							<div class=ImportFavoritesUrlControls>
 								<label for=ImportFavoritesUrl>URL:</label
-								><input id=ImportFavoritesUrl></input
+								><input type=url pattern="http.*" required id=ImportFavoritesUrl></input
 								><button @click=${onClickUrl}>${localization.common['Open']}</button>
 							</div>
-							${urlDataError ? html`<div class=ImportFavoritesUrlError>urlDataError</div>` : ''}
+							${urlDataError ? html`<div class=ImportFavoritesUrlError>${urlDataError}</div>` : ''}
 						`;
 					} else {
 						return html`
