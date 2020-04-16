@@ -10,6 +10,7 @@ const localizationIndex = require('./localization/index');
 const dbconnection = require('./server/dbconnection');
 const sessionMgmt = require('./server/sessionMgmt');
 const sessionRoutes = require('./server/sessionRoutes');
+const miscRoutes = require('./server/miscRoutes');
 const clientSocket = require('./server/clientSocket');
 
 global.SITENAME = 'EyeVocalize';
@@ -205,7 +206,7 @@ sessionMgmt.init(app).then(() => {
   logger.info('server.js before setting up /api');
   global.apiBasePath = '/api';
   global.appUrl = global.config.BASE_URL + '/app';
-  logger.info('server.js before setting up /signup');
+  let authMiddleware = sessionMgmt.auth;
   app.post('/api/signup', sessionRoutes.signup)
   app.post('/api/login', sessionRoutes.login)
   app.post('/api/autologin', sessionRoutes.autologin)
@@ -214,9 +215,9 @@ sessionMgmt.init(app).then(() => {
   app.post('/api/sendresetpassword', sessionRoutes.sendResetPasswordEmail)
   app.get('/api/gotoresetpasswordpage/:token', sessionRoutes.gotoResetPasswordPage)
   app.post('/api/resetpassword', sessionRoutes.resetPassword)
-  logger.info('server.js before setting up /api/verifyaccount');
   app.get('/api/verifyaccount/:token', sessionRoutes.verifyAccount)
   app.post('/api/closeaccount', sessionRoutes.closeAccount);
+  app.post('/api/getFavoritesFromURL', authMiddleware, miscRoutes.getFavoritesFromURL);
   app.get('/*', (req, res) => res.redirect(301, '/'));
 
   logger.info('before calling listen on port');

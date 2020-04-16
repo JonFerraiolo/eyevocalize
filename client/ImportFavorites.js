@@ -25,6 +25,26 @@ let css = `
 .ImportFavoritesTopControlsRow Label {
 	font-size: 90%;
 }
+.ImportFavoritesVerticalSpacer {
+	flex: 1;
+}
+.ImportFavoritesUrlControls {
+	padding: 1em 0;
+	display: flex;
+}
+.ImportFavoritesUrlControls > label {
+	margin-right: 0.25em;
+}
+.ImportFavoritesUrlControls > input {
+	flex: 1;
+}
+.ImportFavoritesUrlControls > button {
+	margin-left: 0.25em;
+}
+.ImportFavoritesUrlError {
+	padding: 1em 0;
+	color: red;
+}
 .ImportFavoritesInstructions {
 	font-style: italic;
 	font-size: 85%;
@@ -39,7 +59,6 @@ let css = `
 	grid-template-columns: 1.5em 1.25em auto 1fr auto;
 	grid-auto-rows: min-content;
 	row-gap: 0.2em;
-
 	flex: 1;
 	overflow-x: hidden;
 	overflow-y: auto;
@@ -121,6 +140,61 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 		e.preventDefault();
 		fromIndex = e.currentTarget.selectedIndex;
 		fromValue = e.currentTarget.value;
+		if (fromValue === 'URL') {
+			data = urlData;
+			if (urlData) {
+				localUpdate();
+			} else {
+				urlDataError = null;
+				localUpdate();
+			}
+		} else if (fromValue === 'local file') {
+
+		} else {
+			data = builtinsData;
+			localUpdate();
+		}
+	};
+	let onClickUrl = e => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (!ImportFavoritesUrl.validity.valid) {
+			urlDataError = localization.common['invalidUrl'];
+			localUpdate();
+		} else {
+			url = document.getElementById('ImportFavoritesUrl').value;
+			let fetchPostOptions = {
+				method: 'POST',
+				mode: 'same-origin',
+				headers: { "Content-type": "application/json" },
+				credentials: 'include',
+				body: JSON.stringify({ url }),
+			};
+			fetch('/api/getFavoritesFromURL', fetchPostOptions).then(resp => {
+				console.log('status='+resp.status);
+				if (resp.status === 200) {
+					resp.json().then(payload => {
+						console.log('ImportFavoritesDialog fetch success return payload=');
+						console.dir(payload);
+						urlData = prepareNewData(payload.collections);
+						data = urlData;
+						localUpdate();
+					});
+				} else {
+					console.log('ImportFavoritesDialog fetch status='+resp.status+' return data=');
+					console.dir(data);
+					if (resp.status === 401) {
+						urlDataError = localization.ImportFavorites['invalidFileFormat'];
+					} else {
+						urlDataError = localization.ImportFavorites['unknownFileLoadingError'];
+					}
+					localUpdate();
+				}
+			}).catch(e => {
+				urlDataError = localization.ImportFavorites['unknownFileLoadingError'];
+				localUpdate();
+			});
+		}
 	};
 	let onClickExpandCollapse = e => {
 		e.preventDefault();
@@ -337,6 +411,8 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 		return returnData;
 	};
 	let urlData = null;
+	let url = null;
+	let urlDataError = null;
 	let localData = null;
 	let fromIndex = 0;
 	let fromValue = 'EyeVocalize.com';
@@ -350,13 +426,9 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 		let CollapseAll = localization.common['Collapse all'];
 		let appmaincontent = document.querySelector('.appmaincontent');
 		let r = appmaincontent.getBoundingClientRect();
-		console.log('r=');
-		console.dir(r);
-		let dialogWidth = Math.max(r.width/4 + 4, 280);
+		let dialogWidth = Math.max(r.width/4 + 4, 300);
 		let dialogHeight = Math.max(r.height+2, 280);
-		console.log('dialogWidth='+dialogWidth);
-		console.log('dialogHeight='+dialogHeight);
-		render(html`<div class=ImportFavorites style=${styleMap({width: dialogWidth+'px', height: dialogHeight+'px'})}>
+		render(html`<div class=ImportFavorites style=${styleMap({ width: dialogWidth+'px', height: dialogHeight+'px'})}>
 			<div class=ImportFavoritesTitle>${localization.ImportFavorites['Import Favorites']}</div>
 			<div class=ImportFavoritesTopControlsRow>
 				<label for="#ImportFavoritesFromSelect">${localization.common['From']}:</label>
@@ -366,57 +438,96 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 					<option value="local file">${localization.common['local file']}</option>
 				</select>
 			</div>
-			<div class=ImportFavoritesInstructions>${localization.ImportFavorites['instructions']}</div>
-			<div class=ImportFavoritesData>
-				${data.map((collection, collectionIndex) => {
-					let triangle = collection.expanded ? html`&#x25bc;` : html`&#x25b6;`; // &#x25bc; Down &#x25b6; Right
-					let collectionClass = "ImportFavoritesCollectionRow" +
-						(collection.selected ? " selected" : "") + (collection.alreadyImported ? " imported" : "");
+			${(() => { // using funky (func)() to create an expression out of func
+				if (fromValue === 'URL') {
+					if (url === null || urlDataError) {
+						return html`
+							<div class=ImportFavoritesUrlControls>
+								<label for=ImportFavoritesUrl>URL:</label
+								><input id=ImportFavoritesUrl></input
+								><button @click=${onClickUrl}>${localization.common['Open']}</button>
+							</div>
+							${urlDataError ? html`<div class=ImportFavoritesUrlError>urlDataError</div>` : ''}
+						`;
+					} else {
+						return html`
+							<div class=ImportFavoritesLoadedFrom>
+								${localization.ImportFavorites['CollectionLoadedFrom']}: ${url}
+							</div>
+						`;
+					}
+				} else if (fromValue === 'local file') {
+					return html``;
+				} else {
+					return '';
+				}
+			})()}
+			${(() => { // using funky (func)() to create an expression out of func
+				if (data === null) {
 					return html`
-						<div class=${collectionClass} @click=${onClickCollectionRow} .CollectionIndex=${collectionIndex}>
-							<label class=ImportFavoritesCollectionCheckbox>
-								<input .CollectionIndex=${collectionIndex} type=checkbox></input>
-							</label>
-							<span class=ImportFavoritesCollectionExpandCollapse .CollectionIndex=${collectionIndex} @click=${onClickExpandCollapse}>${triangle}</span>
-							<span class=ImportFavoritesCollectionLabel>${collection.label}</span>
-							<span class=ImportFavoritesCollectionTarget .CollectionIndex=${collectionIndex}></span>
-						</div>
-						${(() => { // using funky (func)() to create an expression out of func
-							if (collection.expanded) {
-								return html`
-									${collection.items.map((item, itemIndex) => {
-										let itemClass = "ImportFavoritesItemRow" +
-											(item.selected ? " selected" : "") + (item.alreadyImported ? " imported" : "");
-										return html`
-											<div class=${itemClass} .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} @click=${onClickItemRow}>
-												<span class=ImportFavoritesItemInitialEmpty></span>
-												<label class=ImportFavoritesItemCheckbox>
-													<input .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} type=checkbox></input>
-												</label>
-												<span class=ImportFavoritesItemLabel>${item.label}</span>
-												<span class=ImportFavoritesItemDetail>
-													${item.type === 'youtube' ? 'youtube:'+item.videoId : item.text}
-													<button class=ImportFavoritesItemPlay .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} @click=${onClickPlay}>
-														${localization.ImportFavorites['Play']}
-													</button>
-												</span>
-											</div>
-										`;
-									})}
-								`;
-							} else {
-								return '';
-							}
-						})()}
+						<div class=ImportFavoritesVerticalSpacer></div>
 					`;
-				})}
-			</div>
-			<div class=ImportFavoritesSelectExpandRow>
-				<a href="" title=${SelectAll} @click=${onClickSelectAll}>${SelectAll}</a>
-				<a href="" title=${DeselectAll} @click=${onClickDeselectAll}>${DeselectAll}</a>
-				<a href="" title=${ExpandAll} @click=${onClickExpandAll}>${ExpandAll}</a>
-				<a href="" title=${CollapseAll} @click=${onClickCollapseAll}>${CollapseAll}</a>
-			</div>
+				} else if (data.length === 0){
+					return html`
+						<div class=ImportFavoritesAllLoaded>${localization.ImportFavorites['AllFavoritesAlreadyLoaded']}</div>
+						<div class=ImportFavoritesVerticalSpacer></div>
+					`;
+				} else {
+					return html`
+						<div class=ImportFavoritesInstructions>${localization.ImportFavorites['instructions']}</div>
+						<div class=ImportFavoritesData>
+							${data.map((collection, collectionIndex) => {
+								let triangle = collection.expanded ? html`&#x25bc;` : html`&#x25b6;`; // &#x25bc; Down &#x25b6; Right
+								let collectionClass = "ImportFavoritesCollectionRow" +
+									(collection.selected ? " selected" : "") + (collection.alreadyImported ? " imported" : "");
+								return html`
+									<div class=${collectionClass} @click=${onClickCollectionRow} .CollectionIndex=${collectionIndex}>
+										<label class=ImportFavoritesCollectionCheckbox>
+											<input .CollectionIndex=${collectionIndex} type=checkbox></input>
+										</label>
+										<span class=ImportFavoritesCollectionExpandCollapse .CollectionIndex=${collectionIndex} @click=${onClickExpandCollapse}>${triangle}</span>
+										<span class=ImportFavoritesCollectionLabel>${collection.label}</span>
+										<span class=ImportFavoritesCollectionTarget .CollectionIndex=${collectionIndex}></span>
+									</div>
+									${(() => { // using funky (func)() to create an expression out of func
+										if (collection.expanded) {
+											return html`
+												${collection.items.map((item, itemIndex) => {
+													let itemClass = "ImportFavoritesItemRow" +
+														(item.selected ? " selected" : "") + (item.alreadyImported ? " imported" : "");
+													return html`
+														<div class=${itemClass} .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} @click=${onClickItemRow}>
+															<span class=ImportFavoritesItemInitialEmpty></span>
+															<label class=ImportFavoritesItemCheckbox>
+																<input .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} type=checkbox></input>
+															</label>
+															<span class=ImportFavoritesItemLabel>${item.label}</span>
+															<span class=ImportFavoritesItemDetail>
+																${item.type === 'youtube' ? 'youtube:'+item.videoId : item.text}
+																<button class=ImportFavoritesItemPlay .CollectionIndex=${collectionIndex} .ItemIndex=${itemIndex} @click=${onClickPlay}>
+																	${localization.ImportFavorites['Play']}
+																</button>
+															</span>
+														</div>
+													`;
+												})}
+											`;
+										} else {
+											return '';
+										}
+									})()}
+								`;
+							})}
+						</div>
+						<div class=ImportFavoritesSelectExpandRow>
+							<a href="" title=${SelectAll} @click=${onClickSelectAll}>${SelectAll}</a>
+							<a href="" title=${DeselectAll} @click=${onClickDeselectAll}>${DeselectAll}</a>
+							<a href="" title=${ExpandAll} @click=${onClickExpandAll}>${ExpandAll}</a>
+							<a href="" title=${CollapseAll} @click=${onClickCollapseAll}>${CollapseAll}</a>
+						</div>
+					`;
+				}
+			})()}
 			<div class=ImportFavoritesButtonRow>
 				<button @click=${onClickDoit} class=ImportFavoritesDoitButton>${localization.ImportFavorites['Import Favorites']}</button>
 				<button @click=${onClickCancel} class=ImportFavoritesCancelButton>${localization.common['Cancel']}</button>
@@ -448,6 +559,10 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 				let itemIndex = checkboxElem.ItemIndex;
 				checkboxElem.checked = data[collectionIndex].items[itemIndex].selected;
 			});
+			let ImportFavoritesUrl = document.getElementById('ImportFavoritesUrl');
+			if (ImportFavoritesUrl) {
+				ImportFavoritesUrl.value = url || '';
+			}
 		}, 0);
 	};
 	localUpdate();

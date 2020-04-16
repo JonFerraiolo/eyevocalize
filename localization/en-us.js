@@ -5,8 +5,10 @@ const Localization = {
     'add to': `add to`,
     Cancel: `Cancel`,
     From: `From`,
+    invalidUrl: `invalid URL`,
     'local file': `local file`,
     name: `name`,
+    Open: `Open`,
     Size: `Size`,
     thin: `thin`,
     wide: `wide`,
@@ -111,9 +113,13 @@ const Localization = {
     right: `right`,
   },
   ImportFavorites: {
+    AllFavoritesAlreadyLoaded: `All favorites from this collection have already been imported.`,
+    CollectionLoadedFrom: `Collection of favorites loaded from`,
     'Import Favorites': `Import Favorites`,
     instructions: `Click on any part of a row to select.`,
+    invalidFileFormat: `Invalid file format for a collection of favorites`,
     Play: `Play`,
+    unknownFileLoadingError: `Unknown error attempting to load a collection of favorites`,
   },
 
   // only translate values of label:, category:, text: properties
@@ -210,31 +216,6 @@ const Localization = {
     { label: 'ALS Clips', column: 1, category: 'Clips', items: [
       { type: 'youtube', label: 'gehrig1', videoId: 'qswig8dcEAY', startAt: 5, endAt: 16 },
       { type: 'youtube', label: 'gehrig2', videoId: 'OyT4mPBe4YQ', startAt: 150, endAt: 165 },
-    ]},
-    { label: 'Jon clips', column: 1, category: 'Jon Clips', items: [
-      { type: 'youtube', label: 'johnny1', videoId: 'WZKmsA8bzao', startAt: 25.5, endAt: 39 },
-      { type: 'youtube', label: 'johnny2', videoId: 'gpCUMdfRa9w', startAt: 67, endAt: 71 },
-      { type: 'youtube', label: 'inconceivable', videoId: 'Z3sLhnDJJn0', startAt: 5.4, endAt: 8.7 },
-      { type: 'youtube', label: 'kenny', videoId: 'kXxr9A_UBG4', startAt: 10, endAt: 16 },
-      { type: 'youtube', label: 'missed', videoId: 'oPwrodxghrw', startAt: 2.5, endAt: 7.5 },
-      { type: 'youtube', label: 'to me?', videoId: 'tp6KExqs_3o', startAt: 0, endAt: 7.5 },
-      { type: 'youtube', label: 'les', videoId: 'dROwEc4VyJA', startAt: 84, endAt: 93 },
-      { type: 'youtube', label: 'friend', videoId: 'AVQ8byG2mY8', startAt: 11, endAt: 17 },
-      { type: 'youtube', label: 'hasta', videoId: 'PnYu23SseHs', startAt: 46, endAt: 51 },
-      { type: 'youtube', label: 'yippie', videoId: '4XEaeOxqy_4', startAt: 20.5, endAt: 25 },
-      { type: 'youtube', label: 'punk', videoId: '8Xjr2hnOHiM', startAt: 109, endAt: 135 },
-      { type: 'youtube', label: 'mad', videoId: 'tUY05_ZwFzg', startAt: 0, endAt: 999 },
-      { type: 'youtube', label: 'failure', videoId: 'V2f-MZ2HRHQ', startAt: 2, endAt: 999 },
-      { type: 'youtube', label: 'disappointed', videoId: 'R97TsVDC1BY', startAt: 12, endAt: 20 },
-      { type: 'youtube', label: 'fraud', videoId: 'AC9z7LIQX_A', startAt: 0, endAt: 999 },
-      { type: 'youtube', label: 'bro', videoId: 'QkkLUP-gm4Q', startAt: 114, endAt: 119 },
-      { type: 'text', label: 'hello', text: "You had me at hello"},
-      { type: 'text', label: 'girl', text: "I'm just a girl, standing in front of a boy, asking him to love her"},
-    ]},
-    { label: 'Jon Other', column: 3, category: 'Other', items: [
-      { type: 'text', label: 'thanka', text: 'Thank you. You are an angel.'},
-      { type: 'text', label: 'Pepe', text: 'Can someone please help Peppay? '},
-      { type: 'text', label: 'testing', text: 'Please ignore what comes out of the computer for the next couple of minutes. I am just testing the software. '},
     ]},
   ]
 }
