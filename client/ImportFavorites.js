@@ -41,7 +41,7 @@ let css = `
 .ImportFavoritesUrlControls > button {
 	margin-left: 0.25em;
 }
-.ImportFavoritesUrlError {
+.ImportFavoritesError {
 	padding: 1em 0;
 	color: red;
 }
@@ -153,7 +153,13 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 				localUpdate();
 			}
 		} else if (fromValue === 'local file') {
-
+			data = localData;
+			if (localData) {
+				localUpdate();
+			} else {
+				localDataError = null;
+				localUpdate();
+			}
 		} else {
 			data = builtinsData;
 			localUpdate();
@@ -201,6 +207,32 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 				localUpdate();
 			});
 		}
+	};
+	let onChangeLocalFile = e => {
+		e.preventDefault();
+		let ImportFavoritesFile = e.currentTarget;
+		let reader = new FileReader();
+		reader.onload = () => {
+			let text = reader.result;
+			let tempData;
+			try {
+				tempData = JSON.parse(text);
+				if (Array.isArray(tempData) && tempData.length > 0 && typeof tempData[0].label === 'string' && Array.isArray(tempData[0].items)) {
+          localData = prepareNewData(tempData);
+          data = localData;
+          localDataError = null;
+          localFileName = ImportFavoritesFile.value;
+          localUpdate();
+				} else {
+          localDataError = localization.ImportFavorites['fileFormatErrorNotValidCollectionFile'];
+          localUpdate();
+				}
+			} catch(e) {
+				localDataError = localization.ImportFavorites['fileFormatErrorNotValidJson'];
+				localUpdate();
+			}
+		};
+		reader.readAsText(ImportFavoritesFile.files[0]);
 	};
 	let onClickExpandCollapse = e => {
 		e.preventDefault();
@@ -420,6 +452,8 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 	let url = null;
 	let urlDataError = null;
 	let localData = null;
+  let localFileName = null;
+	let localDataError = null;
 	let fromIndex = 0;
 	let fromValue = 'EyeVocalize.com';
 	let builtinsData = prepareNewData(localization.builtinFavoritesCollections);
@@ -453,7 +487,7 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 								><input type=url pattern="http.*" required id=ImportFavoritesUrl></input
 								><button @click=${onClickUrl}>${localization.common['Open']}</button>
 							</div>
-							${urlDataError ? html`<div class=ImportFavoritesUrlError>${urlDataError}</div>` : ''}
+							${urlDataError ? html`<div class=ImportFavoritesError>${urlDataError}</div>` : ''}
 						`;
 					} else {
 						return html`
@@ -463,7 +497,20 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 						`;
 					}
 				} else if (fromValue === 'local file') {
-					return html``;
+          if (localFileName === null || localDataError) {
+            return html`
+              <div class=ImportFavoritesUrlControls>
+                <input type=file @change=${onChangeLocalFile} id=ImportFavoritesFile></input>
+              </div>
+              ${localDataError ? html`<div class=ImportFavoritesError>${localDataError}</div>` : ''}
+            `;
+          } else {
+            return html`
+              <div class=ImportFavoritesLoadedFrom>
+                ${localization.ImportFavorites['CollectionLoadedFrom']}: ${localFileName}
+              </div>
+            `;
+          }
 				} else {
 					return '';
 				}

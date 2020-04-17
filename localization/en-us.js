@@ -115,6 +115,8 @@ const Localization = {
   ImportFavorites: {
     AllFavoritesAlreadyLoaded: `All favorites from this collection have already been imported.`,
     CollectionLoadedFrom: `Collection of favorites loaded from`,
+    fileFormatErrorNotValidJson: `Invalid file, not a valid JSON file`,
+    fileFormatErrorNotValidCollectionFile: `Invalid file, not a valid collection of favorites`,
     'Import Favorites': `Import Favorites`,
     instructions: `Click on any part of a row to select.`,
     invalidFileFormat: `Invalid file format for a collection of favorites`,
