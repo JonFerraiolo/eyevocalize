@@ -464,6 +464,20 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 		let DeselectAll = localization.common['Deselect all'];
 		let ExpandAll = localization.common['Expand all'];
 		let CollapseAll = localization.common['Collapse all'];
+    let noneSelected = true;
+    if (Array.isArray(data)) {
+      data.forEach(collection => {
+        if (collection.selected) {
+          noneSelected = false;
+        } else {
+          collection.items.forEach(item => {
+            if (item.selected) {
+              noneSelected =false;
+            }
+          });
+        }
+      });
+    }
 		let appmaincontent = document.querySelector('.appmaincontent');
 		let r = appmaincontent.getBoundingClientRect();
 		let dialogWidth = Math.max(r.width/4 + 4, 300);
@@ -582,7 +596,7 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 				}
 			})()}
 			<div class=ImportFavoritesButtonRow>
-				<button @click=${onClickDoit} class=ImportFavoritesDoitButton>${localization.ImportFavorites['Import Favorites']}</button>
+				<button @click=${onClickDoit} ?disabled=${noneSelected} class=ImportFavoritesDoitButton>${localization.ImportFavorites['Import Favorites']}</button>
 				<button @click=${onClickCancel} class=ImportFavoritesCancelButton>${localization.common['Cancel']}</button>
 			</div>
 		</div>`, parentElement);

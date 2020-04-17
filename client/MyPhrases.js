@@ -45,6 +45,7 @@ let css = `
   flex: 1 1 0;
   display: flex;
   width: 100%;
+  overflow: hidden;
 }
 .MyPhrasesColumn {
   height: 100%;
