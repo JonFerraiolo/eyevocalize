@@ -19,6 +19,27 @@ const Localization = {
   },
   help: {
     Contents: `Contents`,
+    Starting: `Getting Started`,
+    StartingContentsDesc: `Getting Started with Eyevocalize.com`,
+    StartingContent: `
+      <p>Welcome to the EyeVocalize browser-based text-to-speech application (beta). EyeVocalize assumes you are using eye gaze technology to communicate. It was designed by me, Jon Ferraiolo, an advanced ALS patient, around my personal needs and abilities.  </p>
+      <p>My particular computer setup has:</p>
+      <ul>
+        <li>A Microsoft Surface laptop running Windows 10.</li>
+        <li>PC Eye Mini with Windows Control 2.0 from Tobii Dynavox (eye gaze technology)</li>
+        <li>Chrome, Firefox or Edge, latest version.</li>
+      </ul>
+      <p class="HelpVeryImportant">Things you should do soon: </p>
+      <ul>
+        <li><strong>Sign up and log in</strong>. The signup/login hyperlink appears in the top-right corner if you are trying out the application without signing up or logging in. </li>
+        <li><strong>You should customize your Favorites</strong>. By default, EyeVocalize provides a limited set of Favorites, such as "yes", "no", "hello" and "goodbye". Press the small <icon1>import</icon1> import icon (on the Favorites section header) to review and import the various collections of add-on Favorites. </li>
+        <li><strong>You should customize your settings</strong> by clicking the <icon1>gear</icon1> gear icon, particularly to customize your voice settings.</li>
+        <li>You might want to skim through the various help screens at some point to get a sense of all of the features.</li>
+      </ul>
+      <p>You can bring up the Help window at any time by clicking on the <icon1>helpicon</icon1> question mark icon.</p>
+      <p>This Help window can be repositioned and resized. Use the <icon1>size</icon1> size icon to make the Help window tall, wide, short or thin. Use the <icon1>position</icon1> position icon to move the Help window to the left, right, top, bottom or center of the application. (If you have mastered drag and drop using eye gaze, the title bar on the Help window is draggable.) </p>
+    `,
+    // FIXME no longer f
     Introduction: `Introduction`,
     IntroductionContentsDesc: `Introduction to Eyevocalize.com`,
     IntroductionContent: `

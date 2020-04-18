@@ -13,7 +13,7 @@ module.exports = {
   logSendOK: function(res, clientData, clientMsg) {
     const logger = global.logger;
     var retobj = Object.assign({}, clientData || {}, { msg:clientMsg });
-    logger.info(clientMsg);
+    //logger.info(clientMsg);
     res.send(retobj);
   },
 

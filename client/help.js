@@ -80,7 +80,7 @@ let css = `
 .HelpPageTitle {
   font-size: 105%;
   font-weight: bold;
-  padding: 0.5em 0 1.0em;
+  padding: 0.5em 0 0.5em;
   display: flex;
   line-height: 100%;
 }
@@ -93,7 +93,15 @@ let css = `
 }
 .HelpPageContent {
   white-space: normal;
-  font-size: 0.95em;
+  font-size: 0.85em;
+}
+.HelpPageContent.HelpPageFlow {
+  margin-top: -0.5em;
+}
+.HelpPageContent.HelpPageFlow ul {
+  padding-inline-start: 1.5em;
+  margin-block-start: 0.0em;
+  margin-block-end: 0.5em;
 }
 .HelpContents {
   display: grid;
@@ -110,6 +118,10 @@ let css = `
 }
 .HelpPageContent topic {
   font-weight: bold;
+}
+.HelpVeryImportant {
+  font-weight: bold;
+  color: red;
 }
 `;
 let styleElement = document.createElement('style');
@@ -286,8 +298,8 @@ function showHelp(topic) {
       value: html`
         ${buildTitle('Contents')}
         <div class="HelpPageContent HelpContents">
-          <span class=HelpContentsName>${buildGoto('Introduction')}</span>
-          <span class=HelpContentsDesc>${unsafeHTML(localization.help.IntroductionContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Starting')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.StartingContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Features')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.FeaturesContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Type-to-speak')}</span>
@@ -303,16 +315,16 @@ function showHelp(topic) {
         </div>
       `,
     },
-    Introduction: {
+    Starting: {
       prev: null,
       next: 'Features',
       value: html`
-        ${buildTitle('Introduction')}
-        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.IntroductionContent)}</div>
+        ${buildTitle('Starting')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.StartingContent)}</div>
       `,
     },
     Features: {
-      prev: 'Introduction',
+      prev: 'Starting',
       next: 'Type-to-speak',
       value: html`
         ${buildTitle('Features')}

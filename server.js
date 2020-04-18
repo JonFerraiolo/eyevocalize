@@ -100,19 +100,16 @@ if (protocol === 'https') {
 }
 logger.info('after https check. protocol='+protocol+', port='+port);
 
-logger.info('localizationIndex='+JSON.stringify(localizationIndex));
 let localizationLanguages = localizationIndex.map(item => {
   for (let language in item) {
     return language; // should be only one property, and the name of the property is the language identifier
   }
 });
-logger.info('localizationLanguages='+JSON.stringify(localizationLanguages));
 let localizationFilenames = localizationIndex.map(item => {
   for (let language in item) {
     return item[language]; // should be only one property, and we return the value of the property, which is folder name
   }
 });
-logger.info('localizationFilenames='+JSON.stringify(localizationFilenames));
 
 dbconnection.initialize(); // kick off the connection to the db and any needed db inits
 const app = express();
@@ -121,7 +118,7 @@ logger.info('before calling createServer');
 try {
   httpServer = protocol === 'https' ? https.createServer(credentials, app) : http.createServer(app);
 } catch(e) {
-  logger.info('exception when calling createServer. e='+e);
+  logger.error('exception when calling createServer. e='+e);
   protocol = 'http'; // revert to http server, which will actually use https under hood
   port = '80';
   httpServer = http.createServer(app);
@@ -164,15 +161,11 @@ sessionMgmt.init(app).then(() => {
   });
   app.get('/app', (req, res) => {
     let langIndex = req.query.lang ? localizationLanguages.indexOf(req.query.lang) : -1;
-    logger.info('1 langIndex='+langIndex);
     if (langIndex === -1) {
       let lang = req.acceptsLanguages(localizationLanguages) || 'en';
-      logger.info('app lang='+lang);
       langIndex = localizationLanguages.indexOf(lang);
-      logger.info('2 langIndex='+langIndex);
     }
     let langFileName = rootDir+'/localization/'+localizationFilenames[langIndex]+'.js';
-    logger.info('langFileName='+langFileName);
     let langJs = fs.readFileSync(langFileName);
     if (!langJs) {
       let msg = 'could not read file '+langFileName;
@@ -203,7 +196,6 @@ sessionMgmt.init(app).then(() => {
       }
     });
   });
-  logger.info('server.js before setting up /api');
   global.apiBasePath = '/api';
   global.appUrl = global.config.BASE_URL + '/app';
   let authMiddleware = sessionMgmt.auth;
@@ -225,10 +217,8 @@ sessionMgmt.init(app).then(() => {
   logger.info('after calling listen on port');
 
   io.on('connection', function(socket){
-    logger.info('user connected');
     clientSocket.onConnect(socket);
     socket.on('disconnect', function(){
-      logger.info('user disconnected');
       clientSocket.onDisconnect(socket);
     });
   });
