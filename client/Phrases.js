@@ -1,7 +1,7 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
 import { speak, playYoutube } from './vocalize.js';
-import { updateWhiteboard } from './Whiteboard.js';
+import { updateNotes } from './Notes.js';
 import { updateHistory } from './History.js';
 import { updateFavorites } from './MyPhrases.js';
 import { updateMain } from './main.js';
@@ -13,7 +13,7 @@ let css = `
   display: flex;
   flex-direction: row;
 }
-.WhiteboardAndHistory, #FavoritesContainer {
+.NotesAndHistory, #FavoritesContainer {
   min-height: 0px;
   height: 100%;
   display: inline-block;
@@ -22,19 +22,19 @@ let css = `
   overflow-x: hidden;
   overflow-y: auto;
 }
-.WhiteboardAndHistory {
+.NotesAndHistory {
   display: inline-flex;
   flex-direction: column;
   flex: 1;
   overflow: hidden;
 }
-#WhiteboardContainer, #HistoryContainer {
+#NotesContainer, #HistoryContainer {
   min-height: 25%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
-#WhiteboardContainer {
+#NotesContainer {
   flex: 0 0 auto;
   height: auto;
   max-height: 75%;
@@ -42,12 +42,12 @@ let css = `
 #HistoryContainer {
   flex: 1 1;
 }
-.WhiteboardContent, .HistoryContent {
+.NotesContent, .HistoryContent {
   overflow-x: hidden;
   overflow-y: auto;
   min-height: 25%;
 }
-.WhiteboardContent {
+.NotesContent {
   flex: 1 1;
 }
 .HistoryContent {
@@ -89,7 +89,7 @@ let css = `
 .skinnyScreenChild .PhraseRow {
   padding: 0 1.5em;
 }
-.HistoryContent button, .WhiteboardContent button {
+.HistoryContent button, .NotesContent button {
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -196,18 +196,18 @@ export function updatePhrases(parentElement, props) {
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
     [];
-  let WhiteboardProps = { searchTokens };
+  let NotesProps = { searchTokens };
   let HistoryProps = { searchTokens };
   let MyPhrasesProps = { searchTokens };
   render(html`
   <div class=Phrases>
-    <div class=WhiteboardAndHistory>
-      <div id=WhiteboardContainer></div>
+    <div class=NotesAndHistory>
+      <div id=NotesContainer></div>
       <div id=HistoryContainer></div>
     </div>
     <div id=FavoritesContainer></div>
   </div>`, parentElement);
-  updateWhiteboard(document.getElementById('WhiteboardContainer'), WhiteboardProps);
+  updateNotes(document.getElementById('NotesContainer'), NotesProps);
   updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
   updateFavorites(document.getElementById('FavoritesContainer'), MyPhrasesProps);
 }

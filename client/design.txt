@@ -39,7 +39,7 @@ click the Speak icon (show icon)
 * to add your own favorite, type text into the composition box and press the add favorite icon
 (show icon)
 * to prepare some text to Vocalize later type text into the composition box and click the
-Add to Whiteboard icon (show icon)
+Add to Notes icon (show icon)
 * to choose a different voice or change speaking speed, click the Settings icon (show icon)
 You can close this help screen by pressing the X at the top right.
 You can move this box by dragging the title bar or pressing one of the arrow icons.
@@ -80,7 +80,7 @@ using voice synthesis
 thank you, toilet please, etc.
 * you can define your own favorites for phrases that you use repeatedly
 * you can prepare text in advance and
-store on the Whiteboard for one-click speaking at just the right time
+store on the Notes for one-click speaking at just the right time
 * for fun, you can play YouTube clips, such as
 "Houston, we have a problem"
 

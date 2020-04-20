@@ -9,7 +9,7 @@ import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows } fro
 import { slideInAddFavoriteScreen } from './MyPhrases.js';
 
 let css = `
-.WhiteboardTitleIcon {
+.NotesTitleIcon {
   display: inline-block;
   width: 1.25em;
   height: 1em;
@@ -19,19 +19,19 @@ let css = `
   background-position: 0em 10%;
   background-repeat: no-repeat;
 }
-.editWhiteboard .skinnyScreenChild {
+.editNotes .skinnyScreenChild {
   display: flex;
   flex-direction: column;
 }
-.editWhiteboard .ScreenInstructions {
+.editNotes .ScreenInstructions {
   text-align: center;
   font-size: 90%;
 }
-.editWhiteboardPhraseRows {
+.editNotesPhraseRows {
   flex: 1;
   overflow: auto;
 }
-.editWhiteboardNewMyPhrase {
+.editNotesNewMyPhrase {
   display: inline-block;
   width: 1.4em;
   height: 1.4em;
@@ -45,34 +45,34 @@ let styleElement = document.createElement('style');
 styleElement.appendChild(document.createTextNode(css));
 document.head.appendChild(styleElement);
 
-let Whiteboard;
+let Notes;
 
-export function initializeWhiteboard(props) {
+export function initializeNotes(props) {
   let { currentVersion } = props;
-  let initialWhiteboard = { version: currentVersion, timestamp: 0, expanded: true, items: [] };
-  let WhiteboardString = localStorage.getItem("Whiteboard");
+  let initialNotes = { version: currentVersion, timestamp: 0, expanded: true, items: [] };
+  let NotesString = localStorage.getItem("Notes");
   try {
-    Whiteboard = (typeof WhiteboardString === 'string') ? JSON.parse(WhiteboardString) : initialWhiteboard;
+    Notes = (typeof NotesString === 'string') ? JSON.parse(NotesString) : initialNotes;
   } catch(e) {
-    Whiteboard = initialWhiteboard;
+    Notes = initialNotes;
   }
-  if (typeof Whiteboard.version != 'number'|| Whiteboard.version < currentVersion) {
-    Whiteboard = initialWhiteboard;
+  if (typeof Notes.version != 'number'|| Notes.version < currentVersion) {
+    Notes = initialNotes;
   }
-  localStorage.setItem("Whiteboard", JSON.stringify(Whiteboard));
+  localStorage.setItem("Notes", JSON.stringify(Notes));
 }
 
-export function WhiteboardGetPending(clientLastSync) {
-  if (!Whiteboard.pending) return null;
-  delete Whiteboard.pending;
-  return Whiteboard.timestamp > clientLastSync ? Whiteboard : null;
+export function NotesGetPending(clientLastSync) {
+  if (!Notes.pending) return null;
+  delete Notes.pending;
+  return Notes.timestamp > clientLastSync ? Notes : null;
 }
 
-export function WhiteboardSync(thisSyncServerTimestamp, newData) {
-  if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Whiteboard.timestamp) {
-    Whiteboard = newData;
+export function NotesSync(thisSyncServerTimestamp, newData) {
+  if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Notes.timestamp) {
+    Notes = newData;
     updateLocalStorage({ timestamp: newData.timestamp });
-    let event = new CustomEvent("ServerInitiatedSyncWhiteboard", { detail: null } );
+    let event = new CustomEvent("ServerInitiatedSyncNotes", { detail: null } );
     window.dispatchEvent(event);
   }
 }
@@ -83,55 +83,55 @@ function updateStorage()  {
 }
 
 function updateLocalStorage(overrides) {
-  Whiteboard.timestamp = Date.now();
-  Whiteboard = Object.assign({}, Whiteboard, overrides || {});
-  localStorage.setItem("Whiteboard", JSON.stringify(Whiteboard));
+  Notes.timestamp = Date.now();
+  Notes = Object.assign({}, Notes, overrides || {});
+  localStorage.setItem("Notes", JSON.stringify(Notes));
 }
 
-// Add phrase to Whiteboard without speaking
-export function addToWhiteboard(phrase) {
-  Whiteboard.items.unshift(phrase);
+// Add phrase to Notes without speaking
+export function addToNotes(phrase) {
+  Notes.items.unshift(phrase);
   updateStorage();
 };
 
-function replaceWhiteboardEntry(index, phrase) {
-  Whiteboard.items[index] = Object.assign({}, phrase);
+function replaceNotesEntry(index, phrase) {
+  Notes.items[index] = Object.assign({}, phrase);
   updateStorage();
 };
 
-function traverseItems(aWhiteboard, func) {
-  aWhiteboard.items.forEach((item, itIndex) => {
-    func(item, aWhiteboard, itIndex);
+function traverseItems(aNotes, func) {
+  aNotes.items.forEach((item, itIndex) => {
+    func(item, aNotes, itIndex);
   });
 };
 
-// Add text to Whiteboard without speaking
-export function AddTextToWhiteboard(text) {
+// Add text to Notes without speaking
+export function AddTextToNotes(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	if (text.length > 0) {
 		TextEntryRowSetText('');
 		let phrase = { type: 'text', text, timestamp: Date.now() };
-    addToWhiteboard(phrase);
+    addToNotes(phrase);
     updateMain();
 	}
 }
 
-function onWhiteboardChange() {
+function onNotesChange() {
   updateStorage();
 }
 
 
-function slideInAddEntryToWhiteboardScreen(props) {
+function slideInAddEntryToNotesScreen(props) {
   props = props || {};
   let { phrase } = props;
   let params = {
     renderFunc: EditPhrase,
     renderFuncParams: {
-      title: 'Add Entry to Whiteboard',
+      title: 'Add Entry to Notes',
       doItButtonLabel: 'Add Entry',
       doItCallback: function(phrase) {
-        // add phrase to Whiteboard, go back to parent screen
-        addToWhiteboard(phrase);
+        // add phrase to Notes, go back to parent screen
+        addToNotes(phrase);
         updateMain();
         secondLevelScreenHide();
       },
@@ -145,30 +145,30 @@ function slideInAddEntryToWhiteboardScreen(props) {
   secondLevelScreenShow(params);
 };
 
-let updateWhiteboardFirstTime = true;
+let updateNotesFirstTime = true;
 
-export function updateWhiteboard(parentElement, props) {
-  if (updateWhiteboardFirstTime) {
-    updateWhiteboardFirstTime = false;
-    window.addEventListener('ServerInitiatedSyncWhiteboard', function(e) {
-      console.log('updateWhiteboard ServerInitiatedSyncWhiteboard custom event listener entered ');
+export function updateNotes(parentElement, props) {
+  if (updateNotesFirstTime) {
+    updateNotesFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncNotes', function(e) {
+      console.log('updateNotes ServerInitiatedSyncNotes custom event listener entered ');
       localUpdate();
     });
   }
   let { searchTokens } = props;
   let onClickAdd = e => {
     e.preventDefault();
-    slideInAddEntryToWhiteboardScreen();
+    slideInAddEntryToNotesScreen();
   };
   let onClickEdit = e => {
     e.preventDefault();
-    onEditWhiteboard();
+    onEditNotes();
   };
-  let WhiteboardTitle = buildTitleWithCollapseExpandArrows(Whiteboard, "Whiteboard", "WhiteboardTitleIcon");
+  let NotesTitle = buildTitleWithCollapseExpandArrows(Notes, "Notes", "NotesTitleIcon");
   let localUpdate = () => {
-    let filteredWhiteboard = JSON.parse(JSON.stringify(Whiteboard));  // deep clone
+    let filteredNotes = JSON.parse(JSON.stringify(Notes));  // deep clone
     if (searchTokens.length > 0) {
-      filteredWhiteboard.items = filteredWhiteboard.items.filter(phrase => {
+      filteredNotes.items = filteredNotes.items.filter(phrase => {
         return searchTokens.some(token => {
           return (typeof phrase.text === 'string' && phrase.text.toLowerCase().includes(token)) ||
                   (typeof phrase.label === 'string' && phrase.label.toLowerCase().includes(token));
@@ -177,11 +177,11 @@ export function updateWhiteboard(parentElement, props) {
     }
     render(html`
       <div class=PhrasesSectionLabel>
-        ${WhiteboardTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
+        ${NotesTitle}${rightSideIcons({ onClickAdd, onClickEdit })}
       </div>
-      ${filteredWhiteboard.expanded ?
-        html`<div class=WhiteboardContent>
-          ${filteredWhiteboard.items.map(phrase =>
+      ${filteredNotes.expanded ?
+        html`<div class=NotesContent>
+          ${filteredNotes.items.map(phrase =>
             html`
               <div class=PhraseRow>
                 <button @click=${onPhraseClick} .phraseObject=${phrase}>${phrase.label || phrase.text}</button>
@@ -194,30 +194,30 @@ export function updateWhiteboard(parentElement, props) {
   localUpdate();
 }
 
-let editWhiteboardActive = false;
+let editNotesActive = false;
 
-function onEditWhiteboard() {
-  editWhiteboardActive = true;
+function onEditNotes() {
+  editNotesActive = true;
   let renderFuncParams = { };
-  secondLevelScreenShow({ renderFunc: editWhiteboard, renderFuncParams });
+  secondLevelScreenShow({ renderFunc: editNotes, renderFuncParams });
 }
 
-function onEditWhiteboardReturn() {
-  editWhiteboardActive = false;
+function onEditNotesReturn() {
+  editNotesActive = false;
   updateMain();
   secondLevelScreenHide();
 }
 
-let editWhiteboardFirstTime = true;
+let editNotesFirstTime = true;
 
-export function editWhiteboard(parentElement, props) {
-  if (editWhiteboardFirstTime) {
-    editWhiteboardFirstTime = false;
-    window.addEventListener('ServerInitiatedSyncWhiteboard', function(e) {
-      if (editWhiteboardActive && parentElement) {
-        console.log('editWhiteboard ServerInitiatedSyncWhiteboard custom event listener entered ');
-        let WhiteboardContent = parentElement.querySelector('.WhiteboardContent');
-        if (WhiteboardContent) {
+export function editNotes(parentElement, props) {
+  if (editNotesFirstTime) {
+    editNotesFirstTime = false;
+    window.addEventListener('ServerInitiatedSyncNotes', function(e) {
+      if (editNotesActive && parentElement) {
+        console.log('editNotes ServerInitiatedSyncNotes custom event listener entered ');
+        let NotesContent = parentElement.querySelector('.NotesContent');
+        if (NotesContent) {
           initializeSelection();
           localUpdate();
         }
@@ -238,17 +238,17 @@ export function editWhiteboard(parentElement, props) {
       lastClickItemIndex = phraseIndex;
     } else if (shift && !meta && !control && lastClickItemIndex != null) {
       // shift click is range selection
-      localWhiteboard.items.forEach(item => {
+      localNotes.items.forEach(item => {
         item.selected = false;
       });
       let f = (lastClickItemIndex > phraseIndex) ? phraseIndex : lastClickItemIndex;
       let l = (lastClickItemIndex > phraseIndex) ? lastClickItemIndex : phraseIndex;
       for (let i=f; i<=l; i++) {
-        localWhiteboard.items[i].selected = true;
+        localNotes.items[i].selected = true;
       }
     } else if (!control && !meta && (!shift || lastClickItemIndex === null)) {
       // simple click deselects everything else but the item getting the click
-      localWhiteboard.items.forEach(item => {
+      localNotes.items.forEach(item => {
         item.selected = false;
       });
       phrase.selected = true;
@@ -258,7 +258,7 @@ export function editWhiteboard(parentElement, props) {
   };
   let onClickSelectAll = e => {
     e.preventDefault();
-    localWhiteboard.items.forEach(item => {
+    localNotes.items.forEach(item => {
       item.selected = true;
     });
     localUpdate();
@@ -266,7 +266,7 @@ export function editWhiteboard(parentElement, props) {
   };
   let onClickDeselectAll = e => {
     e.preventDefault();
-    localWhiteboard.items.forEach(item => {
+    localNotes.items.forEach(item => {
       item.selected = false;
     });
     localUpdate();
@@ -277,12 +277,12 @@ export function editWhiteboard(parentElement, props) {
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
-        title: 'Add New Entry To Whiteboard',
-        doItButtonLabel: 'Add to Whiteboard',
+        title: 'Add New Entry To Notes',
+        doItButtonLabel: 'Add to Notes',
         doItCallback: function(phrase) {
-          // add phrase to Whiteboard, go back to parent screen
-          addToWhiteboard(phrase);
-          localWhiteboard = JSON.parse(JSON.stringify(Whiteboard));  // deep clone
+          // add phrase to Notes, go back to parent screen
+          addToNotes(phrase);
+          localNotes = JSON.parse(JSON.stringify(Notes));  // deep clone
           initializeSelection();
           localUpdate();
           thirdLevelScreenHide();
@@ -298,19 +298,19 @@ export function editWhiteboard(parentElement, props) {
   };
   let onClickEditItem = e => {
     e.preventDefault();
-    let index = localWhiteboard.items.findIndex(phrase => phrase.selected);
-    let phrase = Whiteboard.items[index];
+    let index = localNotes.items.findIndex(phrase => phrase.selected);
+    let phrase = Notes.items[index];
     let params = {
       renderFunc: EditPhrase,
       renderFuncParams: {
         phrase,
-        title: 'Edit Entry From Whiteboard',
+        title: 'Edit Entry From Notes',
         doItButtonLabel: 'Update Entry',
         doItCallback: function(phrase) {
-          // add phrase to Whiteboard, go back to parent screen
-          replaceWhiteboardEntry(index, phrase);
-          localWhiteboard = JSON.parse(JSON.stringify(Whiteboard));  // deep clone
-          localWhiteboard.items[index].selected = true;
+          // add phrase to Notes, go back to parent screen
+          replaceNotesEntry(index, phrase);
+          localNotes = JSON.parse(JSON.stringify(Notes));  // deep clone
+          localNotes.items[index].selected = true;
           localUpdate();
           thirdLevelScreenHide();
         },
@@ -324,118 +324,118 @@ export function editWhiteboard(parentElement, props) {
   };
   let onClickRemoveSelected = e => {
     e.preventDefault();
-    localWhiteboard.items = localWhiteboard.items.filter(item => !item.selected);
-    Whiteboard = JSON.parse(JSON.stringify(localWhiteboard));  // deep clone
-    traverseItems(Whiteboard, deleteTemporaryProperties);
-    onWhiteboardChange();
+    localNotes.items = localNotes.items.filter(item => !item.selected);
+    Notes = JSON.parse(JSON.stringify(localNotes));  // deep clone
+    traverseItems(Notes, deleteTemporaryProperties);
+    onNotesChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickAddToMyPhrases = e => {
     e.preventDefault();
-    let index = localWhiteboard.items.findIndex(phrase => phrase.selected);
-    let phrase = Whiteboard.items[index];
+    let index = localNotes.items.findIndex(phrase => phrase.selected);
+    let phrase = Notes.items[index];
     slideInAddFavoriteScreen({ slideInLevel: 'third', phrase });
   };
   let onClickMoveUp = e => {
     e.preventDefault();
-    for (let i=1, n=localWhiteboard.items.length; i<n; i++) {
-      let item = localWhiteboard.items[i];
-      if (item.selected && !localWhiteboard.items[i-1].selected) {
-        [ localWhiteboard.items[i-1], localWhiteboard.items[i] ] = [ localWhiteboard.items[i], localWhiteboard.items[i-1] ];  // swap
+    for (let i=1, n=localNotes.items.length; i<n; i++) {
+      let item = localNotes.items[i];
+      if (item.selected && !localNotes.items[i-1].selected) {
+        [ localNotes.items[i-1], localNotes.items[i] ] = [ localNotes.items[i], localNotes.items[i-1] ];  // swap
       }
     }
-    Whiteboard = JSON.parse(JSON.stringify(localWhiteboard));  // deep clone
-    traverseItems(Whiteboard, deleteTemporaryProperties);
-    onWhiteboardChange();
+    Notes = JSON.parse(JSON.stringify(localNotes));  // deep clone
+    traverseItems(Notes, deleteTemporaryProperties);
+    onNotesChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickMoveDown = e => {
     e.preventDefault();
-    for (let n=localWhiteboard.items.length, i=n-2; i>=0; i--) {
-      let item = localWhiteboard.items[i];
-      if (item.selected && !localWhiteboard.items[i+1].selected) {
-        [ localWhiteboard.items[i+1], localWhiteboard.items[i] ] = [ localWhiteboard.items[i], localWhiteboard.items[i+1] ];  // swap
+    for (let n=localNotes.items.length, i=n-2; i>=0; i--) {
+      let item = localNotes.items[i];
+      if (item.selected && !localNotes.items[i+1].selected) {
+        [ localNotes.items[i+1], localNotes.items[i] ] = [ localNotes.items[i], localNotes.items[i+1] ];  // swap
       }
     }
-    Whiteboard = JSON.parse(JSON.stringify(localWhiteboard));  // deep clone
-    traverseItems(Whiteboard, deleteTemporaryProperties);
-    onWhiteboardChange();
+    Notes = JSON.parse(JSON.stringify(localNotes));  // deep clone
+    traverseItems(Notes, deleteTemporaryProperties);
+    onNotesChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickMoveToTop = e => {
     e.preventDefault();
-    for (let n=localWhiteboard.items.length, toPosition=0, fromPosition=1; fromPosition<n; fromPosition++) {
-      let toItem = localWhiteboard.items[toPosition];
-      let fromItem = localWhiteboard.items[fromPosition];
+    for (let n=localNotes.items.length, toPosition=0, fromPosition=1; fromPosition<n; fromPosition++) {
+      let toItem = localNotes.items[toPosition];
+      let fromItem = localNotes.items[fromPosition];
       if (fromItem.selected && !toItem.selected) {
-        localWhiteboard.items.splice(fromPosition, 1);
-        localWhiteboard.items.splice(toPosition, 0, fromItem);
+        localNotes.items.splice(fromPosition, 1);
+        localNotes.items.splice(toPosition, 0, fromItem);
       }
-      if (localWhiteboard.items[toPosition].selected) {
+      if (localNotes.items[toPosition].selected) {
         toPosition++;
       }
     }
-    Whiteboard = JSON.parse(JSON.stringify(localWhiteboard));  // deep clone
-    traverseItems(Whiteboard, deleteTemporaryProperties);
-    onWhiteboardChange();
+    Notes = JSON.parse(JSON.stringify(localNotes));  // deep clone
+    traverseItems(Notes, deleteTemporaryProperties);
+    onNotesChange();
     localUpdate();
     lastClickItemIndex = null;
   };
   let onClickMoveToBottom = e => {
     e.preventDefault();
-    for (let n=localWhiteboard.items.length, toPosition=n-1, fromPosition=n-2; fromPosition>=0; fromPosition--) {
-      let toItem = localWhiteboard.items[toPosition];
-      let fromItem = localWhiteboard.items[fromPosition];
+    for (let n=localNotes.items.length, toPosition=n-1, fromPosition=n-2; fromPosition>=0; fromPosition--) {
+      let toItem = localNotes.items[toPosition];
+      let fromItem = localNotes.items[fromPosition];
       if (fromItem.selected && !toItem.selected) {
-        localWhiteboard.items.splice(fromPosition, 1);
-        localWhiteboard.items.splice(toPosition, 0, fromItem);
+        localNotes.items.splice(fromPosition, 1);
+        localNotes.items.splice(toPosition, 0, fromItem);
       }
-      if (localWhiteboard.items[toPosition].selected) {
+      if (localNotes.items[toPosition].selected) {
         toPosition--;
       }
     }
-    Whiteboard = JSON.parse(JSON.stringify(localWhiteboard));  // deep clone
-    traverseItems(Whiteboard, deleteTemporaryProperties);
-    onWhiteboardChange();
+    Notes = JSON.parse(JSON.stringify(localNotes));  // deep clone
+    traverseItems(Notes, deleteTemporaryProperties);
+    onNotesChange();
     localUpdate();
     lastClickItemIndex = null;
 
   };
   let initializeSelection = () => {
-    localWhiteboard.items.forEach((item, index) => {
+    localNotes.items.forEach((item, index) => {
       item.selected = false;
     });
     lastClickItemIndex = null;
   };
   let localUpdate = () => {
-    localWhiteboard.items.forEach(item => {
+    localNotes.items.forEach(item => {
       item.cls = item.selected ? 'selected' : '';
       item.checkmark = item.selected ? html`<span class=checkmark>&#x2714;</span>` : '';
     });
-    let enableEditItem = localWhiteboard.items.reduce((accumulator, item) => {
+    let enableEditItem = localNotes.items.reduce((accumulator, item) => {
       if (item.selected) {
         accumulator++;
       }
       return accumulator;
     }, 0) === 1;
     let enableAddToMyPhrases = enableEditItem;
-    let enableRemoveSelected = localWhiteboard.items.some(item => item.selected);
-    let enableMoveUp = localWhiteboard.items.some((item, index, arr) =>
+    let enableRemoveSelected = localNotes.items.some(item => item.selected);
+    let enableMoveUp = localNotes.items.some((item, index, arr) =>
       item.selected && (index > 0 && !arr[index-1].selected));
-    let enableMoveDown = localWhiteboard.items.some((item, index, arr) =>
+    let enableMoveDown = localNotes.items.some((item, index, arr) =>
       item.selected && (index < arr.length-1 && !arr[index+1].selected));
     render(html`
-    <div class="Whiteboard editWhiteboard skinnyScreenParent">
+    <div class="Notes editNotes skinnyScreenParent">
       <div class=skinnyScreenChild>
-        ${buildSlideRightTitle("Manage Whiteboard", onEditWhiteboardReturn)}
+        ${buildSlideRightTitle("Manage Notes", onEditNotesReturn)}
         <div class=ScreenInstructions>
           (Click to select, control-click to toggle, shift-click for range)
         </div>
-        <div class=editWhiteboardPhraseRows>
-          ${localWhiteboard.items.map((phrase, index) => {
+        <div class=editNotesPhraseRows>
+          ${localNotes.items.map((phrase, index) => {
             return html`
               <div class=PhraseRow>
                 <button @click=${onItemClick} .phraseObject=${phrase} .phraseIndex=${index} class=${phrase.cls}>
@@ -458,7 +458,7 @@ export function editWhiteboard(parentElement, props) {
             title="Delete selected items">Delete</button>
           <button @click=${onClickAddToMyPhrases} ?disabled=${!enableAddToMyPhrases}
             title="Make selected item into a favorite">
-            <span class=editWhiteboardNewMyPhrase></span></button>
+            <span class=editNotesNewMyPhrase></span></button>
           <button @click=${onClickMoveUp} ?disabled=${!enableMoveUp}
             title="Move selected items up one position">
             <span class=arrowButton>&#x1f851;</span></button>
@@ -475,7 +475,7 @@ export function editWhiteboard(parentElement, props) {
       </div>
     </div>`, parentElement);
   };
-  let localWhiteboard = JSON.parse(JSON.stringify(Whiteboard));  // deep clone
+  let localNotes = JSON.parse(JSON.stringify(Notes));  // deep clone
   initializeSelection();
   localUpdate();
 }

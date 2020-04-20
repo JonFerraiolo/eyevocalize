@@ -69,15 +69,15 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
     if (client.lastSync < minLastSyncConnected) minLastSyncConnected = client.lastSync;
   }
   let thisSyncServerTimestamp = Date.now();
-  let WhiteboardPromise = syncMiscDataSync(email, 'Whiteboard', connectionsByEmail[email],
-    clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Whiteboard);
+  let NotesPromise = syncMiscDataSync(email, 'Notes', connectionsByEmail[email],
+    clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Notes);
   let HistoryPromise = syncHistory(email, connectionsByEmail[email], minLastSyncConnected,
     thisSyncClientTimestamp, thisSyncServerTimestamp, clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.History);
   let FavoritesPromise = syncMiscDataSync(email, 'Favorites', connectionsByEmail[email],
     clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Favorites);
   let SettingsPromise = syncMiscDataSync(email, 'Settings', connectionsByEmail[email],
     clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Settings);
-  Promise.all([WhiteboardPromise, HistoryPromise, FavoritesPromise, SettingsPromise]).then(values => {
+  Promise.all([NotesPromise, HistoryPromise, FavoritesPromise, SettingsPromise]).then(values => {
     updateClients(socket, email, thisSyncServerTimestamp, values, fn);
   }, () => {
     logger.error('updateTopicTables Promise.all topic promises rejected');
@@ -96,7 +96,7 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
   const logger = global.logger;
   //logger.info('updateClients entered');
   //logger.info('updateClients values='+JSON.stringify(values));
-  let returnWhiteboard = values[0];
+  let returnNotes = values[0];
   let returnHistory = values[1];
   let returnFavorites = values[2];
   let returnSettings = values[3];
@@ -116,7 +116,7 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
         let serverInitiatedSyncDataJson = JSON.stringify({
           thisSyncServerTimestamp,
           updates: {
-            Whiteboard: returnWhiteboard[clientId] || null,
+            Notes: returnNotes[clientId] || null,
             History: returnHistory[clientId] || null,
             Favorites: returnFavorites[clientId] || null,
             Settings: returnSettings[clientId] || null,

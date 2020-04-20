@@ -61,7 +61,7 @@ const Localization = {
       <ul>
         <li><topic>Type-to-speak</topic>: Type text, then press Return (or click the speak icon) to cause the typed words to be spoken using voice synthesis</li>
         <li><topic>Favorites</topic>: Ability to define your own favorites for phrases that you use repeatedly </li>
-        <li><topic>Whiteboard</topic>: Ability to prepare text in advance and store on the Whiteboard for one-click speaking at just the right time </li>
+        <li><topic>Notes</topic>: Ability to prepare text in advance and store on the Notes for one-click speaking at just the right time </li>
         <li><topic>History</topic>: EyeVocalize saves your history of vocalizations so you can search for things you said in the past and repeat again </li>
         <li><topic>Video</topic>: For fun, you can play YouTube clips, such as "Houston, we have a problem" </li>
         <li><topic>Cloud Backup</topic>: If you sign up and login, which are recommended, EyeVocalize By default will back up your history, clipboard, favorites and some other settings to the EyeVocalize server.</li>
@@ -77,20 +77,20 @@ const Localization = {
       <p>Type what you want to say. </p>
       <p>Press Return or click the <icon2>speak</icon2> speak icon to cause speech synthesis to vocalize using the current system voice. </p>
     `,
-    Whiteboard: `Whiteboard`,
-    WhiteboardContentsDesc: `Store expressions for the future`,
-    WhiteboardContent: `
-      <p>The Whiteboard is on the left side of the application.</p>
-      <p>You can type expressions and store them on the Whiteboard for saying later. </p>
-      <p>To store something on the Whiteboard, type words into the <strong>Compose</strong> text input box at the top of the application, and then either click on the <icon2>stickynote</icon2> sticky note icon or press <strong>Control-Return</strong>.  </p>
-      <p>To vocalize any of the entries in the Whiteboard, click on them. </p>
-      <p>On the Whiteboard title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you can add, edit, delete, reorder or make <topic>Favorites</topic> of the items in the Whiteboard. </p>
-      <p>The Whiteboard title bar also has an <icon1>addicon</icon1> plus icon, which gives you another way to add an item to the Whiteboard. </p>
+    Notes: `Notes`,
+    NotesContentsDesc: `Store expressions for the future`,
+    NotesContent: `
+      <p>The Notes is on the left side of the application.</p>
+      <p>You can type expressions and store them on the Notes for saying later. </p>
+      <p>To store something on the Notes, type words into the <strong>Compose</strong> text input box at the top of the application, and then either click on the <icon2>stickynote</icon2> sticky note icon or press <strong>Control-Return</strong>.  </p>
+      <p>To vocalize any of the entries in the Notes, click on them. </p>
+      <p>On the Notes title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you can add, edit, delete, reorder or make <topic>Favorites</topic> of the items in the Notes. </p>
+      <p>The Notes title bar also has an <icon1>addicon</icon1> plus icon, which gives you another way to add an item to the Notes. </p>
     `,
     History: `History`,
     HistoryContentsDesc: `Your history of vocalizations`,
     HistoryContent: `
-      <p>The History is on the left side of the application under the Whiteboard.</p>
+      <p>The History is on the left side of the application under the Notes.</p>
       <p>Everything you vocalize is recorded in the History. </p>
       <p>To repeat a vocalization, click on the entry within the History.  </p>
       <p><strong>Control-period</strong> (Control plus the "." character) will repeat the most recent vocalization.  </p>

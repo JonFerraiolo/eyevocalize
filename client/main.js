@@ -6,7 +6,7 @@ import { popupShowing } from './popup.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize, getSyncMyData, SettingsGetPending, SettingsSync } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
-import { initializeWhiteboard, WhiteboardGetPending, WhiteboardSync, AddTextToWhiteboard, editWhiteboard } from './Whiteboard.js';
+import { initializeNotes, NotesGetPending, NotesSync, AddTextToNotes, editNotes } from './Notes.js';
 import { initializeHistory, HistoryGetPending, HistorySync, playLastHistoryItem } from './History.js';
 import { initializeFavorites, FavoritesGetPending, FavoritesSync,  editFavorites } from './MyPhrases.js';
 import { fromRight, fromLeft } from './animSlide.js';
@@ -185,7 +185,7 @@ function main() {
   let currentVersion = 4;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
-  initializeWhiteboard(initializationProps);
+  initializeNotes(initializationProps);
   initializeHistory(initializationProps);
 	initializeFavorites(initializationProps);
 
@@ -269,7 +269,7 @@ function main() {
 				try {
 					let serverSyncData = JSON.parse(serverSyncDataJson);
 					let { thisSyncServerTimestamp, updates } = serverSyncData;
-					WhiteboardSync(thisSyncServerTimestamp, updates && updates.Whiteboard);
+					NotesSync(thisSyncServerTimestamp, updates && updates.Notes);
 					HistorySync(thisSyncServerTimestamp, updates && updates.History);
 					FavoritesSync(thisSyncServerTimestamp, updates && updates.Favorites);
 					SettingsSync(thisSyncServerTimestamp, updates && updates.Settings);
@@ -315,7 +315,7 @@ function main() {
         // just pass through to default processing, which will add a newline
       } else if (!shift && (control || meta)) {
         e.preventDefault();
-        AddTextToWhiteboard();
+        AddTextToNotes();
       } else {
         e.preventDefault();
         speak();
@@ -365,7 +365,7 @@ export function sync() {
 		lastSync,
 		thisSyncClientTimestamp: Date.now(),
 		updates: {
-			Whiteboard: WhiteboardGetPending(lastSync),
+			Notes: NotesGetPending(lastSync),
 			History: HistoryGetPending(lastSync),
 			Favorites: FavoritesGetPending(lastSync),
 			Settings: SettingsGetPending(lastSync),

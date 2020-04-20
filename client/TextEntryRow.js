@@ -1,6 +1,6 @@
 
 import { speak } from './vocalize.js';
-import { AddTextToWhiteboard } from './Whiteboard.js';
+import { AddTextToNotes } from './Notes.js';
 import { slideInAddFavoriteScreen } from './MyPhrases.js';
 import { search, clear, getAppMinOrMax, setAppMinOrMax, localization } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
@@ -79,7 +79,7 @@ let css = `
   background-image: url('./images/speak.svg');
   background-position: 0px 0.2em;
 }
-.TextEntryWhiteboard {
+.TextEntryNotes {
   background-image: url('./images/stickynote.svg');
   background-size: 2.5em 2.5em;
   background-position: 0.2em 50%;
@@ -152,9 +152,9 @@ export function updateTextEntryRow(parentElement, props) {
     speak(document.getElementById('TextEntryRowTextArea').value);
     TextEntryRowSetFocus();
   }
-  let onWhiteboard = e => {
+  let onNotes = e => {
     e.preventDefault();
-    AddTextToWhiteboard(document.getElementById('TextEntryRowTextArea').value);
+    AddTextToNotes(document.getElementById('TextEntryRowTextArea').value);
     TextEntryRowSetFocus();
   }
   let onClear = e => {
@@ -215,8 +215,8 @@ export function updateTextEntryRow(parentElement, props) {
             title='Vocalize the words in the text entry box using speech synthesis'></button
           ><button class="TextEntryIcon TextEntryAddMyPhrase" @click=${onAddMyPhrase}
             title='Save these words as a new favorite'></button
-          ><button class="TextEntryIcon TextEntryWhiteboard" @click=${onWhiteboard}
-            title='Save these words in the "Whiteboard", the storage area for things you might need to say soon'></button
+          ><button class="TextEntryIcon TextEntryNotes" @click=${onNotes}
+            title='Save these words in the "Notes", the storage area for things you might need to say soon'></button
           ><button class="TextEntryIcon TextEntrySearch" @click=${search}
             title='Filter the clipboard, the history and your favorites using the search words typed into the text entry box'></button
         ></span

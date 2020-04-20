@@ -57,7 +57,7 @@ using voice synthesis
 thank you, toilet please, etc.
 * you can define your own favorites for phrases that you use repeatedly
 * you can prepare text in advance and
-store on the Whiteboard for one-click speaking at just the right time
+store on the Notes for one-click speaking at just the right time
 * for fun, you can play YouTube clips, such as
 "Houston, we have a problem"
 

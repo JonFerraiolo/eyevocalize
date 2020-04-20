@@ -321,8 +321,8 @@ export function showHelp(initialPage, initialSize) {
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.FeaturesContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Type-to-speak')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.TtsContentsDesc)}</span>
-          <span class=HelpContentsName>${buildGoto('Whiteboard')}</span>
-          <span class=HelpContentsDesc>${unsafeHTML(localization.help.WhiteboardContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Notes')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.NotesContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('History')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.HistoryContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Favorites')}</span>
@@ -350,22 +350,22 @@ export function showHelp(initialPage, initialSize) {
     },
     "Type-to-speak": {
       prev: 'Features',
-      next: 'Whiteboard',
+      next: 'Notes',
       value: html`
         ${buildTitle('Type-to-speak')}
         <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.TtsContent)}</div>
       `,
     },
-    Whiteboard: {
+    Notes: {
       prev: 'Type-to-speak',
       next: 'History',
       value: html`
-        ${buildTitle('Whiteboard')}
-        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.WhiteboardContent)}</div>
+        ${buildTitle('Notes')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.NotesContent)}</div>
       `,
     },
     History: {
-      prev: 'Whiteboard',
+      prev: 'Notes',
       next: 'Favorites',
       value: html`
         ${buildTitle('History')}
