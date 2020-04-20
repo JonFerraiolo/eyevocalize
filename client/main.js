@@ -1,7 +1,7 @@
 
 
 import { startupChecks } from './startupChecks.js';
-import { helpShowing, toggleHelp } from './help.js';
+import { helpShowing, toggleHelp, showHelp } from './help.js';
 import { popupShowing } from './popup.js';
 import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize, getSyncMyData, SettingsGetPending, SettingsSync } from './Settings.js';
@@ -299,14 +299,12 @@ function main() {
 		window.eyevocalizeUserEmail = null;
 		window.eyevocalizeUserChecksum = null;
 	});
-	/*FIXME change to quick tutorial
-	if (window.eyevocalizeUserEmail === '') {
+	// FIXME wrong check
+	if (window.eyevocalizeUserEmail === '' || !localStorage.getItem('LoginHelpClosed')) {
 		setTimeout(() => {
-			let props = { refNodeSelector: '.main' };
-			showLoginSignupPopup(props);
+			showHelp('Starting', 'tall-wide');
 		}, 0);
 	}
-	*/
 
 	document.addEventListener('keydown', e => {
 		let shift = e.getModifierState("Shift");

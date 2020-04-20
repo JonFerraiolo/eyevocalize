@@ -42,14 +42,16 @@ let css = `
 }
 .HelpHeaderPosition, .HelpHeaderSize, .HelpHeaderClose, .HelpPageContentIcon1, .HelpPageContentIcon2 {
   display: inline-block;
-  width: 1.5em;
-  height: 1.5em;
+  width: 1em;
+  height: 1em;
   background-size: 1em 1em;
   background-position: 50% 50%;
   background-repeat: no-repeat;
 }
 .HelpHeaderPosition, .HelpHeaderSize, .HelpHeaderClose {
   float: right;
+  width: 1.5em;
+  height: 1.5em;
   margin: 0 0.1em 0 0;
   cursor: pointer;
 }
@@ -72,7 +74,7 @@ let css = `
 }
 .HelpContent {
   font-size: 0.95em;
-  padding: 0.5em 1em;
+  padding: 0em 1em;
   flex: 1;
   overflow-x: hidden;
   overflow-y: auto;
@@ -90,18 +92,23 @@ let css = `
 .HelpPageTitleString {
   flex: 1;
   text-align: center;
+  margin-bottom: 0.7em;
 }
 .HelpPageContent {
   white-space: normal;
   font-size: 0.85em;
 }
-.HelpPageContent.HelpPageFlow {
-  margin-top: -0.5em;
+.HelpPageContent.HelpPageFlow > *:first-child {
+  margin-top: 0em;
 }
-.HelpPageContent.HelpPageFlow ul {
+.HelpPageContent ul {
   padding-inline-start: 1.5em;
   margin-block-start: 0.0em;
   margin-block-end: 0.5em;
+}
+.HelpPageContent p {
+  margin-block-start: 0.7em;
+  margin-block-end: 0.7em;
 }
 .HelpContents {
   display: grid;
@@ -115,6 +122,7 @@ let css = `
   display: flex;
   justify-content: space-between;
   font-size: 0.95em;
+  margin: 1em 0 0.4em;
 }
 .HelpPageContent topic {
   font-weight: bold;
@@ -130,15 +138,17 @@ document.head.appendChild(styleElement);
 
 let oldClientX, oldClientY;
 let showingHelp = false;
-let Size = 'short-thin'; // short-thin, tall-wide, tall-thin, short-wide
-let Position = 'middle-center'; // top-left, ... , bottom-right / top,middle,right;left,center,right plus manual
+let Size, Position;
 let DefaultSizeThin = '24em';
-let DefaultSizeWide = '37.5em';
+let DefaultSizeMedium = '36em';
+let DefaultSizeWide = '48em';
 let DefaultSizeShort = '21em';
 let DefaultSizeTall = '60em';
 let showHelpFirstTime = true;
 
-function showHelp(topic) {
+export function showHelp(initialPage, initialSize) {
+  Size = initialSize || 'short-thin'; // short-thin, short-medium, short-wide, tall-thin, tall-medium, tall-wide
+  Position = 'middle-center'; // top-left, ... , bottom-right / top,middle,right;left,center,right plus manual
   function AppLayoutChangedHandler(e) {
     console.log('AppLayoutChangedHandler');
     if (showingHelp) {
@@ -167,6 +177,9 @@ function showHelp(topic) {
   let onClose = e => {
     e.preventDefault();
     hideHelp();
+    if (window.eyevocalizeUserEmail.length > 1) {
+      localStorage.setItem('LoginHelpClosed', Date.now().toString());
+    }
   };
   let dragMouseDown = e => {
     e.preventDefault();
@@ -246,13 +259,17 @@ function showHelp(topic) {
     helpDiv.style.visibility = 'hidden';
     helpDiv.style.display = 'flex';
     let [sizey, sizex] = Size.split('-');
-    helpDiv.style.width = sizex === 'wide' ? DefaultSizeWide : DefaultSizeThin;
+    helpDiv.style.width = sizex === 'wide' ? DefaultSizeWide : (sizex === 'medium'  ?  DefaultSizeMedium : DefaultSizeThin);
     helpDiv.style.height = sizey === 'tall' ? DefaultSizeTall : DefaultSizeShort;
     let iw = window.innerWidth;
     let ih = window.innerHeight;
     let HelpContentElem = helpDiv.querySelector('.HelpContent');
     if (HelpContentElem) {
       HelpContentElem.scrollTop = 0;
+    }
+    let HelpPageContent = helpDiv.querySelector('.HelpPageContent');
+    if (HelpPageContent) {
+      HelpPageContent.style.columns = (sizex === 'wide') ? 2 : 1;
     }
     setTimeout(() => {
       // First setTimeout to allow browser to lay out the help content so that everything has a size
@@ -375,7 +392,7 @@ function showHelp(topic) {
     },
   };
 
-  let currentPage = 'Contents';
+  let currentPage = (initialPage && helpPages[initialPage]) ? initialPage : 'Contents';
   localUpdate();
 }
 
@@ -473,6 +490,8 @@ let HelpSizeMenu = (parentElement, customControlsData) => {
     }
     if (HelpMenuId === 'max' || HelpMenuId === 'wide') {
       x = 'wide';
+    } else if (HelpMenuId === 'medium') {
+      x = 'medium';
     } else if (HelpMenuId === 'min' || HelpMenuId === 'thin') {
       x = 'thin';
     }
@@ -498,6 +517,9 @@ let HelpSizeMenu = (parentElement, customControlsData) => {
       <li class="popupMenuItem popupMenuSeparator"></li>
       <li><a class="popupMenuItem" href="" .HelpMenuId=${'wide'} @click=${onClick}>
         <span class=popupMenuLabel>${localization.help['wide']}</span>
+      </a></li>
+      <li><a class="popupMenuItem" href="" .HelpMenuId=${'medium'} @click=${onClick}>
+        <span class=popupMenuLabel>${localization.help['medium']}</span>
       </a></li>
       <li><a class="popupMenuItem" href="" .HelpMenuId=${'thin'} @click=${onClick}>
         <span class=popupMenuLabel>${localization.help['thin']}</span>
