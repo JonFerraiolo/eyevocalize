@@ -2,7 +2,7 @@
 import { speak } from './vocalize.js';
 import { AddTextToWhiteboard } from './Whiteboard.js';
 import { slideInAddFavoriteScreen } from './MyPhrases.js';
-import { search, clear, getAppMinOrMax, setAppMinOrMax } from './main.js';
+import { search, clear, getAppMinOrMax, setAppMinOrMax, localization } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
 import { slideInSettingsScreen } from './Settings.js';
 import { toggleHelp } from './help.js';
@@ -18,8 +18,14 @@ let css = `
   font-size: 0.9em;
 }
 .TextEntryRow .TextEntryLabel {
+  font-size: 85%;
+  font-weight: bold;
+  text-align: center;
+  display: inline-block;
+  padding:  0 0.5em 0 0;
+}
+.TextEntryRow .TextEntryLabel em {
   font-size: 90%;
-  font-weight: normal;
 }
 .TextEntryRow textarea {
   height: 2.75em;
@@ -32,6 +38,9 @@ let css = `
   overflow: hidden;
   resize: none;
   min-width: 5em;
+}
+.TextEntryRow textarea::placeholder {
+  font-size: 75%;
 }
 .TextEntryRow button:hover, .TextEntryRow button:focus {
   cursor: pointer;
@@ -196,8 +205,8 @@ export function updateTextEntryRow(parentElement, props) {
     let signupLoginClass =  + (window.eyevocalizeUserEmail ? ' loggedin' : '');
     render(html`
     <div class=TextEntryRow>
-      <label class=TextEntryLabel for=TextEntryRowTextArea>Compose:</label
-      ><textarea id=TextEntryRowTextArea>${text}</textarea
+      <label class=TextEntryLabel for=TextEntryRowTextArea><span class=logo></span>EyeVocalize<br><em>(beta)</em></label
+      ><textarea id=TextEntryRowTextArea placeholder=${localization.TextEntryRow['typeTextHere']}>${text}</textarea
       ><button class="TextEntryIcon TextEntryClear" @click=${onClear}
         title='Clear the current composition in the text entry box'></button
       ><span class=TextEntryIconBlocks

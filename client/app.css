@@ -333,3 +333,15 @@ button,input,textarea,select {
 a.popupMenuItemIndented.popupMenuItem {
   padding-left: 0.75em;
 }
+.logo {
+  margin-right: 0.25em;
+  display: inline-block;
+  width: 1em;
+  height:1em;
+  background-repeat: no-repeat;
+  background-size: 1em 1em;
+  background-position: 50% 50%;
+  background-image: url('./images/favicon.svg');
+  vertical-align: middle;
+  background-color: white;
+}

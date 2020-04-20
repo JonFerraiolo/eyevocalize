@@ -145,6 +145,9 @@ const Localization = {
     Play: `Play`,
     unknownFileLoadingError: `Unknown error attempting to load a collection of favorites`,
   },
+  TextEntryRow: {
+    typeTextHere: `Type text here, then press Return`,
+  },
 
   // only translate values of label:, category:, text: properties
   builtinFavoritesCollections: [
