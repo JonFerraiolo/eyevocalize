@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const express = require('express');
 const http = require('http');
 const https = require('https');
+const compression = require('compression');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
@@ -132,6 +133,7 @@ const authMiddleware = sessionMgmt.auth;
 sessionMgmt.init(app).then(() => {
 
   logger.info('server.js sessionMgmt.init successful return');
+  app.use(compression());
   app.use(express.static('client'));
   app.use(bodyParser.urlencoded({ extended: true })); // for uploading files
   app.use(bodyParser.json());

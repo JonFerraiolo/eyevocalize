@@ -177,7 +177,7 @@ export function showHelp(initialPage, initialSize) {
   let onClose = e => {
     e.preventDefault();
     hideHelp();
-    if (window.eyevocalizeUserEmail.length > 1) {
+    if (window.eyevocalizeUserEmail && window.eyevocalizeUserEmail.length > 1) {
       localStorage.setItem('LoginHelpClosed', Date.now().toString());
     }
   };
