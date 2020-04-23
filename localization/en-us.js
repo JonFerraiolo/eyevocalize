@@ -140,13 +140,13 @@ const Localization = {
     fileFormatErrorNotValidJson: `Invalid file, not a valid JSON file`,
     fileFormatErrorNotValidCollectionFile: `Invalid file, not a valid collection of favorites`,
     'Import Favorites': `Import Favorites`,
-    instructions: `Click on any part of a row to select.`,
+    instructions: `Select entire groups or individual items to import. Click on triangles to see/hide items within a group.`,
     invalidFileFormat: `Invalid file format for a collection of favorites`,
     Play: `Play`,
     unknownFileLoadingError: `Unknown error attempting to load a collection of favorites`,
   },
   TextEntryRow: {
-    typeTextHere: `Type text here, then press Return`,
+    typeText: `type text, press Return`,
   },
 
   // only translate values of label:, category:, text: properties

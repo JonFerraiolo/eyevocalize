@@ -131,7 +131,7 @@ export function updateMain(searchString) {
 		html`<div class=TrialVersion>You are using the Trial Version.
 		To remove this message, sign up and log in. (The app is free) </div>`;
 	render(html`
-		<div class=appfullheight style=${styleMap({fontSize: appFontSize+'%'})}>
+		<div class=appfullheight style=${styleMap({fontSize: (appFontSize*1.1)+'%'})}>
 			${trial}
 			<div class=appmaincontent>
 				<div class=main>

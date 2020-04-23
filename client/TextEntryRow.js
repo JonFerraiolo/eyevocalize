@@ -206,7 +206,7 @@ export function updateTextEntryRow(parentElement, props) {
     render(html`
     <div class=TextEntryRow>
       <label class=TextEntryLabel for=TextEntryRowTextArea><span class=logo></span>EyeVocalize<br><em>(beta)</em></label
-      ><textarea id=TextEntryRowTextArea placeholder=${localization.TextEntryRow['typeTextHere']}>${text}</textarea
+      ><textarea id=TextEntryRowTextArea placeholder=${localization.TextEntryRow['typeText']}>${text}</textarea
       ><button class="TextEntryIcon TextEntryClear" @click=${onClear}
         title='Clear the current composition in the text entry box'></button
       ><span class=TextEntryIconBlocks

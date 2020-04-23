@@ -145,22 +145,8 @@ sessionMgmt.init(app).then(() => {
       next();
     }
   });
-  app.get('/', (req, res) => res.sendFile(rootDir+'/index.html'));
+  app.get(['/', '/About', '/TermsOfUse','/PrivacyPolicy','/Cookies'], (req, res) => res.sendFile(rootDir+'/index.html'));
   app.get(['/signup','/login', '/resetpassword', '/accountclosed'], (req, res) => res.sendFile(rootDir+'/session.html'));
-  app.get(['/TermsOfUse','/PrivacyPolicy','/Cookies'], (req, res) => {
-    fs.readFile(rootDir+'/legal.html', (err, html) => {
-      if (err) { logSendSE(res, err, 'could not load '+req.path+' (html)'); }
-      else {
-        fs.readFile(rootDir+'/md'+req.path+'.md', (err, markdown) => {
-          if (err) { logSendSE(res, err, 'could not load '+req.path+' (md)'); }
-          else {
-            const s = html.toString().replace('((EVMARKDOWN))', markdown.toString());
-            res.send(s);
-          }
-        });
-      }
-    });
-  });
   app.get('/app', (req, res) => {
     let langIndex = req.query.lang ? localizationLanguages.indexOf(req.query.lang) : -1;
     if (langIndex === -1) {
