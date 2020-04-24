@@ -128,6 +128,17 @@ logger.info('after calling createServer');
 let io = require('socket.io')(httpServer, global.config.SOCKETIO_OPTIONS);
 logger.info('after creating io');
 
+let getLangJs = req => {
+  let langIndex = req.query.lang ? localizationLanguages.indexOf(req.query.lang) : -1;
+  if (langIndex === -1) {
+    let lang = req.acceptsLanguages(localizationLanguages) || 'en';
+    langIndex = localizationLanguages.indexOf(lang);
+  }
+  let langFileName = rootDir+'/localization/'+localizationFilenames[langIndex]+'.js';
+  let langJs = fs.readFileSync(langFileName);
+  return langJs;
+};
+
 const authMiddleware = sessionMgmt.auth;
 // this call results in app.use with session middleware, which needs to be first in line
 sessionMgmt.init(app).then(() => {
@@ -145,16 +156,24 @@ sessionMgmt.init(app).then(() => {
       next();
     }
   });
-  app.get(['/', '/About', '/TermsOfUse','/PrivacyPolicy','/Cookies'], (req, res) => res.sendFile(rootDir+'/index.html'));
+  app.get(['/', '/About', '/TermsOfUse','/PrivacyPolicy','/Cookies'], (req, res) => {
+    let langJs = getLangJs(req);
+    if (!langJs) {
+      let msg = 'could not read file '+langFileName;
+      logSendSE(res, msg, msg);
+      return;
+    }
+    fs.readFile(rootDir+'/index.html', (err, data) => {
+      if (err) { logSendSE(res, err, 'index.html'); }
+      else {
+        const s = data.toString().replace('((EvcLocalization))', langJs);
+        res.send(s);
+      }
+    });
+  });
   app.get(['/signup','/login', '/resetpassword', '/accountclosed'], (req, res) => res.sendFile(rootDir+'/session.html'));
   app.get('/app', (req, res) => {
-    let langIndex = req.query.lang ? localizationLanguages.indexOf(req.query.lang) : -1;
-    if (langIndex === -1) {
-      let lang = req.acceptsLanguages(localizationLanguages) || 'en';
-      langIndex = localizationLanguages.indexOf(lang);
-    }
-    let langFileName = rootDir+'/localization/'+localizationFilenames[langIndex]+'.js';
-    let langJs = fs.readFileSync(langFileName);
+    let langJs = getLangJs(req);
     if (!langJs) {
       let msg = 'could not read file '+langFileName;
       logSendSE(res, msg, msg);

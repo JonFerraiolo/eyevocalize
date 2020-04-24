@@ -17,6 +17,57 @@ const Localization = {
     'Expand all': `Expand all`,
     'Collapse all': `Collapse all`,
   },
+  siteMarkdown: {
+    Home: `
+  # Welcome to EyeVocalize.com!
+
+  This website is a free, public version of a text-to-speech Web application that I wrote for myself
+  (an advanced ALS patient).
+  I included various features so that I can communicate quickly and efficiently
+  using only my eyes.
+
+  Only a few people will find this application useful. This app might be useful if you, like me, are:
+  * Paralyzed in your arms and hands
+  * Unable to talk
+  * Proficient in using eye gaze technology,  such as the
+  [Tobii PC Eye Mini](https://www.tobiidynavox.com/en-us/devices/eye-gaze-devices/pceye-mini-access-windows-control/)
+
+  You run EyeVocalize in a browser tab,
+  which allows you to quickly switch between speech synthesis (using EyeVocalize),
+  other browser tabs (eg, web mail, search, calendar, chat, document authoring)
+  and other desktop applications (which for me is mostly programming tools).
+
+  EyeVocalize features:
+  * **Text-to-speech**: You can type text, then press Return (or click the speak icon) to cause the words to be spoken
+  using voice synthesis
+  * **Favorites**: You can define your own favorites for phrases that you use repeatedly, use the default set of favorites or import libraries of favorites
+  * **Notes**: You can prepare text in advance and
+  store on the Notes for one-click speaking at just the right time
+  * **Video**: For fun, you can play YouTube clips, such as
+  "Houston, we have a problem"
+
+  To explore, press the Try It button at the top of this window.
+  To sign up as a user of EyeVocalize.com, press the Sign Up button, which unlocks
+  cross-device syncing and automatic cloud backup
+  (and removes annoying reminders).
+  `,
+  About: `
+  # About EyeVocalize.com
+  not yet available
+  `,
+  TermsOfUse: `
+  # EyeVocalize.com Terms of Use
+  not yet available
+  `,
+  PrivacyPolicy: `
+  # EyeVocalize.com Privacy Policy
+  not yet available
+  `,
+  Cookies: `
+  # EyeVocalize.com Use of Cookies and Similar Technologies
+  not yet available
+  `,
+  },
   help: {
     Contents: `Contents`,
     Starting: `Getting Started`,
