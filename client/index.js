@@ -14,14 +14,17 @@ body {
 	background-image: linear-gradient(#2C3E50, #4CA1AF);
 }
 .PageContainer {
+  flex-direction: column;
+  box-sizing: border-box;
   height: 100%;
   display: flex;
+  padding: 1.5em;
 }
 .Page {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 1.5em 2em;
+  padding: 1em;
   max-width: 40em;
   margin: 0 auto;
   background: #fefefe;
@@ -31,10 +34,27 @@ body {
   overflow-y: hidden;
 }
 .PageTopBar {
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+}
+.PageTopBar > label {
+  font-weight: bold;
+}
+.logo {
+  margin-right: 0.25em;
+  display: inline-block;
+  width: 1em;
+  height:1em;
+  background-repeat: no-repeat;
+  background-size: 1em 1em;
+  background-position: 50% 50%;
+  background-image: url('./images/favicon.svg');
+  vertical-align: middle;
+  background-color: white;
 }
 .PageContent {
   flex: 1;
+  padding: 0 1em;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -91,9 +111,12 @@ const ShowPage = page => {
     <div class=PageContainer>
       <div class=Page>
         <div class=PageTopBar>
-          <button @click=${tryit} class=TryIt>Try It</button>
-          <button @click=${signup} class=SignUp>Sign Up</button>
-          <button @click=${login} class=Login>Login</button>
+          <label><span class=logo></span>EyeVocalize.com</label>
+          <span class=PageTopBarButtons>
+            <button @click=${tryit} class=TryIt>Try It</button>
+            <button @click=${signup} class=SignUp>Sign Up</button>
+            <button @click=${login} class=Login>Login</button>
+          </span>
         </div>
         <div class=PageContent>
           ${unsafeHTML(marked(localization.siteMarkdown[page]))}

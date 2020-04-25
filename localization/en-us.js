@@ -19,59 +19,173 @@ const Localization = {
   },
   siteMarkdown: {
     Home: `
-  # Welcome to EyeVocalize.com!
+# Welcome to EyeVocalize.com!
 
-  This website is a free, public version of a text-to-speech Web application that I wrote for myself
-  (an advanced ALS patient).
-  I included various features so that I can communicate quickly and efficiently
-  using only my eyes.
+This website is a free, public version of a text-to-speech Web application that I wrote for myself
+(an advanced ALS patient).
+I included various features so that I can communicate quickly and efficiently
+using only my eyes.
 
-  Only a few people will find this application useful. This app might be useful if you, like me, are:
-  * Paralyzed in your arms and hands
-  * Unable to talk
-  * Proficient in using eye gaze technology,  such as the
-  [Tobii PC Eye Mini](https://www.tobiidynavox.com/en-us/devices/eye-gaze-devices/pceye-mini-access-windows-control/)
+Only a few people will find this application useful. This app might be useful if you, like me, are:
+* Paralyzed in your arms and hands
+* Unable to talk
+* Proficient in using eye gaze technology,  such as the
+[Tobii PC Eye Mini](https://www.tobiidynavox.com/en-us/devices/eye-gaze-devices/pceye-mini-access-windows-control/)
 
-  You run EyeVocalize in a browser tab,
-  which allows you to quickly switch between speech synthesis (using EyeVocalize),
-  other browser tabs (eg, web mail, search, calendar, chat, document authoring)
-  and other desktop applications (which for me is mostly programming tools).
+You run EyeVocalize in a browser tab,
+which allows you to quickly switch between speech synthesis (using EyeVocalize),
+other browser tabs (eg, web mail, search, calendar, chat, document authoring)
+and other desktop applications (which for me is mostly programming tools).
 
-  EyeVocalize features:
-  * **Text-to-speech**: You can type text, then press Return (or click the speak icon) to cause the words to be spoken
-  using voice synthesis
-  * **Favorites**: You can define your own favorites for phrases that you use repeatedly, use the default set of favorites or import libraries of favorites
-  * **Notes**: You can prepare text in advance and
-  store on the Notes for one-click speaking at just the right time
-  * **Video**: For fun, you can play YouTube clips, such as
-  "Houston, we have a problem"
+EyeVocalize features:
+* **Text-to-speech**: You can type text, then press Return (or click the speak icon) to cause the words to be spoken
+using voice synthesis
+* **Favorites**: You can define your own favorites for phrases that you use repeatedly, use the default set of favorites or import libraries of favorites
+* **Notes**: You can prepare text in advance and
+store in Notes for one-click speaking at just the right time
+* **Video**: For fun, you can play YouTube clips, such as
+"Houston, we have a problem"
 
-  To explore, press the Try It button at the top of this window.
-  To sign up as a user of EyeVocalize.com, press the Sign Up button, which unlocks
-  cross-device syncing and automatic cloud backup
-  (and removes annoying reminders).
-  `,
-  About: `
-  # About EyeVocalize.com
-  not yet available
-  `,
-  TermsOfUse: `
-  # EyeVocalize.com Terms of Use
-  not yet available
-  `,
-  PrivacyPolicy: `
-  # EyeVocalize.com Privacy Policy
-  not yet available
-  `,
-  Cookies: `
-  # EyeVocalize.com Use of Cookies and Similar Technologies
-  not yet available
-  `,
+To explore, press the Try It button at the top of this window.
+To sign up as a user of EyeVocalize.com, press the Sign Up button, which unlocks
+cross-device syncing and automatic cloud backup
+(and removes annoying reminders).
+`,
+About: `
+# About EyeVocalize.com
+EyeVocalize.com was created by me, Jon Ferraiolo, for my own use and then posted on the Web at EyeVocalize.com for free public use
+in case it might be useful to others.
+
+I have advanced ALS. As a result, I cannot speak or use my hands.
+I had to learn to communicate with eye gaze technology.
+I determined that the best match for me was the
+[Tobii PC Eye Mini](https://www.tobiidynavox.com/en-us/devices/eye-gaze-devices/pceye-mini-access-windows-control/).
+I practiced using the technology for months until I became proficient.
+
+EyeVocalize is an advanced application with a ton of features that I wrote it for my own needs and my own particular setup.
+It is available for others to use on an as is basis with absolutely no guarantees of suitability or correctness.
+Oher users will probably need to have
+a high level of skill with eye gaze and a similar computer setup to me:
+
+* A Microsoft Surface laptop running Windows 10.
+* [Tobii PC Eye Mini](https://www.tobiidynavox.com/en-us/devices/eye-gaze-devices/pceye-mini-access-windows-control/)
+with Windows Control 2.0 from Tobii Dynavox (eye gaze technology)
+* Chrome, Firefox or Edge, latest version
+
+I am alive today but far into my decline.
+Theoretically, the site should keep running forever after I go, but in reality Web sites require periodic maintenance.
+When EyeVocalize goes down and I am not around to fix it, it is probably gone forever.
+
+The only user support mechanism is email to [EyeVocalize@EyeVocalize.com](mailto:EyeVocalize@EyeVocalize.com)
+which currently redirects to me. If anyone is interested in taking over EyeVocalize.com,
+please send email to [EyeVocalize@EyeVocalize.com](mailto:EyeVocalize@EyeVocalize.com).
+
+The source code is open source available at https://github.com/JonFerraiolo/eyevocalize.
+A capable Web programmer who knows about site administration should be able to take over
+the code and the site, or host the app on a different domain.
+
+The Web site uses Nodejs on the server and uses a MySQL database. The Web site was developed with the attempt to follow
+Web programming best practices, particularly around security,
+but the site is hosted on a shared Web hosting service; I don't know everything; time was a scarce resource; and I make mistakes.
+The application has a ton of features and I did my best
+to make sure everything works, but I know
+it has to have hundreds of bugs.
+I hope none of the bugs affects you.
+
+Here is a list of third party icons used by the application along with attribution:
+
+* edit by Fabián Alexis [source](https://commons.wikimedia.org/wiki/File:Antu_document-edit-sign.svg) CC BY-SA 3.0
+* questionmark by Google [source](https://commons.wikimedia.org/wiki/File:Question,_Web_Fundamentals.svg) Apache License 2.0
+* arrowback by Google [source](https://commons.wikimedia.org/wiki/File:Ic_arrow_back_48px.svg) CC BY 4.0
+* talk by Gregor Cresnar from the Noun Project
+* sticky notes by Azmi Anshori from the Noun Project
+* sticky notes by OliM from the Noun Project
+* Search by Nebhav from the Noun Project
+* clear by Landan Lloyd from the Noun Project
+* gear by [fontawesome](https://commons.wikimedia.org/wiki/File:Font_Awesome_5_solid_cog.svg) CC BY 4.0
+* History by Rockicon from the Noun Project
+* account by Lyhn from the Noun Project
+* heart by Fabián Alexis [source](https://commons.wikimedia.org/wiki/File:Antu_love-amarok.svg) CC BY-SA 3.0
+* account by Fabián Alexis [source](https://commons.wikimedia.org/wiki/File:Antu_list-resource-add.svg) CC BY-SA 3.0
+* close by MGalloway (WMF) [source](https://commons.wikimedia.org/wiki/File:OOjs_UI_icon_close-ltr.svg) CC BY-SA 3.0
+* import by [Pixel perfect](https://www.flaticon.com/authors/pixel-perfect) from [Flaticon](https://www.flaticon.com/)
+`,
+TermsOfUse: `
+# EyeVocalize.com Terms of Use
+
+### Limitation of Liability
+
+This website and its application are provided on an as is basis with no guarantees of any kind,
+including suitability or correctness. The site is owned and managed by me, Jon Ferraiolo,
+a terminally ill ALS patient who could die at any time. If the site goes down or has technical issues, Jon Ferraiolo, if still alive,
+may or may not fix the issues, depending on his capabilities and other personal priorities.
+
+Any person or entity who uses this site agrees to not hold
+Jon Ferraiolo or his estate liable or in any way responsible for anything associated with EyeVocalize.com.
+
+### Permitted Use
+
+The public is free to use EyeVocalize.com for the purpose of browser-based text-to-speech.
+Usage must conform to the applicable governing laws (see below).
+
+The site administrators (i.e., Jon Ferraiolo) may deny any user access at his own discretion if he sees some sort of abuse.
+
+### Copyright
+
+Jon Ferraiolo owns the copyright to the content that he created, but grants the public
+unrestricted ability to use, copy or modify without attribution.
+
+### Third party content
+
+EyeVocalize.com uses a couple of standard open source JavaScript libraries. The intellectual property rights of those libraries belong to others.
+
+EyeVocalize.com uses some free or almost free icons from third parties.
+If these icons are transferred to a different domain or for any other use,
+you will need to research the license to see whether you have to pay a few dollars and/or give
+appropriate attribution to the creator.
+You can find a list of third party icons on the [About](/About) page.
+
+### Governing Law
+
+The applicable jurisdiction for legal matters is the state of California. USA.
+
+### Privacy Policy
+
+See [Privacy Policy](/PrivacyPolicy) on a separate page.
+
+`,
+PrivacyPolicy: `
+# EyeVocalize.com Privacy Policy
+
+EyeVocalize.com does not share any user information with third parties.
+
+User account information is stored on a server database that theoretically is private to EyeVocalize.com. However, EyeVocalize.com is hosted on a cheap shared Web hosting service which, while it has a reputation for trustworthiness, the technical personnel could violate rules and figure out how to look at the database if they so wanted.
+
+The only personal identification information that is stored on the server are your email and an encrypted password, which are stored in the database.
+
+By default, users with accounts will have their History, Notes and Favorites stored in the server database for the purposes of cross-device synchronization and cloud backup. There is an option under account settings to turn the cloud storage feature off.
+The user data will not be looked at or used in any way except for the previously mentioned purposes.
+
+The one exception is that there is a user interface option under account settings that allows EyeVocalize.com developers to look at your data. This option is off by default. If you turn it on, then you give EyeVocalize.com developers the right to look at your data only for the purpose of improving the product, particularly new built-in favorites.
+
+EyeVocalize.com has a couple of automatic backup mechanisms for the rare cases of server disk crashes or the hosting company going
+out of business with no data preservation. Snapshots of your server data will be stored within these backups even if you close your account.
+`,
+Cookies: `
+# EyeVocalize.com Use of Cookies and Similar Technologies
+
+EyeVocalize.com does not share cookie information with third parties.
+
+EyeVocalize.com uses cookies only for session management, where a random number that represents the session ID is stored in a cookie. This is kept private to the EyeVocalize.com server.
+
+There is another browser technology with some similarities to cookies called Local Storage.  Local Storage information is stored in a secure location on your local disk and is not shared with third parties. EyeVocalize.com uses Local Storage for performance reasons and so that the application will continue to work even when the computer is offline.
+
+`,
   },
   help: {
     Contents: `Contents`,
     Starting: `Getting Started`,
-    StartingContentsDesc: `Getting Started with Eyevocalize.com`,
+    StartingContentsDesc: `Getting Started with EyeVocalize.com`,
     StartingContent: `
       <p>Welcome to the EyeVocalize browser-based text-to-speech application (beta). EyeVocalize assumes you are using eye gaze technology to communicate. It was designed by me, Jon Ferraiolo, an advanced ALS patient, around my personal needs and abilities.  </p>
       <p>My particular computer setup has:</p>
@@ -92,10 +206,10 @@ const Localization = {
     `,
     // FIXME no longer f
     Introduction: `Introduction`,
-    IntroductionContentsDesc: `Introduction to Eyevocalize.com`,
+    IntroductionContentsDesc: `Introduction to EyeVocalize.com`,
     IntroductionContent: `
       <p>I, Jon Ferraiolo, a person who cannot speak or use his hands, created this application for my own use so I can not only communicate with my family and caregivers, but also participate as normally as possible in social activities. Although I tailored the software for my own needs, I tried to write the software so that others could use it, too. There are many other text-to-speech systems. I do not expect very many people will choose this application, but if you like it, great, use it. It is free with no restrictions other than don't do illegal or bad things listed in the Terms of Use. </p>
-      <p>The biggest difference between Eyevocalize and older text-to-speech systems is that it runs in a browser tab. That allows you to easily transition between Web mail, Facebook, Twitter, Web browsing, Web music, streaming video, etc., and your text-to-speech application, including copy/paste to/from each. </p>
+      <p>The biggest difference between EyeVocalize and older text-to-speech systems is that it runs in a browser tab. That allows you to easily transition between Web mail, Facebook, Twitter, Web browsing, Web music, streaming video, etc., and your text-to-speech application, including copy/paste to/from each. </p>
       <p>My particular computer setup has:</p>
       <ul>
         <li>A Microsoft Surface laptop (because Tobii Dynavox software requires Windows) with a current version of Windows 10. The Surface hangs about 18" in front of me. (I actually have two nearly identical systems, one for my wheelchair and one hanging over my head in bed.)</li>
@@ -197,7 +311,7 @@ const Localization = {
     unknownFileLoadingError: `Unknown error attempting to load a collection of favorites`,
   },
   TextEntryRow: {
-    typeText: `type text, press Return`,
+    typeText: `type text, press return`,
   },
 
   // only translate values of label:, category:, text: properties

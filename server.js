@@ -95,7 +95,7 @@ if (protocol === 'https') {
     logger.info('credentials='+JSON.stringify(credentials));
   } catch(e) {
     logger.info('fs read file failure for https');
-    protocol = 'http'; // revert to http server, which at Eyevocalize.com will actually use https under hood
+    protocol = 'http'; // revert to http server, which at EyeVocalize.com will actually use https under hood
     port = '80';
   }
 }
