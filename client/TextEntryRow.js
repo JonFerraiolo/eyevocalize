@@ -41,6 +41,7 @@ let css = `
 }
 .TextEntryRow textarea::placeholder {
   font-size: 75%;
+  padding-left: 0.25em;
 }
 .TextEntryRow button:hover, .TextEntryRow button:focus {
   cursor: pointer;
@@ -90,7 +91,7 @@ let css = `
   background-position: 50% 55%;
 }
 .TextEntrySearch {
-  background-image: url('./images/noun_Search_2784652.svg');
+  background-image: url('./images/search.svg');
   background-size: 2.5em 2.5em;
   background-position: 0.2em 0.5em;
   margin-right: 1em;

@@ -65,13 +65,14 @@ let css = `
   font-size: 0.9em;
 }
 .PhrasesSectionLabel .collapsearrow, .PhrasesSectionLabel .expandarrow,
-    .MyPhrasesCategoryLabel .collapsearrow, .MyPhrasesCategoryLabel .expandarrow {
+    .MyPhrasesCategoryLabel .collapsearrow, .MyPhrasesCategoryLabel .expandarrow,
+        .Help .collapsearrow, .Help .expandarrow {
   padding: 0 0.5em;
   line-height: 50%;
-  vertical-align: -50%;
-}
-.PhrasesSectionLabel .collapsearrow, .MyPhrasesCategoryLabel .collapsearrow {
   vertical-align: 50%;
+}
+.PhrasesSectionLabel .collapsearrow, .MyPhrasesCategoryLabel .collapsearrow, .Help .collapsearrow {
+  vertical-align: -50%;
 }
 .PhrasesSectionLabel a, .PhrasesSectionLabel a:link, .PhrasesSectionLabel a:visited {
   text-decoration: none;
@@ -132,8 +133,8 @@ let styleElement = document.createElement('style');
 styleElement.appendChild(document.createTextNode(css));
 document.head.appendChild(styleElement);
 
-const expandArrowSpan = html`<span class=collapsearrow>&#x2304;</span>`;
-const collapseArrowSpan = html`<span class=expandarrow>&#x2303;</span>`;
+const expandArrowSpan = html`<span class=expandarrow>&#x2304;</span>`;
+const collapseArrowSpan = html`<span class=collapsearrow>&#x2303;</span>`;
 const phrasePermanentProps = ['type', 'text', 'label', 'url', 'videoId',
   'startAt', 'endAt',' timestamp'];
 

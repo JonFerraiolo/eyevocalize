@@ -153,6 +153,13 @@ export function updateMain(searchString) {
 			<p>To use this area instead for the application's user interface, press the
 				<span @click=${onMinOrMax} class=icon></span> toggle icon at the top-right of the application.</p>
 			</div>
+			<div class=footer>
+				<a href="/">Home</a>
+				<a href="/About">About</a>
+				<a href="/TermsOfUse">Terms of Use</a>
+				<a href="/PrivacyPolicy">Privacy Policy</a>
+				<a href="/Cookies">Cookies</a>
+			</div>
 		</div>
 	`, document.body);
 	setAppMinOrMax(appMinOrMax);

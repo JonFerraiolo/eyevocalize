@@ -345,3 +345,14 @@ a.popupMenuItemIndented.popupMenuItem {
   vertical-align: middle;
   background-color: white;
 }
+.footer {
+  background: #222;
+  display: flex;
+  justify-content: space-around;
+  font-size: 60%;
+  padding: 0.4em 0 1em;
+}
+.footer a, .footer a:link, .footer a:visited {
+  color: #888;
+  text-decoration: none;
+}

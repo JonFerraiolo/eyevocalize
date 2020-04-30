@@ -86,6 +86,12 @@ html {
 .LoginSignupSuccess div.LoginSignupToComplete {
   padding-bottom: 1.5em;
 }
+.footer {
+  display: flex;
+  justify-content: space-around;
+  font-size: 80%;
+  padding: 1em 0 0.5em;
+}
 `;
 let styleElement = document.createElement('style');
 styleElement.appendChild(document.createTextNode(css));
@@ -217,6 +223,9 @@ const Signup = () => {
           <span class=logo></span>
         </div>
         ${mainBody}
+        <div class=footer>
+          <a href="/">Home</a>
+        </div>
       </div>
     `, document.body);
   };
@@ -520,6 +529,9 @@ const Login = () => {
       <div class=LoginSignup>
         <div class=LoginSignupTitle>${title}<span class=logo></span></div>
         ${mainBody}
+        <div class=footer>
+          <a href="/">Home</a>
+        </div>
       </div>
     `, document.body);
     setTimeout(() => {
@@ -634,6 +646,9 @@ const ResetPassword = () => {
           <span class=logo></span>
         </div>
         ${mainBody}
+        <div class=footer>
+          <a href="/">Home</a>
+        </div>
       </div>
     `, document.body);
   };

@@ -111,11 +111,11 @@ Here is a list of third party icons used by the application along with attributi
 * import by [Pixel perfect](https://www.flaticon.com/authors/pixel-perfect) from [Flaticon](https://www.flaticon.com/)
 `,
 TermsOfUse: `
-# EyeVocalize.com Terms of Use
+# Terms of Use
 
 ### Limitation of Liability
 
-This website and its application are provided on an as is basis with no guarantees of any kind,
+This website and its application are provided on an as is basis at your own risk with no guarantees of any kind,
 including suitability or correctness. The site is owned and managed by me, Jon Ferraiolo,
 a terminally ill ALS patient who could die at any time. If the site goes down or has technical issues, Jon Ferraiolo, if still alive,
 may or may not fix the issues, depending on his capabilities and other personal priorities.
@@ -155,7 +155,7 @@ See [Privacy Policy](/PrivacyPolicy) on a separate page.
 
 `,
 PrivacyPolicy: `
-# EyeVocalize.com Privacy Policy
+# Privacy Policy
 
 EyeVocalize.com does not share any user information with third parties.
 
@@ -172,7 +172,7 @@ EyeVocalize.com has a couple of automatic backup mechanisms for the rare cases o
 out of business with no data preservation. Snapshots of your server data will be stored within these backups even if you close your account.
 `,
 Cookies: `
-# EyeVocalize.com Use of Cookies and Similar Technologies
+# Use of Cookies and Similar Technologies
 
 EyeVocalize.com does not share cookie information with third parties.
 
@@ -197,57 +197,28 @@ There is another browser technology with some similarities to cookies called Loc
       <p class="HelpVeryImportant">Things you should do soon: </p>
       <ul>
         <li><strong>Sign up and log in</strong>. The signup/login hyperlink appears in the top-right corner if you are not currently logged in. </li>
+        <li><strong>You should customize your settings</strong> by clicking the <icon1>gear</icon1> gear icon, particularly your voice settings.</li>
         <li><strong>You should customize your Favorites</strong>. By default, EyeVocalize provides a limited set of Favorites, such as "yes", "no", "hello" and "goodbye". Press the small <icon1>import</icon1> import icon (on the Favorites section header) to review and import the various collections of add-on Favorites. </li>
-        <li><strong>You should customize your settings</strong> by clicking the <icon1>gear</icon1> gear icon, particularly to customize your voice settings.</li>
         <li>You might want to skim through the various help screens at some point to get a sense of all of the features.</li>
       </ul>
       <p>You can bring up the Help window at any time by clicking on the <icon1>helpicon</icon1> question mark icon.</p>
-      <p>This Help window can be repositioned and resized. Use the <icon1>size</icon1> size icon to make the Help window tall, wide, short or thin. Use the <icon1>position</icon1> position icon to move the Help window to the left, right, top, bottom or center of the application. (The title bar on the Help window is draggable.) </p>
-    `,
-    // FIXME no longer f
-    Introduction: `Introduction`,
-    IntroductionContentsDesc: `Introduction to EyeVocalize.com`,
-    IntroductionContent: `
-      <p>I, Jon Ferraiolo, a person who cannot speak or use his hands, created this application for my own use so I can not only communicate with my family and caregivers, but also participate as normally as possible in social activities. Although I tailored the software for my own needs, I tried to write the software so that others could use it, too. There are many other text-to-speech systems. I do not expect very many people will choose this application, but if you like it, great, use it. It is free with no restrictions other than don't do illegal or bad things listed in the Terms of Use. </p>
-      <p>The biggest difference between EyeVocalize and older text-to-speech systems is that it runs in a browser tab. That allows you to easily transition between Web mail, Facebook, Twitter, Web browsing, Web music, streaming video, etc., and your text-to-speech application, including copy/paste to/from each. </p>
-      <p>My particular computer setup has:</p>
-      <ul>
-        <li>A Microsoft Surface laptop (because Tobii Dynavox software requires Windows) with a current version of Windows 10. The Surface hangs about 18" in front of me. (I actually have two nearly identical systems, one for my wheelchair and one hanging over my head in bed.)</li>
-        <li>PC Eye Mini with Windows Control 2.0</li>
-        <li>Chrome, Firefox or Edge. I mostly use Chrome, but I have found no problems with Firefox and Edge so far. In fact, the other two seem to work better for speech synthesis. </li>
-      </ul>
-      <p>EyeVocalize will only be useful to people who not only have a similar technology stack, but also have a high level of proficiency using their eyes to do ordinary computer tasks such as clicking, typing and scrolling. </p>
-      <p>EyeVocalize is alpha software that is maintained by me, and I am a terminally ill patient who could go at any time. The website should just keep working until it doesn't, for whatever reason. If I am not around to fix, that will probably be the end of EyeVocalize. </p>
-    `,
-    Features: `Features`,
-    FeaturesContentsDesc: `Features in the application`,
-    FeaturesContent: `
-      <p>EyeVocalize features:</p>
-      <ul>
-        <li><topic>Type-to-speak</topic>: Type text, then press Return (or click the speak icon) to cause the typed words to be spoken using voice synthesis</li>
-        <li><topic>Favorites</topic>: Ability to define your own favorites for phrases that you use repeatedly </li>
-        <li><topic>Notes</topic>: Ability to prepare text in advance and store on the Notes for one-click speaking at just the right time </li>
-        <li><topic>History</topic>: EyeVocalize saves your history of vocalizations so you can search for things you said in the past and repeat again </li>
-        <li><topic>Video</topic>: For fun, you can play YouTube clips, such as "Houston, we have a problem" </li>
-        <li><topic>Cloud Backup</topic>: If you sign up and login, which are recommended, EyeVocalize By default will back up your history, clipboard, favorites and some other settings to the EyeVocalize server.</li>
-        <li><topic>Sync</topic>: If you have multiple eye gaze systems like me, and you allow EyeVocalize to back up your data, EyeVocalize will sync your data across all of your systems and browsers.  </li>
-        <li><topic>Shortcuts</topic>: For advanced users, EyeVocalize has various keyboard shortcuts to accelerate your use of the application.  </li>
-      </ul>
+      <p>This Help window can be repositioned and resized. Use the <icon1>size</icon1> size icon to set the horizontal and vertical size of the Help window. Use the <icon1>position</icon1> position icon to move the Help window to the left, right, top, bottom or center of the application. (The title bar on the Help window is draggable.) </p>
     `,
     "Type-to-speak": `Type-to-speak`,
     TtsContentsDesc: `Type what you want to say`,
     TtsContent: `
-      <p>On the main screen of the application, you should see a <strong>Compose</strong> text input box with a type-in cursor.</p>
+      <p>At the top of the main screen of the application, you should see a large text input box with a type-in cursor.</p>
       <p>Bring up the onscreen keyboard from your eye gaze system. (For example, I have a Tobii Dynavox PC Eye Mini. The onscreen keyboard is part of their Windows Control software.) </p>
       <p>Type what you want to say. </p>
       <p>Press Return or click the <icon2>speak</icon2> speak icon to cause speech synthesis to vocalize using the current system voice. </p>
+      <p>There is a Voice section on the <topic>Settings</topic> screen, available from the <icon2>gear</icon2> gear icon at the top of the application. Depending on your browser, you might be able to be able to change voices, rate and pitch. </p>
     `,
     Notes: `Notes`,
     NotesContentsDesc: `Store expressions for the future`,
     NotesContent: `
       <p>The Notes is on the left side of the application.</p>
-      <p>You can type expressions and store them on the Notes for saying later. </p>
-      <p>To store something on the Notes, type words into the <strong>Compose</strong> text input box at the top of the application, and then either click on the <icon2>stickynote</icon2> sticky note icon or press <strong>Control-Return</strong>.  </p>
+      <p>You can type expressions and store them in Notes for saying later. </p>
+      <p>To store something on the Notes, type words into the text input box at the top of the application, and then either click on the <icon2>stickynote</icon2> sticky note icon or press <strong>Control-Return</strong>.  </p>
       <p>To vocalize any of the entries in the Notes, click on them. </p>
       <p>On the Notes title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you can add, edit, delete, reorder or make <topic>Favorites</topic> of the items in the Notes. </p>
       <p>The Notes title bar also has an <icon1>addicon</icon1> plus icon, which gives you another way to add an item to the Notes. </p>
@@ -255,7 +226,7 @@ There is another browser technology with some similarities to cookies called Loc
     History: `History`,
     HistoryContentsDesc: `Your history of vocalizations`,
     HistoryContent: `
-      <p>The History is on the left side of the application under the Notes.</p>
+      <p>The History is on the left side of the application under Notes.</p>
       <p>Everything you vocalize is recorded in the History. </p>
       <p>To repeat a vocalization, click on the entry within the History.  </p>
       <p><strong>Control-period</strong> (Control plus the "." character) will repeat the most recent vocalization.  </p>
@@ -270,12 +241,48 @@ There is another browser technology with some similarities to cookies called Loc
       <p>Favorites are things you say regularly that you want to be only a single click away.</p>
       <p>To vocalize a favorite, simply click on that  entry.  </p>
       <p>When you open the application initially, you will see a minimal list of default Favorites. Sometime soon after you start to use EyeVocalize, set aside a block of time to build your list of things you say regularly and add those things to your Favorites.   </p>
-      <p>You can import a collection of Favorites using the <icon1>import</icon1> import icon on the Favorites title bar. For example, there is a collection of Favorites called "ALS" on the EyeVocalize website that you might want to import if you have ALS like me. You can import from an EyeVocalize collection, or from a URL or your local file system if the target file is the correct format. </p>
-      <p>On the Favorites title bar is a <icon1>addicon</icon1> plus icon, which is one way to define a new favorite. You can also create favorites by typing text into the <strong>Compose</strong> text box and clicking the <icon2>heart</icon2> heart icon at the top of the application. </p>
+      <p>You can import a collection of Favorites using the <icon1>import</icon1> import icon on the Favorites title bar. For example, there are collections of Favorites labeled "ALS" on the EyeVocalize website that you might want to import if you have ALS like me. You can import **From** one three types of sources: an EyeVocalize collection, or a URL or your local file system if the target file is the correct format. </p>
+      <p>On the Favorites title bar is a <icon1>addicon</icon1> plus icon, which is one way to define a new favorite. You can also create favorites by typing text into the input text box and clicking the <icon2>heart</icon2> heart icon at the top of the application. </p>
       <p>On the Favorites title bar is a <icon1>editicon</icon1> pencil icon. If you click that icon, you go to the <strong>Manage Favorites</strong> screen where you can add, edit, delete and reorder both individual favorites but also the categories.  </p>
+    `,
+    'Half-vs-Full Page': `Half-vs-Full Page`,
+    HvFContentsDesc: `How to switch between Half-vs-Full Page UI`,
+    HvFContent: `
+      <p>EyeVocalize by default only uses the top part of the screen and reserves the bottom of the screen for the onscreen keyboard. (The onscreen keyboard is provided by the eye gaze system.)  </p>
+      <p>When the application only uses the top part of the screen, the app is in half-page mode.  </p>
+      <p>For those times when you don't need the keyboard, you can toggle between half-page and full-page mode. </p>
+      <p>If you are in half-page mode, the <icon2>halfpage</icon2> half-page icon  appears both in the top right icon bar and also in the dark bottom half of the screen (active in both places).  </p>
+      <p>If you are in full-page mode, the <icon2>fullpage</icon2> full-page icon  appears in the icon bar. </p>
+      <p>You can control what percentage of the screen the app uses in half-page mode. Click on the <icon2>gear</icon2> Settings icon and go to the Appearance tab. </p>
+    `,
+    Search: `Search`,
+    SearchContentsDesc: `How to search Notes, History and Favorites`,
+    SearchContent: `
+      <p>You can search your <topic>Notes</topic>, <topic>History</topic> and <topic>Favorites</topic> for entries that match one or more search strings. </p>
+      <p>To search, type one or more search strings (space-separated) in the text input box at the top of the application.  </p>
+      <p>Then, either press the <icon2>search</icon2> search icon or press Control-s on the keyboard.  </p>
+      <p>After triggering the search, the screen will filter your <topic>Notes</topic>, <topic>History</topic> and <topic>Favorites</topic> to only show entries that match one of the search strings. </p>
+      <p>To cancel the search, clear the text input box, then either press the <icon2>search</icon2> search icon or press Control-s on the keyboard.  </p>
+    `,
+    Sync: `Sync`,
+    SyncContentsDesc: `Cloud backup and synchronization across devices`,
+    SyncContent: `
+      <p>If you are logged in, EyeVocalize will automatically back up the current <topic>Notes</topic>, <topic>History</topic> and <topic>Favorites</topic> to  the cloud and will automatically synchronize your data across all of your devices that run EyeVocalize.  </p>
+      <p>The synchronization feature obviously only makes sense for users with at least two eye gaze systems; for example, one eye gaze system on your wheelchair and another on your bed.  </p>
+      <p>You can turn off the cloud backup and synchronization features by clicking on the <icon2>gear</icon2> Settings icon and then going to the Account tab. There is a checkbox that enables/disables the sync feature.  </p>
+    `,
+    'Collapse/Expand': `Collapse/Expand Sections`,
+    CEContentsDesc: `Collapsing and expanding sections of the UI`,
+    CEContent: `
+      <p>Various sections of the EyeVocalize user interface can be collapsed or expanded to give you more control over screen space. </p>
+      <p>Wherever you see a <span class=collapsearrow>&#x2303;</span> symbol, that section can be collapsed. Click on the section title string or the <span class=collapsearrow>&#x2303;</span> character to collapse that section. </p>
+      <p>To expand a collapsed section, either click on the section title string or on the <span class=expandarrow>&#x2304;</span> character. </p>
+      <p>Collapsible sections include <topic>Notes</topic>, <topic>History</topic> and the various groups within <topic>Favorites</topic>.  </p>
     `,
     Shortcuts: `Shortcuts`,
     ShortcutsContentsDesc: `Keyboard shortcuts`,
+    ShortcutsContent: `
+    `,
     Prev: `Prev`,
     Next: `Next`,
     positionIconDesc: `bring up a menu that allows you to change the position of the help popup`,
@@ -298,6 +305,16 @@ There is another browser technology with some similarities to cookies called Loc
     left: `left`,
     center: `center`,
     right: `right`,
+    shortcutsBrowser: `In addition to most browser shortcuts (eg, Control-c for Cut), EyeVocalize adds the following keyboard shortcuts:`,
+    shortcutsControl: `Control`,
+    shortcutsReturn: `Return`,
+    shortcutsSpeak: `vocalize the words in the text input box (equivalent to the <icon1>speak</icon1> speak icon)`,
+    shortcutsAddToNotes: `add the words in the text input box to <topic>Notes</topic> (equivalent to the <icon1>stickynote</icon1> sticky note icon)`,
+    shortcutsSearch: `Search <topic>Notes</topic>, <topic>History</topic> and <topic>Favorites</topic> for matches with the words in the text input box (equivalent to the <icon1>search</icon1> search icon)`,
+    shortcutsRepeat: `Repeat the last vocalization`,
+    shortcutsHelp: `Bring up the floating Help system (equivalent to the <icon1>helpicon</icon1> question mark icon - note: only works if keyboard focus is on the app) `,
+    shortcutsBringToTextBox: `(only applies when you Control-click over an item in <topic>Notes</topic>, <topic>History</topic> or <topic>Favorites</topic>) put the text contents of the target into the text input box`,
+    shortcutsClick: `click`,
   },
   ImportFavorites: {
     AllFavoritesAlreadyLoaded: `All favorites from this collection have already been imported.`,

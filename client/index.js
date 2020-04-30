@@ -104,9 +104,6 @@ const ShowPage = page => {
     e.preventDefault();
     window.location='/login';
   };
-  let onClickFooter = () => {
-
-  };
   render(html`
     <div class=PageContainer>
       <div class=Page>
@@ -122,11 +119,11 @@ const ShowPage = page => {
           ${unsafeHTML(marked(localization.siteMarkdown[page]))}
         </div>
         <div class=footer>
-          <a href="/" class=Home @click=${onClickFooter}>Home</a>
-          <a href="/About" class=About @click=${onClickFooter}>About</a>
-          <a href="/TermsOfUse" class=TermsOfUse @click=${onClickFooter}>Terms of Use</a>
-          <a href="/PrivacyPolicy" class=PrivacyPolicy @click=${onClickFooter}>Privacy Policy</a>
-          <a href="/Cookies" class=Cookies @click=${onClickFooter}>Cookies</a>
+          <a href="/">Home</a>
+          <a href="/About">About</a>
+          <a href="/TermsOfUse">Terms of Use</a>
+          <a href="/PrivacyPolicy">Privacy Policy</a>
+          <a href="/Cookies">Cookies</a>
         </div>
       </div>
     </div>`, document.body);

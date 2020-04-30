@@ -94,7 +94,7 @@ let css = `
   text-align: center;
   margin-bottom: 0.7em;
 }
-.HelpPageContent {
+.HelpPageContent, .HelpPageContentOneColumn {
   white-space: normal;
   font-size: 0.85em;
 }
@@ -106,17 +106,25 @@ let css = `
   margin-block-start: 0.0em;
   margin-block-end: 0.5em;
 }
-.HelpPageContent p {
+.HelpPageContent p, .HelpPageContentOneColumn p {
   margin-block-start: 0.7em;
   margin-block-end: 0.7em;
 }
-.HelpContents {
+.HelpContents, .HelpShortcuts {
   display: grid;
   grid-template-columns: auto auto;
   width: fit-content;
-  grid-column-gap: 0.5em;
-  grid-row-gap: 0.5em;
+  grid-column-gap: 0em;
+  grid-row-gap: 0em;
   line-height: 1.2em;
+}
+.HelpContents > *, .HelpShortcuts > * {
+  padding: 0.25em 0.75em;
+}
+.HelpShortcuts > * {
+  border: 1px solid black;
+  margin-top: -1px;
+  margin-left: -1px;
 }
 .HelpFooter {
   display: flex;
@@ -124,6 +132,19 @@ let css = `
   font-size: 0.95em;
   margin: 1em 0 0.4em;
 }
+.HelpFooter > * {
+  min-width: 6em;
+}
+.HelpFooterPrev {
+  text-align: left;
+}
+.HelpFooterContents {
+  text-align: center;
+}
+.HelpFooterNext {
+  text-align: right;
+}
+
 .HelpPageContent topic {
   font-weight: bold;
 }
@@ -147,8 +168,10 @@ let DefaultSizeTall = '60em';
 let showHelpFirstTime = true;
 
 export function showHelp(initialPage, initialSize) {
-  Size = initialSize || 'short-thin'; // short-thin, short-medium, short-wide, tall-thin, tall-medium, tall-wide
-  Position = 'middle-center'; // top-left, ... , bottom-right / top,middle,right;left,center,right plus manual
+  let lastHelpSize = localStorage.getItem('HelpSize') || 'tall-wide';
+  Size = initialSize || lastHelpSize; // short-thin, short-medium, short-wide, tall-thin, tall-medium, tall-wide
+  let lastHelpPosition = localStorage.getItem('HelpPosition') || 'middle-center';
+  Position = lastHelpPosition; // top-left, ... , bottom-right / top,middle,right;left,center,right plus manual
   function AppLayoutChangedHandler(e) {
     console.log('AppLayoutChangedHandler');
     if (showingHelp) {
@@ -317,8 +340,6 @@ export function showHelp(initialPage, initialSize) {
         <div class="HelpPageContent HelpContents">
           <span class=HelpContentsName>${buildGoto('Starting')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.StartingContentsDesc)}</span>
-          <span class=HelpContentsName>${buildGoto('Features')}</span>
-          <span class=HelpContentsDesc>${unsafeHTML(localization.help.FeaturesContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Type-to-speak')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.TtsContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Notes')}</span>
@@ -327,6 +348,14 @@ export function showHelp(initialPage, initialSize) {
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.HistoryContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Favorites')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.FavoritesContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Half-vs-Full Page')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.HvFContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Search')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.SearchContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Sync')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.SyncContentsDesc)}</span>
+          <span class=HelpContentsName>${buildGoto('Collapse/Expand')}</span>
+          <span class=HelpContentsDesc>${unsafeHTML(localization.help.CEContentsDesc)}</span>
           <span class=HelpContentsName>${buildGoto('Shortcuts')}</span>
           <span class=HelpContentsDesc>${unsafeHTML(localization.help.ShortcutsContentsDesc)}</span>
         </div>
@@ -334,22 +363,14 @@ export function showHelp(initialPage, initialSize) {
     },
     Starting: {
       prev: null,
-      next: 'Features',
+      next: 'Type-to-speak',
       value: html`
         ${buildTitle('Starting')}
         <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.StartingContent)}</div>
       `,
     },
-    Features: {
-      prev: 'Starting',
-      next: 'Type-to-speak',
-      value: html`
-        ${buildTitle('Features')}
-        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.FeaturesContent)}</div>
-      `,
-    },
     "Type-to-speak": {
-      prev: 'Features',
+      prev: 'Starting',
       next: 'Notes',
       value: html`
         ${buildTitle('Type-to-speak')}
@@ -374,19 +395,67 @@ export function showHelp(initialPage, initialSize) {
     },
     Favorites: {
       prev: 'History',
-      next: 'Favorites',
+      next: 'Half-vs-Full Page',
       value: html`
         ${buildTitle('Favorites')}
         <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.FavoritesContent)}</div>
       `,
     },
-    Shortcuts: {
+    'Half-vs-Full Page': {
       prev: 'Favorites',
+      next: 'Search',
+      value: html`
+        ${buildTitle('Half-vs-Full Page')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.HvFContent)}</div>
+      `,
+    },
+    Search: {
+      prev: 'Half-vs-Full Page',
+      next: 'Sync',
+      value: html`
+        ${buildTitle('Search')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.SearchContent)}</div>
+      `,
+    },
+    Sync: {
+      prev: 'Search',
+      next: 'Collapse/Expand',
+      value: html`
+        ${buildTitle('Sync')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.SyncContent)}</div>
+      `,
+    },
+    'Collapse/Expand': {
+      prev: 'Sync',
+      next: 'Shortcuts',
+      value: html`
+        ${buildTitle('Collapse/Expand')}
+        <div class="HelpPageContent HelpPageFlow">${unsafeHTML(localization.help.CEContent)}</div>
+      `,
+    },
+    Shortcuts: {
+      prev: 'Collapse/Expand',
       next: null,
       value: html`
         ${buildTitle('Shortcuts')}
-        <div class="HelpPageContent HelpShortcuts">
-          <span class=HelpPageGridItem>Shortcut one</span>
+        <div class="HelpPageContentOneColumn">
+          <div class="HelpPageFlow">
+            <p>${localization.help['shortcutsBrowser']}</p>
+          </div>
+          <div class="HelpShortcuts">
+            <span class=HelpContentsName>${localization.help.shortcutsReturn}</span>
+            <span class=HelpContentsDesc>${unsafeHTML(localization.help.shortcutsSpeak)}</span>
+            <span class=HelpContentsName>${localization.help.shortcutsControl}-${localization.help.shortcutsReturn}</span>
+            <span class=HelpContentsDesc>${unsafeHTML(localization.help.shortcutsAddToNotes)}</span>
+            <span class=HelpContentsName>${localization.help.shortcutsControl}-s</span>
+            <span class=HelpContentsDesc>${unsafeHTML(localization.help.shortcutsSearch)}</span>
+            <span class=HelpContentsName>${localization.help.shortcutsControl}-.</span>
+            <span class=HelpContentsDesc>${unsafeHTML(localization.help.shortcutsRepeat)}</span>
+            <span class=HelpContentsName>${localization.help.shortcutsControl}-h</span>
+            <span class=HelpContentsDesc>${unsafeHTML(localization.help.shortcutsHelp)}</span>
+            <span class=HelpContentsName>${localization.help.shortcutsControl}-${localization.help.shortcutsClick}</span>
+            <span class=HelpContentsDesc>${unsafeHTML(localization.help.shortcutsBringToTextBox)}</span>
+          </div>
         </div>
       `,
     },
@@ -496,6 +565,7 @@ let HelpSizeMenu = (parentElement, customControlsData) => {
       x = 'thin';
     }
     Size = y+'-'+x;
+    localStorage.setItem('HelpSize', Size);
 		hidePopup(showPopupReturnData, customControlsData);
   };
   render(html`<div class="HelpSizeMenu popupMenu">
@@ -555,6 +625,7 @@ let HelpPositionMenu = (parentElement, customControlsData) => {
     } else if (['left', 'center', 'right'].indexOf(HelpMenuId) >= 0) {
       Position = Position === 'manual' ? 'middle-'+HelpMenuId : y+'-'+HelpMenuId;
     }
+    localStorage.setItem('HelpPosition', Position);
 		hidePopup(showPopupReturnData, customControlsData);
   };
   render(html`<div class="HelpPositionMenu popupMenu">
