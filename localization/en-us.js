@@ -29,7 +29,7 @@ using only my eyes.
 _**Only a few people will find this application useful.**_ This app might be useful if you, like me, are:
 * Paralyzed in your arms and hands
 * Unable to talk
-* _**Proficient in using eye gaze technology**_,  such as the
+* **Proficient in using eye gaze technology**,  such as the
 [Tobii PC Eye Mini](https://www.tobiidynavox.com/en-us/devices/eye-gaze-devices/pceye-mini-access-windows-control/)
 
 You run EyeVocalize in a browser tab,
