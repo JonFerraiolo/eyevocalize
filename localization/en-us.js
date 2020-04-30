@@ -251,8 +251,8 @@ There is another browser technology with some similarities to cookies called Loc
       <p>EyeVocalize by default only uses the top part of the screen and reserves the bottom of the screen for the onscreen keyboard. (The onscreen keyboard is provided by the eye gaze system.)  </p>
       <p>When the application only uses the top part of the screen, the app is in half-page mode.  </p>
       <p>For those times when you don't need the keyboard, you can toggle between half-page and full-page mode. </p>
-      <p>If you are in half-page mode, the <icon2>halfpage</icon2> half-page icon  appears both in the top right icon bar and also in the dark bottom half of the screen (active in both places).  </p>
-      <p>If you are in full-page mode, the <icon2>fullpage</icon2> full-page icon  appears in the icon bar. </p>
+      <p>If you are in half-page mode, the <icon2>halfpage</icon2> half-page icon  appears both in the top right icon bar and also in the dark bottom half of the screen (active in both places). Clicking on the half-page icon will switch to full-page.  </p>
+      <p>If you are in full-page mode, the <icon2>fullpage</icon2> full-page icon  appears in the icon bar. Clicking on the full-page icon will switch to half-page. </p>
       <p>You can control what percentage of the screen the app uses in half-page mode. Click on the <icon2>gear</icon2> Settings icon and go to the Appearance tab. </p>
     `,
     Search: `Search`,
@@ -268,7 +268,7 @@ There is another browser technology with some similarities to cookies called Loc
     SyncContentsDesc: `Cloud backup and synchronization across devices`,
     SyncContent: `
       <p>If you are logged in, EyeVocalize will automatically back up the current <topic>Notes</topic>, <topic>History</topic> and <topic>Favorites</topic> to  the cloud and will automatically synchronize your data across all of your devices that run EyeVocalize.  </p>
-      <p>The synchronization feature obviously only makes sense for users with at least two eye gaze systems; for example, one eye gaze system on your wheelchair and another on your bed.  </p>
+      <p>The cross-device synchronization feature obviously only makes sense for users with at least two eye gaze systems; for example, one eye gaze system on your wheelchair and another on your bed.  </p>
       <p>You can turn off the cloud backup and synchronization features by clicking on the <icon2>gear</icon2> Settings icon and then going to the Account tab. There is a checkbox that enables/disables the sync feature.  </p>
     `,
     'Collapse/Expand': `Collapse/Expand Sections`,
