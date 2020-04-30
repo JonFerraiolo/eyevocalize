@@ -26,10 +26,10 @@ This website is a free, public version of a text-to-speech Web application that 
 I included various features so that I can communicate quickly and efficiently
 using only my eyes.
 
-Only a few people will find this application useful. This app might be useful if you, like me, are:
+_**Only a few people will find this application useful.**_ This app might be useful if you, like me, are:
 * Paralyzed in your arms and hands
 * Unable to talk
-* Proficient in using eye gaze technology,  such as the
+* _**Proficient in using eye gaze technology**_,  such as the
 [Tobii PC Eye Mini](https://www.tobiidynavox.com/en-us/devices/eye-gaze-devices/pceye-mini-access-windows-control/)
 
 You run EyeVocalize in a browser tab,
@@ -187,7 +187,7 @@ There is another browser technology with some similarities to cookies called Loc
     Starting: `Getting Started`,
     StartingContentsDesc: `Getting Started with EyeVocalize.com`,
     StartingContent: `
-      <p>Welcome to the EyeVocalize browser-based text-to-speech application (beta). EyeVocalize assumes you are using eye gaze technology to communicate. It was designed by me, Jon Ferraiolo, an advanced ALS patient, around my personal needs and abilities.  </p>
+      <p>Welcome to the EyeVocalize browser-based text-to-speech application (beta). <strong>EyeVocalize assumes you are using eye gaze technology to communicate.</strong> It was designed by me, Jon Ferraiolo, an advanced ALS patient, around my personal needs and abilities.  </p>
       <p>My particular computer setup has:</p>
       <ul>
         <li>A Microsoft Surface laptop running Windows 10.</li>
