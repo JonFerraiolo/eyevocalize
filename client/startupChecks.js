@@ -32,6 +32,16 @@ export function startupChecks(successCB, failureCB) {
     failureCB();
   };
 
+  let defaultVoiceFirst = () => {
+    if (!window.evc_voices[0].default) {
+      let index = window.evc_voices.findIndex(voice => voice.default);
+      if (index > 0) {
+        let arr = window.evc_voices.splice(index, 1);
+        window.evc_voices.unshift(arr[0]);
+      }
+    }
+  };
+
   if ('speechSynthesis' in window) {
     let voicesPromise = new Promise((resolve, reject) => {
       window.evc_voices = speechSynthesis.getVoices();
@@ -50,6 +60,7 @@ export function startupChecks(successCB, failureCB) {
       }
     });
     voicesPromise.then(() => {
+      defaultVoiceFirst();
       successCB();
     }, () => {
       badBrowser();

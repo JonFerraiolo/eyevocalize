@@ -3,16 +3,6 @@ import { html, render } from './lib/lit-html/lit-html.js';
 import { startupChecks } from './startupChecks.js';
 
 let css = `
-/* try to force scrollbars on mobile Safari */
-::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: 11px;
-}
-::-webkit-scrollbar-thumb {
-  border-radius: 4px;
-  background-color: rgba(0, 0, 0, .35);
-  box-shadow: 0 0 1px rgba(255, 255, 255, .5);
-}
 html {
   font-family: Helvetica, Arial, sans-serif;
   margin: 0;
