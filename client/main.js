@@ -271,6 +271,10 @@ function main() {
 				console.log ('socket.io reconnect. msg='+msg);
 				sync();
 			});
+			socket.on('ServerInitiatedRefresh', (serverSyncDataJson, fn) => {
+				// after every server restart, pull down the latest client code
+				window.location.reload();
+			});
 			socket.on('ServerInitiatedSync', (serverSyncDataJson, fn) => {
 				console.log('ServerInitiatedSync serverSyncDataJson='+serverSyncDataJson);
 				try {

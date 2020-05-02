@@ -22,11 +22,23 @@ exports.onConnect = function(socket) {
           fn(JSON.stringify({ success: false, error: 'invalid email, clientId or lastSync' }));
         }
       } else {
-        if (!connectionsByEmail[email]) connectionsByEmail[email] = {};
+        let refresh = false;
+        if (!connectionsByEmail[email]) {
+          connectionsByEmail[email] = {};
+          refresh = true;
+        }
         socketById[socket.id] = socket;
-        connectionsByEmail[email][clientId] = { socketId: socket.id, lastSync };
+        if (!connectionsByEmail[email][clientId]) {
+          refresh = true;
+        }
+        connectionsByEmail[email][clientId] = { socketId: socket.id, lastSync, active: true };
         connectionsBySocket[socket.id] = { email, clientId };
-        updateTopicTables(socket, clientInitiatedSyncData, fn);
+        if (refresh) {
+          // If this is first handshake with client for this server execution, force client to pull latest client code
+          socket.emit('ServerInitiatedRefresh', '{}');
+        } else {
+          updateTopicTables(socket, clientInitiatedSyncData, fn);
+        }
       }
     } catch(e) {
       if (fn) {
@@ -45,10 +57,7 @@ exports.onDisconnect = function(socket) {
   //logger.info('at start of onDisconnect  o='+JSON.stringify(o));
   if (o && o.email && o.clientId && connectionsByEmail[o.email] && connectionsByEmail[o.email][o.clientId]) {
     //logger.info('onDisconnect connectionsByEmail[o.email][o.clientId]='+connectionsByEmail[o.email][o.clientId]);
-    delete connectionsByEmail[o.email][o.clientId];
-    if (Object.keys(connectionsByEmail[o.email]).length === 0) {
-      delete connectionsByEmail[o.email];
-    }
+    connectionsByEmail[o.email][o.clientId].active = false;
     delete socketById[o.socketId];
   }
   delete connectionsBySocket[socket.id];
@@ -66,7 +75,7 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
   for (const clientId in connectionsByEmail[email]) {
     let client = connectionsByEmail[email][clientId];
     //logger.info('updateTopicTables client.lastSync='+client.lastSync);
-    if (client.lastSync < minLastSyncConnected) minLastSyncConnected = client.lastSync;
+    if (client.active && client.lastSync < minLastSyncConnected) minLastSyncConnected = client.lastSync;
   }
   let thisSyncServerTimestamp = Date.now();
   let NotesPromise = syncMiscDataSync(email, 'Notes', connectionsByEmail[email], lastSync,
@@ -106,6 +115,9 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
     //logger.info('updateClients clientId='+clientId);
     let client = connectionsByEmail[email][clientId];
     //logger.info('updateClients client='+JSON.stringify(client));
+    if (!client.active) {
+      continue;
+    }
     let clientPromise = new Promise((clientResolve, clientReject) => {
       //logger.info('updateClients promise function entered');
       let { lastSync, socketId } = client;
@@ -260,7 +272,9 @@ let syncMiscDataSync = (email, type, connectedClients, thisClientLastSync, clien
               //logger.info("syncMiscDataSync innerPromise resolved for email=" + email + " and type=" + type);
               let returnObj = {};
               for (let clientId in connectedClients) {
-                returnObj[clientId] = retval;
+                if (connectedClients[clientId].active) {
+                  returnObj[clientId] = retval;
+                }
               };
               //logger.info('syncMiscDataSync, returnObj='+JSON.stringify(returnObj));
               outerResolve(returnObj);
@@ -378,6 +392,9 @@ let syncHistory = (email, connectedClients, minLastSyncConnected, thisSyncClient
             let returnObj = {};
             for (let clientId in connectedClients) {
               let client = connectedClients[clientId];
+              if (!client.active) {
+                continue;
+              }
               let { lastSync } = client;
               let mintime = calcMinTime([lastSync]);
               returnObj[clientId] = {
