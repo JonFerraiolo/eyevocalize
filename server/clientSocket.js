@@ -303,11 +303,6 @@ let syncHistory = (email, connectedClients, minLastSyncConnected, thisSyncClient
   //logger.info('at start of syncHistory  clientInitiatedSyncData='+JSON.stringify(clientInitiatedSyncData));
   return new Promise((outerResolve, outerReject) => {
     //logger.info('syncHistory promise function entered ');
-    let cid;
-    for (let cli in connectedClients) {
-      cid = cli;
-    }
-    //logger.info('syncHistory  cid='+cid);
     dbconnection.dbReady().then(connectionPool => {
       //logger.info('syncHistory got connection');
       const historyTable = global.historyTable;
@@ -464,8 +459,8 @@ let updateClientTableLastSync = (email, clientId, thisSyncServerTimestamp) => {
 };
 
 let calcMinTime = arr => {
-  let onehour = 1000*60*60;
-  return Math.max(Math.min(...arr) - onehour,  0);
+  let fifteenminutes = 1000*60*15;
+  return Math.max(Math.min(...arr) - fifteenminutes,  0);
 
 
 
