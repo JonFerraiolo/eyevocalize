@@ -69,13 +69,13 @@ let updateTopicTables = (socket, clientInitiatedSyncData, fn) => {
     if (client.lastSync < minLastSyncConnected) minLastSyncConnected = client.lastSync;
   }
   let thisSyncServerTimestamp = Date.now();
-  let NotesPromise = syncMiscDataSync(email, 'Notes', connectionsByEmail[email],
+  let NotesPromise = syncMiscDataSync(email, 'Notes', connectionsByEmail[email], lastSync,
     clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Notes);
   let HistoryPromise = syncHistory(email, connectionsByEmail[email], minLastSyncConnected,
     thisSyncClientTimestamp, thisSyncServerTimestamp, clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.History);
-  let FavoritesPromise = syncMiscDataSync(email, 'Favorites', connectionsByEmail[email],
+  let FavoritesPromise = syncMiscDataSync(email, 'Favorites', connectionsByEmail[email], lastSync,
     clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Favorites);
-  let SettingsPromise = syncMiscDataSync(email, 'Settings', connectionsByEmail[email],
+  let SettingsPromise = syncMiscDataSync(email, 'Settings', connectionsByEmail[email], lastSync,
     clientInitiatedSyncData.updates && clientInitiatedSyncData.updates.Settings);
   Promise.all([NotesPromise, HistoryPromise, FavoritesPromise, SettingsPromise]).then(values => {
     updateClients(socket, email, thisSyncServerTimestamp, values, fn);
@@ -174,7 +174,7 @@ let updateClients = (socket, email, thisSyncServerTimestamp, values, fn) => {
   @param connectedClients {object} associative array of all currently connected clients
       for the given email, whichere each entry is clientId:{socketId, clientId}
 */
-let syncMiscDataSync = (email, type, connectedClients, clientInitiatedSyncData) => {
+let syncMiscDataSync = (email, type, connectedClients, thisClientLastSync, clientInitiatedSyncData) => {
   const logger = global.logger;
   //logger.info('at start of syncMiscDataSync  email='+email);
   //logger.info('at start of syncMiscDataSync  type='+type);
@@ -197,11 +197,6 @@ let syncMiscDataSync = (email, type, connectedClients, clientInitiatedSyncData) 
         return;
       }
     }
-    let cid;
-    for (let cli in connectedClients) {
-      cid = cli;
-    }
-    //logger.info('syncMiscDataSync  cid='+cid);
     dbconnection.dbReady().then(function(connectionPool) {
       //logger.info('syncMiscDataSync got connection');
       const miscsyncdataTable = global.miscsyncdataTable;
@@ -221,25 +216,28 @@ let syncMiscDataSync = (email, type, connectedClients, clientInitiatedSyncData) 
             let innerPromise = new Promise(function(innerResolve, innerReject) {
               if (currentRows.length === 1) {
                 let dbRecord = currentRows[0];
-                if (clientInitiatedSyncData === null) {
-                  try {
-                    let o = JSON.parse(dbRecord.data);
+                try {
+                  let o = JSON.parse(dbRecord.data);
+                  // If client did not change and last time the client sync'd was earlier than the time of the record in db,
+                  // leave db alone and update all clients to the db record
+                  if (clientInitiatedSyncData === null && thisClientLastSync < o.timestamp) {
                     innerResolve(o);
-                  } catch(e) {
-                    logger.error("syncMiscDataSync JSON parse error for dbRecord.data for email=" + email + " and type=" + type);
+                  // else if client did not change, leave db and all clients alone
+                  } else if (clientInitiatedSyncData === null) {
                     innerResolve(null);
+                  } else {
+                    connectionPool.query(`UPDATE ${miscsyncdataTable} SET timestamp = ?, data = ? WHERE email = ? and type = ?`, [timestamp, data, email, type], function (error, results, fields) {
+                      if (error) {
+                        logger.error("miscsyncdataTable update database failure for email=" + email + " and type=" + type);
+                        innerReject();
+                      } else {
+                        innerResolve(clientInitiatedSyncData);
+                      }
+                    });
                   }
-                } else if (dbRecord.timestamp >= timestamp) {
+                } catch(e) {
+                  logger.error("syncMiscDataSync JSON parse error for dbRecord.data for email=" + email + " and type=" + type);
                   innerResolve(null);
-                } else {
-                  connectionPool.query(`UPDATE ${miscsyncdataTable} SET timestamp = ?, data = ? WHERE email = ? and type = ?`, [timestamp, data, email, type], function (error, results, fields) {
-                    if (error) {
-                      logger.error("miscsyncdataTable update database failure for email=" + email + " and type=" + type);
-                      innerReject();
-                    } else {
-                      innerResolve(clientInitiatedSyncData);
-                    }
-                  });
                 }
               } else {
                 if (clientInitiatedSyncData === null) {
