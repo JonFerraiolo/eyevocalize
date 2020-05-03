@@ -2,7 +2,6 @@
 
 **eyevocalize** holds all of the server and client code for what ultimately becomes https://EyeVocalize.com.
 
-
 The code includes a small website and a fairly substantial text-to-speech Web application.
 The webapp runs in the browser and invokes browser speech synthesis to vocalize text.
 
@@ -33,11 +32,11 @@ latest automatic updates to Chrome, Firefox and Edge.
 ## Getting it running
 
 * Install latest versions of Nodejs, git and MySQL server.
+* Sign up for SendGrid (see above) if you want to use signup, login and sync features
 * git clone the repository
-* go to the base directory for the project
-* npm install
 * create a JSON configuration file with the following contents, substituting appropriate values, and save in a directory not outside of the git project:
 
+```
 {
   "BASE_URL": "http://localhost:3000",
   "HOSTNAME": "localhost",
@@ -62,8 +61,10 @@ latest automatic updates to Chrome, Firefox and Edge.
   "SENDGRID_API_KEY": "changeme",
   "PROBLEM_EMAIL": "changeme"
 }
+```
 
-* set environment variable EVC_CONFIG to the path to the JSON config file, relative to the server.js file in the project root directory
+* set environment variable `EVC_CONFIG` to the path to the JSON config file, relative to the server.js file in the project root directory
+* go to the base directory for the project
 * npm install
 * npm start
 * direct browser to http://localhost:3000
