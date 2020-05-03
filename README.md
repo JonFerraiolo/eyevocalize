@@ -42,8 +42,6 @@ latest automatic updates to Chrome, Firefox and Edge.
   "HOSTNAME": "localhost",
   "PROTOCOL": "http",
   "PORT": "3000",
-  "SSL_DB": null,
-  "SSL_DIR": null,
   "SSL_KEY": null,
   "SSL_CERT": null,
   "SOCKETIO_OPTIONS": {"transports": ["polling"]},
