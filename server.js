@@ -128,15 +128,34 @@ logger.info('after calling createServer');
 let io = require('socket.io')(httpServer, global.config.SOCKETIO_OPTIONS);
 logger.info('after creating io');
 
-let getLangJs = req => {
+// Merge user language localization object into default language localization object
+// to ensure each possible localization key has a value
+// this routine assumes localization objects have only one level of subobjects
+// and every string is within a subobject
+let deepMergeLang = (dft, user) => {
+  let returnObj = {};
+  Object.keys(dft).forEach(key => {
+    if (Array.isArray(dft[key]) && Array.isArray(user[key])) {
+      returnObj[key] = JSON.parse(JSON.stringify(user[key]));
+    } else if (typeof dft[key] === 'object' && typeof user[key] === 'object') {
+      returnObj[key] = {};
+      Object.assign(returnObj[key], dft[key], user[key]);
+    }
+  });
+  return returnObj;
+};
+let getLangJson = req => {
   let langIndex = req.query.lang ? localizationLanguages.indexOf(req.query.lang) : -1;
   if (langIndex === -1) {
     let lang = req.acceptsLanguages(localizationLanguages) || 'en';
     langIndex = localizationLanguages.indexOf(lang);
   }
-  let langFileName = rootDir+'/localization/'+localizationFilenames[langIndex]+'.js';
-  let langJs = fs.readFileSync(langFileName);
-  return langJs;
+  let userLangFileName = './localization/'+localizationFilenames[langIndex];
+  let defaultLangFileName = './localization/en-us';
+  let defaultLangObj = require(defaultLangFileName);
+  let userLangObj = require(userLangFileName);
+  let langObj = deepMergeLang(defaultLangObj, userLangObj);
+  return JSON.stringify(langObj, '\t');
 };
 
 const authMiddleware = sessionMgmt.auth;
@@ -157,25 +176,39 @@ sessionMgmt.init(app).then(() => {
     }
   });
   app.get(['/', '/About', '/TermsOfUse','/PrivacyPolicy','/Cookies'], (req, res) => {
-    let langJs = getLangJs(req);
-    if (!langJs) {
-      let msg = 'could not read file '+langFileName;
+    let langJson = getLangJson(req);
+    if (!langJson) {
+      let msg = 'could not get localization file ';
       logSendSE(res, msg, msg);
       return;
     }
     fs.readFile(rootDir+'/index.html', (err, data) => {
       if (err) { logSendSE(res, err, 'index.html'); }
       else {
-        const s = data.toString().replace('((EvcLocalization))', langJs);
+        const s = data.toString().replace('((EvcLocalization))', langJson);
         res.send(s);
       }
     });
   });
-  app.get(['/signup','/login', '/resetpassword', '/accountclosed'], (req, res) => res.sendFile(rootDir+'/session.html'));
+  app.get(['/signup','/login', '/resetpassword', '/accountclosed'], (req, res) => {
+    let langJson = getLangJson(req);
+    if (!langJson) {
+      let msg = 'could not get localization file ';
+      logSendSE(res, msg, msg);
+      return;
+    }
+    fs.readFile(rootDir+'/session.html', (err, data) => {
+      if (err) { logSendSE(res, err, 'session.html'); }
+      else {
+        const s = data.toString().replace('((EvcLocalization))', langJson);
+        res.send(s);
+      }
+    });
+  });
   app.get('/app', (req, res) => {
-    let langJs = getLangJs(req);
-    if (!langJs) {
-      let msg = 'could not read file '+langFileName;
+    let langJson = getLangJson(req);
+    if (!langJson) {
+      let msg = 'could not get localization file ';
       logSendSE(res, msg, msg);
       return;
     }
@@ -197,7 +230,7 @@ sessionMgmt.init(app).then(() => {
           }
           const s = data.toString().replace('((EVUSER))', email)
             .replace('((EVCHECKSUM))', checksum)
-            .replace('((EvcLocalization))', langJs);
+            .replace('((EvcLocalization))', langJson);
           res.send(s);
         });
       }

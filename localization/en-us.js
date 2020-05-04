@@ -1,6 +1,6 @@
 // us-en strings for the Web site
 
-const Localization = {
+module.exports = {
   common: {
     'add to': `add to`,
     Cancel: `Cancel`,
