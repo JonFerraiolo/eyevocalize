@@ -212,12 +212,20 @@ document.head.appendChild(styleElement);
 
 let Favorites;
 export function getFavorites() {
+  let FavoritesString = localStorage.getItem("Favorites");
+  try {
+    Favorites = (typeof FavoritesString === 'string') ? JSON.parse(FavoritesString) : initialFavorites;
+  } catch(e) {
+    Favorites = initialFavorites;
+  }
   return Favorites;
 }
 
+let initialFavorites;
+
 export function initializeFavorites(props) {
   let { currentVersion } = props;
-  let initialFavorites = {
+  initialFavorites = {
     version: currentVersion,
     timestamp: 0,
     lastChooseCategory: { columnIndex: 0, categoryIndex: 0, categoryLabel: null },
@@ -233,12 +241,7 @@ export function initializeFavorites(props) {
       label: collection.category, expanded: true, items: collection.items,
     });
   });
-  let FavoritesString = localStorage.getItem("Favorites");
-  try {
-    Favorites = (typeof FavoritesString === 'string') ? JSON.parse(FavoritesString) : initialFavorites;
-  } catch(e) {
-    Favorites = initialFavorites;
-  }
+  getFavorites();
   if (typeof Favorites.version != 'number'|| Favorites.version < currentVersion) {
     Favorites = initialFavorites;
   }
@@ -252,13 +255,15 @@ export function FavoritesGetPending(clientLastSync) {
 }
 
 export function FavoritesSync(thisSyncServerTimestamp, newData) {
+  getFavorites();
   if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Favorites.timestamp) {
     console.log('FavoritesSync. newData.timestamp='+newData.timestamp+', Favorites.timestamp='+Favorites.timestamp);
     Favorites = newData;
     updateLocalStorageFavorites({ timestamp: newData.timestamp });
-    let event = new CustomEvent("ServerInitiatedSyncFavorites", { detail: null } );
-    window.dispatchEvent(event);
   }
+  let event = new CustomEvent("ServerInitiatedSyncFavorites", { detail: null } );
+  window.dispatchEvent(event);
+
 }
 
 function updateStorageFavorites()  {

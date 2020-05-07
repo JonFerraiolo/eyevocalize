@@ -354,9 +354,25 @@ function main() {
 		}
 	}, false);
 	document.addEventListener('visibilitychange', e => {
+		console.log('visibilitychange. document.hidden='+document.hidden);
 		if (!document.hidden) {
 			if (mainShowing && !popupShowing()) {
 				TextEntryRowSetFocus();
+			}
+		}
+		if (socket /*&& socket.connected*/ && window.eyevocalizeUserEmail && getSyncMyData()) {
+			let lastSync = window.eyevocalizeLastSync;
+			let clientData = {
+				email: window.eyevocalizeUserEmail,
+				clientId: window.eyevocalizeClientId,
+				lastSync,
+			};
+			console.log('before emit document.hidden='+document.hidden);
+			socket.emit(document.hidden ? 'ClientHidden' : 'ClientVisible', JSON.stringify(clientData), msg => {
+				console.log('server says: '+msg);
+			});
+			if (!document.hidden) {
+				sync();
 			}
 		}
 	}, false);

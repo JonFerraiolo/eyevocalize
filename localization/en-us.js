@@ -26,11 +26,13 @@ This website is a free, public version of a text-to-speech Web application that 
 I included various features so that I can communicate quickly and efficiently
 using only my eyes.
 
-_**Only a few people will find this application useful.**_ This app might be useful if you, like me, are:
+_**Few people will find this application useful.**_ This app might be useful if you, like me, are:
 * Paralyzed in your arms and hands
 * Unable to talk
 * **Proficient in using eye gaze technology**,  such as the
 [Tobii PC Eye Mini](https://www.tobiidynavox.com/en-us/devices/eye-gaze-devices/pceye-mini-access-windows-control/)
+
+_**EyeVocalize is not designed for cell phones**_ and has not been tested on MacOS or Safari.
 
 You run EyeVocalize in a browser tab,
 which allows you to quickly switch between speech synthesis (using EyeVocalize),

@@ -46,16 +46,21 @@ styleElement.appendChild(document.createTextNode(css));
 document.head.appendChild(styleElement);
 
 let Notes;
+let initialNotes;
 
-export function initializeNotes(props) {
-  let { currentVersion } = props;
-  let initialNotes = { version: currentVersion, timestamp: 0, expanded: true, items: [] };
+function getNotes() {
   let NotesString = localStorage.getItem("Notes");
   try {
     Notes = (typeof NotesString === 'string') ? JSON.parse(NotesString) : initialNotes;
   } catch(e) {
     Notes = initialNotes;
   }
+}
+
+export function initializeNotes(props) {
+  let { currentVersion } = props;
+  initialNotes = { version: currentVersion, timestamp: 0, expanded: true, items: [] };
+  getNotes();
   if (typeof Notes.version != 'number'|| Notes.version < currentVersion) {
     Notes = initialNotes;
   }
@@ -69,12 +74,13 @@ export function NotesGetPending(clientLastSync) {
 }
 
 export function NotesSync(thisSyncServerTimestamp, newData) {
+  getNotes();
   if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Notes.timestamp) {
     Notes = newData;
     updateLocalStorage({ timestamp: newData.timestamp });
-    let event = new CustomEvent("ServerInitiatedSyncNotes", { detail: null } );
-    window.dispatchEvent(event);
   }
+  let event = new CustomEvent("ServerInitiatedSyncNotes", { detail: null } );
+  window.dispatchEvent(event);
 }
 
 function updateStorage()  {
