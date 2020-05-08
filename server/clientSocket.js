@@ -41,11 +41,9 @@ exports.onConnect = function(socket) {
     }
   };
   socket.on('ClientHidden', (msg, fn) => {
-    logger.info('ClientHidden. msg='+msg);
     changeActive(msg, fn, false);
   });
   socket.on('ClientVisible', (msg, fn) => {
-    logger.info('ClientVisible. msg='+msg);
     changeActive(msg, fn, true);
   });
   socket.on('ClientInitiatedSync', (msg, fn) => {

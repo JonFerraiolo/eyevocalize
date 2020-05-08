@@ -23,6 +23,7 @@ export let localization;
 
 let mainShowing = true;
 
+// Chrome gets messed up if user changes voice pitch, this API allows hiding pitch option for Chrome
 export function isChrome() {
 	return !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 };
@@ -172,8 +173,6 @@ export function updateMain(searchString) {
 let socket;
 
 function main() {
-	console.log(window.eyevocalizeUserEmail+'/'+window.eyevocalizeUserChecksum);
-	console.dir(window.EvcLocalization);
 	localization = window.EvcLocalization;
 	window.eyevocalizeClientId = localStorage.getItem('clientId');
 	if (window.eyevocalizeClientId) {
@@ -218,11 +217,8 @@ function main() {
 				};
 				fetchPostOptions.body = JSON.stringify(credentials);
 				fetch('/api/autologin', fetchPostOptions).then(resp => {
-					console.log('status='+resp.status);
 					if (resp.status === 200) {
 						resp.json().then(data => {
-							console.log('autologin fetch success return data=');
-							console.dir(data);
 							window.eyevocalizeUserEmail = lsEmail;
 							window.eyevocalizeUserChecksum = lsChecksum;
 							localStorage.setItem('userEmail', window.eyevocalizeUserEmail);
@@ -232,8 +228,6 @@ function main() {
 						});
 					} else if (resp.status === 401) {
 						resp.json().then(data => {
-							console.log('autologin fetch 401 return data=');
-							console.dir(data);
 							let errorMessage;
 							if (data.error === 'EMAIL_NOT_REGISTERED') {
 								errorMessage = `*** Error: '${lsEmail}' not registered ***`;
@@ -309,13 +303,13 @@ function main() {
 	  console.error('autoLoginPromise error'+e);
 		window.eyevocalizeUserEmail = null;
 		window.eyevocalizeUserChecksum = null;
+	}).finally(() => {
+		if (window.eyevocalizeUserEmail === '' || !localStorage.getItem('LoginHelpClosed')) {
+			setTimeout(() => {
+				showHelp('Starting', 'tall-wide');
+			}, 0);
+		}
 	});
-	// FIXME wrong check
-	if (window.eyevocalizeUserEmail === '' || !localStorage.getItem('LoginHelpClosed')) {
-		setTimeout(() => {
-			showHelp('Starting', 'tall-wide');
-		}, 0);
-	}
 
 	document.addEventListener('keydown', e => {
 		let shift = e.getModifierState("Shift");
@@ -354,7 +348,6 @@ function main() {
 		}
 	}, false);
 	document.addEventListener('visibilitychange', e => {
-		console.log('visibilitychange. document.hidden='+document.hidden);
 		if (!document.hidden) {
 			if (mainShowing && !popupShowing()) {
 				TextEntryRowSetFocus();
@@ -367,9 +360,7 @@ function main() {
 				clientId: window.eyevocalizeClientId,
 				lastSync,
 			};
-			console.log('before emit document.hidden='+document.hidden);
 			socket.emit(document.hidden ? 'ClientHidden' : 'ClientVisible', JSON.stringify(clientData), msg => {
-				console.log('server says: '+msg);
 			});
 			if (!document.hidden) {
 				sync();
@@ -400,13 +391,8 @@ export function sync() {
 	};
 	console.log('sync entered. syncData=');
 	console.dir(syncData);
-	if (socket) {
-		console.log('socket.connected=');
-		console.dir(socket.connected);
-	}
 	if (socket /*&& socket.connected*/ && window.eyevocalizeUserEmail && getSyncMyData()) {
 		socket.emit('ClientInitiatedSync', JSON.stringify(syncData), msg => {
-			console.log('server says: '+msg);
 		});
 	}
 }

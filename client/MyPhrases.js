@@ -257,7 +257,6 @@ export function FavoritesGetPending(clientLastSync) {
 export function FavoritesSync(thisSyncServerTimestamp, newData) {
   getFavorites();
   if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Favorites.timestamp) {
-    console.log('FavoritesSync. newData.timestamp='+newData.timestamp+', Favorites.timestamp='+Favorites.timestamp);
     Favorites = newData;
     updateLocalStorageFavorites({ timestamp: newData.timestamp });
   }
@@ -364,7 +363,6 @@ function updateMyPhrases(Section, parentElement, props) {
   if (updateFavoritesFirstTime) {
     updateFavoritesFirstTime = false;
     window.addEventListener('ServerInitiatedSyncFavorites', function(e) {
-      console.log('updateFavorites ServerInitiatedSyncFavorites custom event listener entered ');
       let oldSection = Section;
       let oldParent = parentElement;
       Section = 'Favorites';
@@ -480,7 +478,6 @@ function editMyPhrases(Section, parentElement, props) {
     editFavoritesFirstTime = false;
     window.addEventListener('ServerInitiatedSyncFavorites', function(e) {
       if (editFavoritesActive && parentElement) {
-        console.log('editFavorites ServerInitiatedSyncFavorites custom event listener entered ');
         let MyPhrases = parentElement.querySelector('.MyPhrases');
         if (MyPhrases) {
           Section = 'Favorites';

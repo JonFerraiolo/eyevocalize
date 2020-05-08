@@ -200,12 +200,10 @@ export function updateHistory(parentElement, props) {
     updateHistoryFirstTime = false;
     document.addEventListener('visibilitychange', e => {
       if (document.visibilityState === 'visible') {
-        console.log('updateHistory visibilitychange event listener entered ');
         updateInterval();
       }
     }, false);
     window.addEventListener('ServerInitiatedSyncHistory', function(e) {
-      console.log('updateHistory ServerInitiatedSyncHistory custom event listener entered ');
       localUpdate();
     });
   }
@@ -321,13 +319,11 @@ export function editHistory(parentElement, props) {
     editHistoryFirstTime = false;
     document.addEventListener('visibilitychange', e => {
       if (editHistoryActive && document.visibilityState === 'visible') {
-        console.log('editHistory visibilitychange event listener entered ');
         externalEvent();
       }
     }, false);
     window.addEventListener('ServerInitiatedSyncHistory', function(e) {
       if (editHistoryActive) {
-        console.log('editHistory ServerInitiatedSyncHistory custom event listener entered ');
         externalEvent();
       }
     });
@@ -485,7 +481,7 @@ export function editHistory(parentElement, props) {
     try {
       document.execCommand('copy');
     } catch(e) {
-      console.log('copy to clipboard failed');
+      console.error('copy to clipboard failed');
     }
     document.body.removeChild(div);
   };

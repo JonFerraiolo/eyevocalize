@@ -157,7 +157,6 @@ export function updateNotes(parentElement, props) {
   if (updateNotesFirstTime) {
     updateNotesFirstTime = false;
     window.addEventListener('ServerInitiatedSyncNotes', function(e) {
-      console.log('updateNotes ServerInitiatedSyncNotes custom event listener entered ');
       localUpdate();
     });
   }
@@ -221,7 +220,6 @@ export function editNotes(parentElement, props) {
     editNotesFirstTime = false;
     window.addEventListener('ServerInitiatedSyncNotes', function(e) {
       if (editNotesActive && parentElement) {
-        console.log('editNotes ServerInitiatedSyncNotes custom event listener entered ');
         let NotesContent = parentElement.querySelector('.NotesContent');
         if (NotesContent) {
           initializeSelection();
