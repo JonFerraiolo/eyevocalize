@@ -102,15 +102,16 @@ let timeGroups = [
   { delta: 1000*60*60, label: '15-60 minutes ago' },
   { delta: 1000*60*60*24, label: '1-24 hours ago' },
   { delta: 1000*60*60*24*7, label: '1-7 days ago' },
-  { delta: 1000*60*60*24*365, label: 'within past year' },
-  { delta: Number.MAX_SAFE_INTEGER, label: 'over a year old' },
+  { delta: 1000*60*60*24*30, label: '7-30 days' },
+  { delta: 1000*60*60*24*60, label: '30-60 days' },
 ];
 let autoDeleteOffset = {
   hour: 1000*60*60,
   day: 1000*60*60*24,
   week: 1000*60*60*24*7,
   month: 1000*60*60*24*30,
-  year: 1000*60*60*24*365,
+  twomonths: 1000*60*60*24*30*2,
+  year: 1000*60*60*24*365, // not used
 };
 
 let initialHistory;
@@ -229,7 +230,9 @@ export function updateHistory(parentElement, props) {
       }
       if (firstItemToDelete != -1) {
         // delete history items that have aged out
-        History.items.splice(firstItemToDelete);
+        let deleted = History.items.splice(firstItemToDelete);
+        HistoryPendingDeletions = HistoryPendingDeletions.concat(deleted);
+        updateLocalStorage();
       }
     }
     let localHistory = History;

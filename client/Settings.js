@@ -106,15 +106,14 @@ let defaultFontSize = 100;
 let appFontSize = defaultFontSize;
 let defaultMinScreenPercent = 50, minScreenPercentMin = 30, minScreenPercentMax = 100;
 let minScreenPercent = defaultMinScreenPercent;
-let defaultAutoDeleteHistory = 'never';
+let defaultAutoDeleteHistory = 'twomonths';
 let autoDeleteHistory = defaultAutoDeleteHistory;
 let autoDeleteHistoryOptions = [
   { value: 'hour',  label: 'an hour' },
   { value: 'day',  label: 'a day' },
   { value: 'week',  label: 'a week' },
   { value: 'month',  label: 'thirty days' },
-  { value: 'year',  label: 'a year' },
-  { value: 'never',  label: 'never' },
+  { value: 'twomonths',  label: 'sixty days' },
 ];
 let autoDeleteHistoryIndex = autoDeleteHistoryOptions.length -  1;
 let defaultSyncMyData = true;
@@ -140,6 +139,9 @@ let getSettings = () => {
   let SettingsString = localStorage.getItem("Settings");
   try {
     Settings = (typeof SettingsString === 'string') ? JSON.parse(SettingsString) : initialSettings;
+    if (autoDeleteHistory === 'year' || autoDeleteHistory === 'never') {
+      autoDeleteHistory = 'twomonths'; // earlier versions allowed history forever, but performance got affected 
+    }
   } catch(e) {
     Settings = initialSettings;
   }

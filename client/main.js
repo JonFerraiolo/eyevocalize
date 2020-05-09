@@ -283,6 +283,7 @@ function main() {
 					if (typeof fn === 'function') {
 						fn(JSON.stringify({ success: true }));
 					}
+					updateMain();
 				} catch(e) {
 					console.error('sync exception, possibly bad JSON. e=');
 					console.dir(e);
