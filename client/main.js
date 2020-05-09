@@ -118,12 +118,13 @@ export function thirdLevelScreenHide() {
 }
 
 let updateMainInProcess = false;
-export function updateMain(searchString) {
+export function updateMain(searchString, updateWhat) {
 	if (updateMainInProcess) return;
 	updateMainInProcess = true;
+	updateWhat = updateWhat || { TextEntryRow: true, Notes: true, History: true, Favorites: true };
 	let appFontSize = getAppFontSize();
 	let TextEntryRowProps = { initialText: '' };
-	let PhrasesProps = { searchString };
+	let PhrasesProps = { searchString, updateWhat };
 	let onMinOrMax = e => {
 		e.preventDefault();
 		setAppMinOrMax('Max');
@@ -164,7 +165,9 @@ export function updateMain(searchString) {
 		</div>
 	`, document.body);
 	setAppMinOrMax(appMinOrMax);
-  updateTextEntryRow(document.getElementById('TextEntryRowContainer'), TextEntryRowProps);
+	if (updateWhat.TextEntryRow) {
+		updateTextEntryRow(document.getElementById('TextEntryRowContainer'), TextEntryRowProps);
+	}
   updatePhrases(document.getElementById('PhrasesContainer'), PhrasesProps);
 	if (mainShowing) TextEntryRowSetFocus();
 	updateMainInProcess = false;
@@ -283,7 +286,7 @@ function main() {
 					if (typeof fn === 'function') {
 						fn(JSON.stringify({ success: true }));
 					}
-					updateMain();
+					updateMain(null, { Notes:true, History: true, Favorites: true });
 				} catch(e) {
 					console.error('sync exception, possibly bad JSON. e=');
 					console.dir(e);

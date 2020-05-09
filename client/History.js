@@ -301,7 +301,7 @@ function onEditHistory() {
 }
 
 function onEditHistoryReturn() {
-  updateMain();
+  updateMain(null, { Notes:true, History: true });
   secondLevelScreenHide();
 }
 

@@ -118,7 +118,7 @@ export function AddTextToNotes(text) {
 		TextEntryRowSetText('');
 		let phrase = { type: 'text', text, timestamp: Date.now() };
     addToNotes(phrase);
-    updateMain();
+    updateMain(null, { Notes:true, History: true });
 	}
 }
 
@@ -138,7 +138,7 @@ function slideInAddEntryToNotesScreen(props) {
       doItCallback: function(phrase) {
         // add phrase to Notes, go back to parent screen
         addToNotes(phrase);
-        updateMain();
+        updateMain(null, { Notes:true, History: true });
         secondLevelScreenHide();
       },
       cancelCallback: function() {
@@ -209,7 +209,7 @@ function onEditNotes() {
 
 function onEditNotesReturn() {
   editNotesActive = false;
-  updateMain();
+  updateMain(null, { Notes:true, History: true });
   secondLevelScreenHide();
 }
 

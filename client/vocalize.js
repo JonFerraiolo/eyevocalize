@@ -26,7 +26,7 @@ export function speak(text) {
 			window.speechSynthesis.speak(msg);
 			TextEntryRowSetText('');
 			addToHistory({ type: 'text', text, timestamp: Date.now() });
-      updateMain();
+			updateMain(null, { Notes:true, History: true, });
 			vocalizePopup('Now vocalizing:', text, () => {
 				window.speechSynthesis.cancel();
 			}, () => {
@@ -54,7 +54,7 @@ function vocalizePopup(title, content, cancelCB, inProcessCB) {
 				render(html``, showPopupReturnData.popupOverlay);
 				popupUp = false;
 			}
-			updateMain();
+			updateMain(null, { Notes:true, History: true, });
 		}
 	};
 	let popupUp = true;

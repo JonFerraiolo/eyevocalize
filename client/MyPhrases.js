@@ -323,7 +323,7 @@ export function slideInAddFavoriteScreen(props) {
         Favorites.lastChooseCategory = { columnIndex, categoryIndex, categoryLabel };
         // add phrase to MyPhrases, go back to parent screen
         addToFavorites(phrase, columnIndex, categoryIndex);
-        updateMain();
+        updateMain(null, { Favorites:true, });
         if (slideInLevel === 'third') {
           thirdLevelScreenHide();
         } else {
@@ -464,7 +464,7 @@ function onEditFavorites() {
 
 function onEditFavoritesReturn() {
   editFavoritesActive = false;
-  updateMain();
+  updateMain(null, { Favorites: true });
   secondLevelScreenHide();
 }
 

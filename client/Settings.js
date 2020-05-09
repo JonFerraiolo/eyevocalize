@@ -106,7 +106,7 @@ let defaultFontSize = 100;
 let appFontSize = defaultFontSize;
 let defaultMinScreenPercent = 50, minScreenPercentMin = 30, minScreenPercentMax = 100;
 let minScreenPercent = defaultMinScreenPercent;
-let defaultAutoDeleteHistory = 'twomonths';
+let defaultAutoDeleteHistory = 'week';
 let autoDeleteHistory = defaultAutoDeleteHistory;
 let autoDeleteHistoryOptions = [
   { value: 'hour',  label: 'an hour' },
@@ -140,7 +140,7 @@ let getSettings = () => {
   try {
     Settings = (typeof SettingsString === 'string') ? JSON.parse(SettingsString) : initialSettings;
     if (autoDeleteHistory === 'year' || autoDeleteHistory === 'never') {
-      autoDeleteHistory = 'twomonths'; // earlier versions allowed history forever, but performance got affected 
+      autoDeleteHistory = 'twomonths'; // earlier versions allowed history forever, but performance got affected
     }
   } catch(e) {
     Settings = initialSettings;
@@ -218,7 +218,7 @@ export function slideInSettingsScreen(props) {
 
 function onSettingsReturn() {
   editSettingsActive = false;;
-  updateMain();
+  updateMain(null, { Notes:true, History: true, Favorites: true });
   secondLevelScreenHide();
 }
 
@@ -313,7 +313,7 @@ export function editSettings(parentElement, params) {
     let v = parseFloat(newValue);
     if (v === NaN || v < minScreenPercentMin || v > minScreenPercentMax) return;
     minScreenPercent = v;
-    updateMain();
+    updateMain(null, { Notes:true, History: true, Favorites: true });
     updateStorage();
     setTimeout(() => {
       let event = new CustomEvent("AppLayoutChanged", { detail: null } );
@@ -326,7 +326,7 @@ export function editSettings(parentElement, params) {
     if (autoDeleteHistoryIndex === -1) autoDeleteHistoryIndex = autoDeleteHistoryOptions.length - 1;
     autoDeleteHistory = autoDeleteHistoryOptions[autoDeleteHistoryIndex].value;
     localUpdate();
-    updateMain();
+    updateMain(null, { Notes:true, History: true, });
     updateStorage();
   };
   let onChangeSyncData = e => {

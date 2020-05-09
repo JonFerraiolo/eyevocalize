@@ -175,7 +175,7 @@ export function onPhraseClick(e) {
     TextEntryRowSetFocus();
   } else if (!shift && !control && !meta) {
     playPhrase(phrase);
-    updateMain();
+    updateMain(null, { Notes:true, History: true });
   }
 };
 
@@ -193,7 +193,8 @@ export function buildTitleWithCollapseExpandArrows(obj, title, iconClass) {
 };
 
 export function updatePhrases(parentElement, props) {
-  let { searchString } = props;
+  let { searchString, updateWhat } = props;
+  updateWhat = updateWhat || { Notes: true, History: true, Favorites: true };
   let searchTokens = (typeof searchString  === 'string') ?
     searchString.toLowerCase().replace(/\s+/g, ' ').trim().split(' ') :
     [];
@@ -208,9 +209,15 @@ export function updatePhrases(parentElement, props) {
     </div>
     <div id=FavoritesContainer></div>
   </div>`, parentElement);
-  updateNotes(document.getElementById('NotesContainer'), NotesProps);
-  updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
-  updateFavorites(document.getElementById('FavoritesContainer'), MyPhrasesProps);
+  if (updateWhat.Notes) {
+    updateNotes(document.getElementById('NotesContainer'), NotesProps);
+  }
+  if (updateWhat.History) {
+    updateHistory(document.getElementById('HistoryContainer'), HistoryProps);
+  }
+  if (updateWhat.Favorites) {
+    updateFavorites(document.getElementById('FavoritesContainer'), MyPhrasesProps);
+  }
 }
 
 export function PhrasesAddDelSync(thisSyncServerTimestamp, updates, Phrases, PhrasesPendingDeletions, PhrasesPendingAdditions) {
