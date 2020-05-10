@@ -374,7 +374,7 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 			});
 		});
 		cleanUpCandidates();
-		customControlsData.doItCallback();
+		customControlsData.doItCallback(Favorites);
   };
   let onClickCancel = e => {
     e.preventDefault();

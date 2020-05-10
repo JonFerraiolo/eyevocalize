@@ -376,8 +376,9 @@ function updateMyPhrases(Section, parentElement, props) {
   let onClickImport = e => {
     e.preventDefault();
     let customControlsData = {
-      doItCallback: () => {
-        traverseColumnsCategoriesItems(Favorites, deleteTemporaryProperties);
+      doItCallback: newFavorites => {
+        traverseColumnsCategoriesItems(newFavorites, deleteTemporaryProperties);
+        Favorites = newFavorites;
         updateStorageFavorites();
         localUpdate();
       },
