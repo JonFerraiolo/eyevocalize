@@ -3,7 +3,7 @@
 import { startupChecks } from './startupChecks.js';
 import { helpShowing, toggleHelp, showHelp } from './help.js';
 import { popupShowing } from './popup.js';
-import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText } from './TextEntryRow.js';
+import { updateTextEntryRow, TextEntryRowSetFocus, TextEntryRowGetText, TextEntryRowSetText, getLastTextSelection } from './TextEntryRow.js';
 import { initializeSettings, editSettings, mainAppPercentWhenSmall, getAppFontSize, getSyncMyData, SettingsGetPending, SettingsSync } from './Settings.js';
 import { updatePhrases } from './Phrases.js';
 import { initializeNotes, NotesGetPending, NotesSync, AddTextToNotes, editNotes } from './Notes.js';
@@ -32,11 +32,6 @@ export function search(text) {
 	text = (typeof text === 'string') ? text : TextEntryRowGetText();
 	updateMain(text);
 };
-
-// The text area control has been cleared
-export function clear() {
-	updateMain();
-}
 
 let appMinOrMax = 'Min'; // either 'Min' or 'Max', controls whether bottom of screen is blocked off for onscreen keyboard
 export function getAppMinOrMax() {
@@ -123,7 +118,7 @@ export function updateMain(searchString, updateWhat) {
 	updateMainInProcess = true;
 	updateWhat = updateWhat || { TextEntryRow: true, Notes: true, History: true, Favorites: true };
 	let appFontSize = getAppFontSize();
-	let TextEntryRowProps = { initialText: '' };
+	let TextEntryRowProps = getLastTextSelection();
 	let PhrasesProps = { searchString, updateWhat };
 	let onMinOrMax = e => {
 		e.preventDefault();

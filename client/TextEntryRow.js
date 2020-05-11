@@ -2,7 +2,7 @@
 import { speak } from './vocalize.js';
 import { AddTextToNotes } from './Notes.js';
 import { slideInAddFavoriteScreen } from './MyPhrases.js';
-import { search, clear, getAppMinOrMax, setAppMinOrMax, localization } from './main.js';
+import { search, updateMain, getAppMinOrMax, setAppMinOrMax, localization } from './main.js';
 import { resizeableTextarea } from './resizeableTextarea.js';
 import { slideInSettingsScreen } from './Settings.js';
 import { toggleHelp } from './help.js';
@@ -145,9 +145,36 @@ let styleElement = document.createElement('style');
 styleElement.appendChild(document.createTextNode(css));
 document.head.appendChild(styleElement);
 
+let updateLocalStorage = () => {
+  let o = TextEntryRowGetTextSelection();
+  localStorage.setItem('TextEntryRowSelection', JSON.stringify(o));
+};
+
+export function getLastTextSelection() {
+  let o = { text: '', start: 0, end: 0 };
+  let s = localStorage.getItem('TextEntryRowSelection');
+  if (s) {
+    try {
+      o = JSON.parse(s);
+  	} catch(e) {}
+  }
+  return o;
+};
+
 export function updateTextEntryRow(parentElement, props) {
-  let text = props.initialText || '';
+  let text = props.text || '';
+  let selectionStart = typeof props.start === 'number' ? props.start : text.length;
+  let selectionEnd = typeof props.end === 'number' ? props.end : text.length;
   let MinOrMax = getAppMinOrMax();
+  let onInput = e => {
+    updateLocalStorage();
+  };
+  let onFocus= e => {
+    updateLocalStorage();
+  };
+  let onSelect = e => {
+    updateLocalStorage();
+  };
   let onSpeak = e => {
     e.preventDefault();
     speak(document.getElementById('TextEntryRowTextArea').value);
@@ -161,7 +188,8 @@ export function updateTextEntryRow(parentElement, props) {
   let onClear = e => {
     e.preventDefault();
     document.getElementById('TextEntryRowTextArea').value = '';
-    clear();
+    updateLocalStorage();
+    updateMain();
     TextEntryRowSetFocus();
   }
   let onAddMyPhrase = e => {
@@ -207,7 +235,7 @@ export function updateTextEntryRow(parentElement, props) {
     render(html`
     <div class=TextEntryRow>
       <label class=TextEntryLabel for=TextEntryRowTextArea><span class=logo></span>EyeVocalize<br><em>(beta)</em></label
-      ><textarea id=TextEntryRowTextArea placeholder=${localization.TextEntryRow['typeText']}>${text}</textarea
+      ><textarea id=TextEntryRowTextArea placeholder=${localization.TextEntryRow['typeText']} @input=${onInput} @focus=${onFocus} @select=${onSelect}>${text}</textarea
       ><button class="TextEntryIcon TextEntryClear" @click=${onClear}
         title='Clear the current composition in the text entry box'></button
       ><span class=TextEntryIconBlocks
@@ -232,7 +260,10 @@ export function updateTextEntryRow(parentElement, props) {
           ></span>${lastIcon}
       </span>
     </div>`, parentElement);
-    resizeableTextarea(document.getElementById('TextEntryRowTextArea'));
+    let textarea = document.getElementById('TextEntryRowTextArea');
+    resizeableTextarea(textarea);
+    textarea.selectionStart = selectionStart;
+    textarea.selectionEnd = selectionEnd;
   };
   localUpdate();
 }
@@ -240,9 +271,9 @@ export function updateTextEntryRow(parentElement, props) {
 export function TextEntryRowSetFocus() {
   setTimeout(()  => {
     let textarea = document.getElementById('TextEntryRowTextArea');
+    let o = TextEntryRowGetTextSelection();
     textarea.focus();
-    let len = textarea.value.length;
-    textarea.setSelectionRange(len, len);
+    TextEntryRowSetTextSelection(o);
   }, 0);
 }
 
@@ -252,4 +283,21 @@ export function TextEntryRowGetText() {
 
 export function TextEntryRowSetText(text) {
   document.getElementById('TextEntryRowTextArea').value = text || '';
+  updateLocalStorage();
+}
+
+export function TextEntryRowGetTextSelection() {
+  let elem = document.getElementById('TextEntryRowTextArea');
+  return {
+    text: elem.value,
+    start: elem.selectionStart,
+    end: elem.selectionEnd,
+  };
+}
+
+export function TextEntryRowSetTextSelection(o) {
+  let elem = document.getElementById('TextEntryRowTextArea');
+  elem.value = o.text;
+  elem.selectionStart = o.start;
+  elem.selectionEnd = o.end;
 }
