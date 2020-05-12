@@ -271,9 +271,7 @@ export function updateTextEntryRow(parentElement, props) {
 export function TextEntryRowSetFocus() {
   setTimeout(()  => {
     let textarea = document.getElementById('TextEntryRowTextArea');
-    let o = TextEntryRowGetTextSelection();
     textarea.focus();
-    TextEntryRowSetTextSelection(o);
   }, 0);
 }
 
@@ -282,8 +280,14 @@ export function TextEntryRowGetText() {
 }
 
 export function TextEntryRowSetText(text) {
-  document.getElementById('TextEntryRowTextArea').value = text || '';
-  updateLocalStorage();
+  text = text || '';
+  let elem = document.getElementById('TextEntryRowTextArea');
+  elem.value = text;
+  setTimeout(() => { //setTimeout Kludge to allow browser focus and select operation s to happen, which move cursor to position zero
+    elem.selectionStart = text.length;
+    elem.selectionEnd= text.length;
+    updateLocalStorage();
+  }, 50);
 }
 
 export function TextEntryRowGetTextSelection() {
