@@ -156,6 +156,7 @@ export function updateMain(searchString, updateWhat) {
 				<a href="/TermsOfUse">Terms of Use</a>
 				<a href="/PrivacyPolicy">Privacy Policy</a>
 				<a href="/Cookies">Cookies</a>
+				<a href="/Contact">Contact</a>
 			</div>
 		</div>
 	`, document.body);

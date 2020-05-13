@@ -124,6 +124,7 @@ const ShowPage = page => {
           <a href="/TermsOfUse">Terms of Use</a>
           <a href="/PrivacyPolicy">Privacy Policy</a>
           <a href="/Cookies">Cookies</a>
+          <a href="/Contact">Contact</a>
         </div>
       </div>
     </div>`, document.body);
@@ -145,4 +146,5 @@ let xref = {
   "/TermsOfUse": "TermsOfUse",
   "/PrivacyPolicy": "PrivacyPolicy",
   "/Cookies": "Cookies",
+  "/Contact": "Contact",
 };

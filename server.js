@@ -175,7 +175,7 @@ sessionMgmt.init(app).then(() => {
       next();
     }
   });
-  app.get(['/', '/About', '/TermsOfUse','/PrivacyPolicy','/Cookies'], (req, res) => {
+  app.get(['/', '/About', '/TermsOfUse','/PrivacyPolicy','/Cookies','/Contact'], (req, res) => {
     let langJson = getLangJson(req);
     if (!langJson) {
       let msg = 'could not get localization file ';
@@ -250,7 +250,9 @@ sessionMgmt.init(app).then(() => {
   app.get('/api/verifyaccount/:token', sessionRoutes.verifyAccount)
   app.post('/api/closeaccount', sessionRoutes.closeAccount);
   app.post('/api/getFavoritesFromURL', authMiddleware, miscRoutes.getFavoritesFromURL);
-  app.get('/*', (req, res) => res.redirect(301, '/'));
+  app.get('/*', (req, res) => {
+    res.redirect(301, '/');
+  });
 
   logger.info('before calling listen on port');
   httpServer.listen(port, () => logger.info(`App listening on port ${port}!`));

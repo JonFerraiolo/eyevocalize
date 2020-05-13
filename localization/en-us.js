@@ -183,6 +183,13 @@ EyeVocalize.com uses cookies only for session management, where a random number 
 There is another browser technology with some similarities to cookies called Local Storage.  Local Storage information is stored in a secure location on your local disk and is not shared with third parties. EyeVocalize.com uses Local Storage for performance reasons and so that the application will continue to work even when the computer is offline.
 
 `,
+Contact: `
+# How to Contact
+
+The only contact mechanism is email to [EyeVocalize@EyeVocalize.com](mailto:EyeVocalize@EyeVocalize.com)
+which currently redirects to me (Jon Ferraiolo). Read the [About](/About) page for more information.
+
+`,
   },
   help: {
     Contents: `Contents`,
