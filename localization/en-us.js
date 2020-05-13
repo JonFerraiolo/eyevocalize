@@ -155,6 +155,9 @@ The applicable jurisdiction for legal matters is the state of California. USA.
 
 See [Privacy Policy](/PrivacyPolicy) on a separate page.
 
+_This page may be updated at any time._
+
+_2020-05-13_
 `,
 PrivacyPolicy: `
 # Privacy Policy
@@ -172,6 +175,10 @@ The one exception is that there is a user interface option under account setting
 
 EyeVocalize.com has a couple of automatic backup mechanisms for the rare cases of server disk crashes or the hosting company going
 out of business with no data preservation. Snapshots of your server data will be stored within these backups even if you close your account.
+
+_This page may be updated at any time._
+
+_2020-05-13_
 `,
 Cookies: `
 # Use of Cookies and Similar Technologies
@@ -182,6 +189,9 @@ EyeVocalize.com uses cookies only for session management, where a random number 
 
 There is another browser technology with some similarities to cookies called Local Storage.  Local Storage information is stored in a secure location on your local disk and is not shared with third parties. EyeVocalize.com uses Local Storage for performance reasons and so that the application will continue to work even when the computer is offline.
 
+_This page may be updated at any time._
+
+_2020-05-13_
 `,
 Contact: `
 # How to Contact
