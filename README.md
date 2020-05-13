@@ -66,3 +66,52 @@ latest automatic updates to Chrome, Firefox and Edge.
 * npm install
 * npm start
 * direct browser to http://localhost:3000
+
+## Server notes
+
+The server uses expressjs.
+
+The server is fairly minimal. Most of the code is in the client.
+
+Look at `./server.js` source code comments for additional details.
+
+## Client notes
+
+### lit-html
+
+The client uses lit-html for almost everything.
+
+For those who are not familiar with lit-html but are familiar with Reactjs:
+
+* lit-html has a similar virtual DOM approach, except instead of massive data structures that duplicate the real DOM, lit-html uses the real DOM for its magic.
+* Instead of dozens of major APIs and a steep learning curve, lit-html only has two main functions: `render` and `html`. The `render` function is super-simple. `html` is the complicated one, but you should be able to figure it oot in a day or so. Here is a short example:
+
+```
+render(html`
+  <div class=PageContainer>
+    <div class=Page>
+      <div class=PageTopBar>
+        <label><span class=logo></span>EyeVocalize.com</label>
+        <span class=PageTopBarButtons>
+          <button @click=${tryit} class=TryIt>Try It</button>
+          <button @click=${signup} class=SignUp>Sign Up</button>
+          <button @click=${login} class=Login>Login</button>
+        </span>
+    ... Other content snipped ...
+  </div>`, document.body);
+```
+
+* Instead of JSX, lit-html takes advantage of a relatively recent addition to JavaScript: [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals). (see example above)
+* lit-html does not have any mechanisms for storing state and triggering updates when state changes. You have to roll your own state management and update logic, which I found I liked better than having to code to the particular rules of Reactjs.
+
+### modules
+
+All client JavaScript files are coded as [modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules).
+
+## socket.io and the data synchronization feature  
+
+The server and the client implement the data synchronization feature using socket.io.
+
+Theoretically, on modern servers and clients, we should be able to run socket.io over Web sockets. However, developers who look at EyeVocalize.com will notice that the site uses long polling instead of Web sockets. This is because of issues with the hosting site.
+
+The data synchronization feature is quite complicated. This is largely due to the complexity of all the possible scenarios. Good luck if you encounter problems. I have tried to comment in the code why things are done in a particular way.

@@ -16,7 +16,10 @@ const clientSocket = require('./server/clientSocket');
 
 global.SITENAME = 'EyeVocalize';
 
+// ==============================
 // read site-specific configuration options and put into global.config
+// ==============================
+
 const rootDir = process.cwd();
 let configFile = process.env.EVC_CONFIG;
 if (!configFile) {
@@ -35,7 +38,10 @@ try {
   process.exit(1);
 }
 
-// set up global.logger
+// ==============================
+// set up global.logger using winston
+// ==============================
+
 const { createLogger, format, transports } = require('winston');
 const { combine, timestamp, printf } = format;
 const myFormat1 = printf(({ level, message, timestamp }) => {
@@ -80,6 +86,11 @@ if (typeof logdir === 'string' && logdir.length > 0) {
   });
 }
 const logger = global.logger;
+
+// ==============================
+// get protocol and certificates ready. Note that https using certificates has not been tested yet.
+// ==============================
+
 let port = global.config.PORT;
 let protocol = global.config.PROTOCOL;
 const hostname = global.config.HOSTNAME;
@@ -101,6 +112,10 @@ if (protocol === 'https') {
 }
 logger.info('after https check. protocol='+protocol+', port='+port);
 
+// ==============================
+// get localization data structures ready
+// ==============================
+
 let localizationLanguages = localizationIndex.map(item => {
   for (let language in item) {
     return language; // should be only one property, and the name of the property is the language identifier
@@ -112,7 +127,14 @@ let localizationFilenames = localizationIndex.map(item => {
   }
 });
 
-dbconnection.initialize(); // kick off the connection to the db and any needed db inits
+dbconnection.initialize(); // kick off the connection to the db and any needed db inits in advance
+
+// ==============================
+// initialize the expressjs server (createServer) and attach socket.io to that server
+// Note that EyeVocalize.com uses an http server which automagically is used over https
+// due to the wonders of Let's Encrypt
+// ==============================
+
 const app = express();
 let httpServer;
 logger.info('before calling createServer');
@@ -127,6 +149,10 @@ try {
 logger.info('after calling createServer');
 let io = require('socket.io')(httpServer, global.config.SOCKETIO_OPTIONS);
 logger.info('after creating io');
+
+// ==============================
+// two functions used to deliver the correct localization data to the client
+// ==============================
 
 // Merge user language localization object into default language localization object
 // to ensure each possible localization key has a value
@@ -159,10 +185,19 @@ let getLangJson = req => {
 };
 
 const authMiddleware = sessionMgmt.auth;
+
+// ==============================
 // this call results in app.use with session middleware, which needs to be first in line
+// ==============================
+
 sessionMgmt.init(app).then(() => {
 
   logger.info('server.js sessionMgmt.init successful return');
+
+  // ==============================
+  // expressjs middleware for compressing content, delivering client code as is, url encoding (not used yet) and parsing JSON payloads
+  // ==============================
+
   app.use(compression());
   app.use(express.static('client'));
   app.use(bodyParser.urlencoded({ extended: true })); // for uploading files
@@ -175,6 +210,11 @@ sessionMgmt.init(app).then(() => {
       next();
     }
   });
+
+  // ==============================
+  // define routes to expressjs, which means how to handle each http request
+  // ==============================
+
   app.get(['/', '/About', '/TermsOfUse','/PrivacyPolicy','/Cookies','/Contact'], (req, res) => {
     let langJson = getLangJson(req);
     if (!langJson) {
@@ -257,6 +297,11 @@ sessionMgmt.init(app).then(() => {
   logger.info('before calling listen on port');
   httpServer.listen(port, () => logger.info(`App listening on port ${port}!`));
   logger.info('after calling listen on port');
+
+  // ==============================
+  // whenever a client runs the app, the client tries to connect via socket.io
+  // all socket.io detailed logic is in clientSocket.js
+  // ==============================
 
   io.on('connection', function(socket){
     clientSocket.onConnect(socket);
