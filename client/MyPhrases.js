@@ -5,7 +5,7 @@ import { onPhraseClick, rightSideIcons, buildTitleWithCollapseExpandArrows,
 import { updateMain, buildSlideRightTitle, sync, localization,
   secondLevelScreenShow, secondLevelScreenHide, thirdLevelScreenShow, thirdLevelScreenHide } from './main.js';
 import { EditPhrase } from './EditPhrase.js';
-import { buildChooseCategoryControl, MyPhrasesChooseCategoryPopupShow } from './ChooseCategory.js';
+import { buildChooseCategoryControl, ChooseCategoryPopupShow } from './ChooseCategory.js';
 import { ImportFavoritesPopupShow } from './ImportFavorites.js';
 
 let css = `
@@ -108,7 +108,7 @@ let css = `
   margin-left: 0.75em;
   font-size: 85%;
 }
-.MyPhrasesChooseCategory {
+.ChooseCategory {
   border: 1px solid black;
   padding: 0.5em 1em;
 }
@@ -667,6 +667,14 @@ function editMyPhrases(Section, parentElement, props) {
               traverseColumnsCategories(localMyPhrases, category => {
                 category.items = category.items.filter(item => !item.selected);
               });
+              // in case we added a new category
+              if (customControlsData.categoryIndex >= localMyPhrases.columns[customControlsData.columnIndex].categories.length) {
+                localMyPhrases.columns[customControlsData.columnIndex].categories[customControlsData.categoryIndex] = {
+                  label: customControlsData.categoryLabel,
+                  expanded: true,
+                  items: [],
+                };
+              }
               makeLocalChangesPermanent();
               addToFavorites(phrase, customControlsData.columnIndex, customControlsData.categoryIndex);
             }
