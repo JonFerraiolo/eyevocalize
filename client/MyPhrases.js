@@ -221,6 +221,11 @@ export function getFavorites() {
   return Favorites;
 }
 
+export function setFavorites(newFavorites) {
+  Favorites = newFavorites;
+  updateLocalStorageFavorites();
+}
+
 let initialFavorites;
 
 export function initializeFavorites(props) {

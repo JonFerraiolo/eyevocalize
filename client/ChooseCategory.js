@@ -1,6 +1,6 @@
 
 import { html, render } from './lib/lit-html/lit-html.js';
-import { getFavorites } from './MyPhrases.js';
+import { getFavorites, setFavorites } from './MyPhrases.js';
 import { localization } from './main.js';
 import { showPopup, hidePopup } from './popup.js';
 
@@ -127,6 +127,7 @@ export let FavoritesChooseCategoryDialog = (parentElement, customControlsData) =
     customControlsData.columnIndex = selCol;
     customControlsData.categoryIndex = selCat;
     customControlsData.categoryLabel = Favorites.columns[selCol].categories[selCat].label;
+    setFavorites(Favorites); // set the real master value for Favorites
     hidePopup(showPopupReturnDataChooseCategory, customControlsData);
   };
   let onClickCancel = e => {
