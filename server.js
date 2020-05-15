@@ -202,6 +202,10 @@ sessionMgmt.init(app).then(() => {
   app.use(express.static('client'));
   app.use(bodyParser.urlencoded({ extended: true })); // for uploading files
   app.use(bodyParser.json());
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-cache'); // tell browser to revalidate all cached files
+    next();
+  });
   app.use(function(req, res, next) { // strip trailing slash from path and redirect
     if (req.path.substr(-1) == '/' && req.path.length > 1) {
       let query = req.url.slice(req.path.length);
