@@ -86,7 +86,7 @@ exports.onConnect = function(socket) {
           refresh = true; // tell browser to reload if this is first encounter with this browser window this server session
         }
         if (thisSyncServerInstance === global.serverInstance.toString()) {
-          logger.info('server instance match, refresh set to false')
+          //logger.info('server instance match, refresh set to false')
           refresh = false;
         }
         connectionsByEmail[email][clientId][socket.id] = { lastSync, active: true };
@@ -95,7 +95,7 @@ exports.onConnect = function(socket) {
         //logger.info('toward end of ClientInitiatedSync connectionsBySocket='+JSON.stringify(connectionsBySocket));
         //logger.info('refresh='+refresh);
         if (refresh) {
-          logger.info('tell client to refresh')
+          //logger.info('tell client to refresh')
           // If this is first handshake with client for this server execution, force client to pull latest client code
           // the reloaded browser window will initiate another ClientInitiatedSync
           socket.emit('ServerInitiatedRefresh', JSON.stringify({ serverInstance: global.serverInstance }));
