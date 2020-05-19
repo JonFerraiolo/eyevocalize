@@ -131,7 +131,6 @@ exports.initialize = function() {
   // sql commands to check if database is empty
   // and to create tables if necessary.
   const accountTable = global.accountTable = global.config.DB_TABLE_PREFIX + 'account';
-  const clientTable = global.clientTable = global.config.DB_TABLE_PREFIX + 'client';
   const miscsyncdataTable = global.miscsyncdataTable = global.config.DB_TABLE_PREFIX + 'miscsyncdata';
   const historyTable = global.historyTable = global.config.DB_TABLE_PREFIX + 'history';
   const showTables = `show tables;`;
@@ -149,13 +148,6 @@ exports.initialize = function() {
     resetPasswordTokenDateTime datetime DEFAULT NULL,
     modified datetime NOT NULL,
     PRIMARY KEY (id),
-    INDEX(email(100))
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
-  const createClient = `CREATE TABLE ${clientTable} (
-    clientId bigint unsigned UNIQUE NOT NULL,
-    email varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-    lastSync bigint unsigned NOT NULL,
-    PRIMARY KEY (clientId),
     INDEX(email(100))
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;`;
   const createMiscSyncData = `CREATE TABLE ${miscsyncdataTable} (
@@ -243,10 +235,9 @@ exports.initialize = function() {
       });
     };
     let accountPromise = dropAndMakeTable(accountTable, createAccount);
-    let clientPromise = dropAndMakeTable(clientTable, createClient);
     let miscsyncdataPromise = dropAndMakeTable(miscsyncdataTable, createMiscSyncData);
     let historyPromise = dropAndMakeTable(historyTable, createHistory);
-    Promise.all([accountPromise, clientPromise, miscsyncdataPromise, historyPromise]).then(values => {
+    Promise.all([accountPromise, miscsyncdataPromise, historyPromise]).then(values => {
       //logger.info('dropAndMakeTables all promises resolved');
       dbInitialized = true;
     }, () => {

@@ -15,6 +15,7 @@ const miscRoutes = require('./server/miscRoutes');
 const clientSocket = require('./server/clientSocket');
 
 global.SITENAME = 'EyeVocalize';
+global.serverInstance = Date.now(); // unique id for this run of server
 
 // ==============================
 // read site-specific configuration options and put into global.config
@@ -274,6 +275,7 @@ sessionMgmt.init(app).then(() => {
           }
           const s = data.toString().replace('((EVUSER))', email)
             .replace('((EVCHECKSUM))', checksum)
+            .replace('((EVCSERVERINSTANCE))', global.serverInstance)
             .replace('((EvcLocalization))', langJson);
           res.send(s);
         });

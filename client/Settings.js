@@ -180,11 +180,14 @@ export function SettingsGetPending(clientLastSync) {
 }
 
 export function SettingsSync(thisSyncServerTimestamp, newData) {
+  // get latest data from localStorage in case a different browser window has updated the data in the background
   let Settings = getSettings();
   if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Settings.timestamp) {
     console.log('SettingsSync. newData.timestamp='+newData.timestamp+', Settings.timestamp='+Settings.timestamp);
     Settings = Object.assign({}, Settings, newData);
+    delete Settings.pending;
     setSettings(Settings);
+    // update data in localStorage setting timestamp to the value in newData
     updateLocalStorage({ timestamp: newData.timestamp });
     let event = new CustomEvent("ServerInitiatedSyncSettings", { detail: null } );
     window.dispatchEvent(event);

@@ -112,6 +112,15 @@ export function thirdLevelScreenHide() {
   slideInScreenHide(document.querySelector('.secondlevelleft'), document.querySelector('.secondlevelright'));
 }
 
+/**
+ * updateMain is the redraw everything function
+ * @param {string} [searchString] optional filter string to filter content shown in Notes, History, Favorites
+ * @param {object} [updateWhat] what sections to redraw, the following booleans. Default is redraw all.
+ * @param {boolean} [updateWhat.TextEntryRow]
+ * @param {boolean} [updateWhat.Notes]
+ * @param {boolean} [updateWhat.History]
+ * @param {boolean} [updateWhat.Favorites]
+ **/
 let updateMainInProcess = false;
 export function updateMain(searchString, updateWhat) {
 	if (updateMainInProcess) return;
@@ -171,6 +180,9 @@ export function updateMain(searchString, updateWhat) {
 
 let socket;
 
+/**
+ * main entry point for application after startupChecks, only called once
+ **/
 function main() {
 	localization = window.EvcLocalization;
 	window.eyevocalizeClientId = localStorage.getItem('clientId');
@@ -254,6 +266,11 @@ function main() {
 			}
 		}
 	});
+
+	// ==============================
+	// after completing autologin process, initialize socket.io for messaging between this browser window and server
+	// socket.io is only used to implement the sync feature
+	// ==============================
 	autoLoginPromise.then(() => {
 		try {
 			socket = io();
@@ -262,22 +279,34 @@ function main() {
 			});
 			socket.on('reconnect', msg => {
 				console.log ('socket.io reconnect. msg='+msg);
+				// when reconnecting with server, do an immediate ClientInitiatedSync.
+				// If server restarted, it will respond with a ServerInitiatedRefresh,
+				// which tells this browser window to reload, which will result in a new ClientInitiatedSync
 				sync();
 			});
-			socket.on('ServerInitiatedRefresh', (serverSyncDataJson, fn) => {
-				// after every server restart, pull down the latest client code
-				window.location.reload();
+			socket.on('ServerInitiatedRefresh', (serverRefreshDataJson, fn) => {
+				try {
+					let o = JSON.parse(serverRefreshDataJson);
+					let { serverInstance } = o;
+					// after every server restart, pull down the latest client code, but only once
+					if (window.EvcServerInstance != serverInstance) {
+						window.location.reload();
+					}
+				} catch(e) {
+					console.error('error in handling ServerInitiatedRefresh');
+				}
 			});
 			socket.on('ServerInitiatedSync', (serverSyncDataJson, fn) => {
 				console.log('ServerInitiatedSync serverSyncDataJson='+serverSyncDataJson);
 				try {
 					let serverSyncData = JSON.parse(serverSyncDataJson);
-					let { thisSyncServerTimestamp, updates } = serverSyncData;
-					NotesSync(thisSyncServerTimestamp, updates && updates.Notes);
-					HistorySync(thisSyncServerTimestamp, updates && updates.History);
-					FavoritesSync(thisSyncServerTimestamp, updates && updates.Favorites);
-					SettingsSync(thisSyncServerTimestamp, updates && updates.Settings);
-					window.eyevocalizeLastSync = Date.now();
+					let { updates } = serverSyncData;
+					let thisComputerTime = Date.now(); // use this computer's clock because comparisons will use this computer's clock too
+					NotesSync(thisComputerTime, updates && updates.Notes);
+					HistorySync(thisComputerTime, updates && updates.History);
+					FavoritesSync(thisComputerTime, updates && updates.Favorites);
+					SettingsSync(thisComputerTime, updates && updates.Settings);
+					window.eyevocalizeLastSync = thisComputerTime;
 					localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
 					if (typeof fn === 'function') {
 						fn(JSON.stringify({ success: true }));
@@ -376,22 +405,23 @@ function main() {
 };
 
 export function sync() {
-	let lastSync = window.eyevocalizeLastSync;
-	let syncData = {
-		email: window.eyevocalizeUserEmail,
-		clientId: window.eyevocalizeClientId,
-		lastSync,
-		thisSyncClientTimestamp: Date.now(),
-		updates: {
-			Notes: NotesGetPending(lastSync),
-			History: HistoryGetPending(lastSync),
-			Favorites: FavoritesGetPending(lastSync),
-			Settings: SettingsGetPending(lastSync),
-		}
-	};
-	console.log('sync entered. syncData=');
-	console.dir(syncData);
 	if (socket /*&& socket.connected*/ && window.eyevocalizeUserEmail && getSyncMyData()) {
+		let lastSync = window.eyevocalizeLastSync;
+		let syncData = {
+			email: window.eyevocalizeUserEmail,
+			clientId: window.eyevocalizeClientId,
+			lastSync,
+			thisSyncClientTimestamp: Date.now(),
+			thisSyncServerInstance: window.EvcServerInstance, 
+			updates: {
+				Notes: NotesGetPending(lastSync),
+				History: HistoryGetPending(lastSync),
+				Favorites: FavoritesGetPending(lastSync),
+				Settings: SettingsGetPending(lastSync),
+			}
+		};
+		console.log('sync entered. syncData=');
+		console.dir(syncData);
 		socket.emit('ClientInitiatedSync', JSON.stringify(syncData), msg => {
 		});
 	}

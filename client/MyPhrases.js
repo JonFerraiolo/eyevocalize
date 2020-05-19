@@ -260,9 +260,12 @@ export function FavoritesGetPending(clientLastSync) {
 }
 
 export function FavoritesSync(thisSyncServerTimestamp, newData) {
+  // get latest data from localStorage in case a different browser window has updated the data in the background
   getFavorites();
   if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Favorites.timestamp) {
     Favorites = newData;
+    delete Favorites.pending;
+    // update data in localStorage setting timestamp to the value in newData
     updateLocalStorageFavorites({ timestamp: newData.timestamp });
   }
   let event = new CustomEvent("ServerInitiatedSyncFavorites", { detail: null } );

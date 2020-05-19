@@ -74,9 +74,12 @@ export function NotesGetPending(clientLastSync) {
 }
 
 export function NotesSync(thisSyncServerTimestamp, newData) {
+  // get latest data from localStorage in case a different browser window has updated the data in the background
   getNotes();
   if (newData && typeof newData === 'object' && typeof newData.timestamp === 'number' && newData.timestamp > Notes.timestamp) {
     Notes = newData;
+    delete Notes.pending;
+    // update data in localStorage setting timestamp to the value in newData
     updateLocalStorage({ timestamp: newData.timestamp });
   }
   let event = new CustomEvent("ServerInitiatedSyncNotes", { detail: null } );
