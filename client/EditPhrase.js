@@ -49,6 +49,14 @@ let styleElement = document.createElement('style');
 styleElement.appendChild(document.createTextNode(css));
 document.head.appendChild(styleElement);
 
+let patternUrl = "^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$";
+export let regexUrl = new RegExp(patternUrl);
+let patternVideoId = "^[A-Za-z0-9\-\._\~\:\@\$]{8,}$";
+let regexVideoId = new RegExp(patternVideoId);
+let patternVideoIdOrUrl = "("+patternUrl+")|("+patternVideoId+")";
+let patternSeconds = "^([0-9]*\.[0-9]+|[0-9]+)$";
+let regexSeconds = new RegExp(patternSeconds);
+
 export function EditPhrase(parentElement, params) {
   let { phrase, title, doItButtonLabel, doItCallback, cancelCallback,
     textLabelRequired, customControlsFunc, customControlsData } = params;
@@ -62,19 +70,21 @@ export function EditPhrase(parentElement, params) {
   startAt = startAt || '';
   endAt = endAt || '';
   if (typeof textLabelRequired != 'boolean') textLabelRequired = false;
-  let patternUrl = "^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$";
-  let regexUrl = new RegExp(patternUrl);
-  let patternVideoId = "^[A-Za-z0-9\-\._\~\:\@\$]{8,}$";
-  let regexVideoId = new RegExp(patternVideoId);
-  let patternSeconds = "^([0-9]*\.[0-9]+|[0-9]+)$";
-  let regexSeconds = new RegExp(patternSeconds);
   let enableTest, enableDoit;
   let validateData = () => {
     enableTest = enableDoit = false;
     if (type === 'text') {
       enableTest = enableDoit = text.trim().length > 0 && (!textLabelRequired || label.trim().length > 0);
     } else if (type === 'youtube') {
-      enableTest = regexVideoId.test(videoId) &&
+      let vid = videoId;
+      if (regexUrl.test(videoId)) {
+        // if a YouTube full url, extract the videoId from the URL
+        try {
+          let search = new URL(videoId).searchParams;
+          vid = search.get('v');
+        } catch(e) {}
+      }
+      enableTest = regexVideoId.test(vid) &&
         (startAt.length === 0 || regexSeconds.test(startAt)) &&
         (endAt.length === 0 || regexSeconds.test(endAt));
       if (regexSeconds.test(startAt) && regexSeconds.test(endAt)) {
@@ -146,8 +156,8 @@ export function EditPhrase(parentElement, params) {
           <input id=EditPhraseLabel @input=${onInput} .editPhraseField=${'label'}></input>
         </div>
         <div class=EditPhraseInputBlock>
-          <label for=EditPhraseVideoId>YouTube videoId for this clip:</label>
-          <input id=EditPhraseVideoId @input=${onInput} pattern=${patternVideoId} .editPhraseField=${'videoId'}></input>
+          <label for=EditPhraseVideoId>YouTube URL (or video ID) for this clip:</label>
+          <input id=EditPhraseVideoId @input=${onInput} pattern=${patternVideoIdOrUrl} .editPhraseField=${'videoId'}></input>
         </div>
         <div class=EditPhraseInputBlock>
           <label for=EditPhraseStartAt>Start at: (seconds, default=0)</label>

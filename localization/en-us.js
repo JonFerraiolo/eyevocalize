@@ -353,7 +353,7 @@ which currently redirects to me (Jon Ferraiolo). Read the [About](/About) page f
   // only translate values of label:, category:, text: properties
   builtinFavoritesCollections: [
     { label: 'Basic', default: true, column: 3, category: 'Basic', items: [
-      { type: 'text', label: 'nevermind', text: 'Sorry. Mistake. Ignore what I just said.'},
+      { type: 'text', label: 'nevermind', text: 'nevermind'},
       { type: 'text', label: 'help', text: 'Please come and help me'},
       { type: 'text', label: 'yes', text: 'yes'},
       { type: 'text', label: 'no', text: 'no'},
@@ -384,7 +384,7 @@ which currently redirects to me (Jon Ferraiolo). Read the [About](/About) page f
       { type: 'text', label: 'little', text: 'Only a small amount. '},
       { type: 'text', label: 'a lot', text: 'Quite a lot. '},
       { type: 'text', label: 'hurry', text: 'Please hurry!'},
-      { type: 'text', label: 'no rush', text: 'Take your time. Not urgent'},
+      { type: 'text', label: 'no rush', text: 'No rush.'},
     ]},
     { label: 'Clips', default: true, column: 1, category: 'Clips', items: [
       { type: 'youtube', label: 'excellent', videoId: 'AKecz2ak78Y', startAt: 0, endAt: 4 },
