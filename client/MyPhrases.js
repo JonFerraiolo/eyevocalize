@@ -131,6 +131,9 @@ let css = `
 .EditMyPhrases .TabControlRadioButton {
   font-size: 95%;
 }
+.EditMyPhrases .MyPhraseContainer button {
+  font-size: 80%;
+}
 .EditMyPhrasesData {
   flex:1;
   display: flex;
@@ -139,14 +142,14 @@ let css = `
   border-top: none;
   padding: 0.25em 0.5em 0;
 }
-.EditMyPhrases .ScreenInstructions {
-  font-size: 85%;
+.skinnyScreenParent.EditMyPhrases .ScreenInstructions {
+  padding: 0em 1em 0.45em;
+  font-size: 80%;
   font-style: italic;
   text-align: center;
-  padding: 0 0 0.5em;
 }
 .EditWhatCategories .MyPhrasesCategoryLabel {
-  font-size: 95%;
+  font-size: 85%;
   color: black;
   background: #eee;
 }
@@ -165,30 +168,34 @@ let css = `
   color: black;
 }
 .MyPhrases .EditWhatCategories .MyPhrasesCategoryItems {
-  line-height: 0.15;
+  line-height: 0;
 }
 .MyPhrases .EditWhatCategories .MyPhraseContainer button {
   border: 1px solid #888;
   color: #888;
-  font-size: 0.35em;
+  font-size: 0.1em;
 }
 .MyPhrases .EditWhatCategories .MyPhrasesColumn {
   display: inline-flex;
   flex-direction: column;
-  padding-bottom: 0.5em;
+  padding-bottom: 0.52em;
 }
 .MyPhrases .EditWhatCategories .MyPhrasesColumn .spacer {
   flex: 1;
 }
+.MyPhrases .EditWhatCategories .MyPhraseContainer {
+  margin-left: -1px;
+  margin-right: -2px;
+}
 .EditMyPhrasesNewCategoryRow button {
-  font-size: 80%;
+  font-size: 75%;
   font-style: italic;
 }
 .EditMyPhrases .SelectLinksRow {
   padding: 0.5em 1.5em 0;
   display: flex;
   justify-content: space-around;
-  font-size: 95%;
+  font-size: 85%;
 }
 .EditMyPhrases .SelectLinksRow a.EditMyPhrasesSelectDisabled {
   opacity: 0.3;
