@@ -69,7 +69,7 @@ let css = `
   align-items: center;
   border-radius: 3px;
   border: 1px solid black;
-  background: none;
+  background: #fdfdfd;
   padding: 0.15em 0.25em;
   color: black;
   text-align: left;

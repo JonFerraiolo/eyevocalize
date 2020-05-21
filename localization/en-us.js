@@ -347,7 +347,7 @@ which currently redirects to me (Jon Ferraiolo). Read the [About](/About) page f
     unknownFileLoadingError: `Unknown error attempting to load a collection of favorites`,
   },
   TextEntryRow: {
-    typeText: `type text, press return`,
+    typeText: `type text here, press return to speak`,
   },
 
   // only translate values of label:, category:, text: properties

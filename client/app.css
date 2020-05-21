@@ -6,6 +6,19 @@
 :root {
   --popupMenuBackgroundColor: #ccc;
   --popupMenuBackgroundColorHover: #9ab;
+  --pairedblue1: #a6cee3;
+  --pairedblue12: #1f78b4;
+  --pairedgreen1: #b2df8a;
+  --pairedgreen2: #33a02c;
+  --pairedred0: #fffdfd;
+  --pairedred1: #fb9a99;
+  --pairedred2: #e31a1c;
+  --pairedorange1: #fdbf6f;
+  --pairedorange2: #ff7f00;
+  --pairedpurple1: #cab2d6;
+  --pairedpurple2: #6a3d9a;
+  --pairedbrown1: #ffff99;
+  --pairedbrown2: #b15928;
 }
 html, body, .appfullheight {
 	width: 100%;

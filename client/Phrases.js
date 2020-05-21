@@ -64,6 +64,15 @@ let css = `
   border: 1px solid black;
   font-size: 0.9em;
 }
+#NotesContainer .PhrasesSectionLabel {
+  background: var(--pairedorange1);
+}
+#HistoryContainer .PhrasesSectionLabel {
+  background: var(--pairedbrown1);
+}
+#FavoritesContainer .PhrasesSectionLabel {
+  background: var(--pairedred1);
+}
 .PhrasesSectionLabel .collapsearrow, .PhrasesSectionLabel .expandarrow,
     .MyPhrasesCategoryLabel .collapsearrow, .MyPhrasesCategoryLabel .expandarrow,
         .Help .collapsearrow, .Help .expandarrow {

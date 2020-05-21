@@ -23,6 +23,7 @@ let css = `
   text-align: center;
   display: inline-block;
   padding:  0 0.5em 0 0;
+  color: #056;
 }
 .TextEntryRow .TextEntryLabel em {
   font-size: 90%;
@@ -34,14 +35,19 @@ let css = `
   padding: 0.25em;
   font-size: 1em;
   border-radius: 3px;
-  border: 1px solid #D9D9D9;
+  border: 2px solid var(--pairedgreen2); /* #D9D9D9 */
+  background: var(--pairedgreen1);
+  color: #010;
   overflow: hidden;
   resize: none;
   min-width: 5em;
 }
 .TextEntryRow textarea::placeholder {
   font-size: 75%;
-  padding-left: 0.25em;
+  padding-top: 0.75em;
+  text-align: center;
+  color: #101;
+  opacity: 1;
 }
 .TextEntryRow button:hover, .TextEntryRow button:focus {
   cursor: pointer;
@@ -77,20 +83,24 @@ let css = `
   margin-right: 1em;
 }
 .TextEntrySpeak {
+  background-color: var(--pairedgreen1);
   background-image: url('./images/speak.svg');
   background-position: 0px 0.2em;
 }
 .TextEntryNotes {
+  background-color: var(--pairedorange1);
   background-image: url('./images/stickynote.svg');
   background-size: 2.5em 2.5em;
   background-position: 0.2em 50%;
 }
 .TextEntryAddMyPhrase {
+  background-color: var(--pairedred1);
   background-image: url('./images/heart.svg');
   background-size: 1.75em 1.75em;
   background-position: 50% 55%;
 }
 .TextEntrySearch {
+  background-color: var(--pairedbrown1);
   background-image: url('./images/search.svg');
   background-size: 2.5em 2.5em;
   background-position: 0.2em 0.5em;
@@ -242,10 +252,10 @@ export function updateTextEntryRow(parentElement, props) {
         ><span class=TextEntryIconBlock
           ><button class="TextEntryIcon TextEntrySpeak" @click=${onSpeak}
             title='Vocalize the words in the text entry box using speech synthesis'></button
-          ><button class="TextEntryIcon TextEntryAddMyPhrase" @click=${onAddMyPhrase}
-            title='Save these words as a new favorite'></button
           ><button class="TextEntryIcon TextEntryNotes" @click=${onNotes}
             title='Save these words in the "Notes", the storage area for things you might need to say soon'></button
+          ><button class="TextEntryIcon TextEntryAddMyPhrase" @click=${onAddMyPhrase}
+            title='Save these words as a new favorite'></button
           ><button class="TextEntryIcon TextEntrySearch" @click=${search}
             title='Filter the clipboard, the history and your favorites using the search words typed into the text entry box'></button
         ></span

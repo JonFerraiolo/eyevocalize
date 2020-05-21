@@ -4,8 +4,8 @@
 	 viewBox="0 0 100 100" xml:space="preserve">
 	<defs>
 		<style type="text/css">
-			.stroke { fill:none; stroke:#333; stroke-width:7; }
-			.fill { fill:#555; stroke:none; }
+			.stroke { fill:none; stroke:#056; stroke-width:7; }
+			.fill { fill:#056; stroke:none; }
 		</style>
 	</defs>
 	<g>
