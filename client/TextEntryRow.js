@@ -23,7 +23,7 @@ let css = `
   text-align: center;
   display: inline-block;
   padding:  0 0.5em 0 0;
-  color: #056;
+  color: #0d0887;
 }
 .TextEntryRow .TextEntryLabel em {
   font-size: 90%;
@@ -33,7 +33,7 @@ let css = `
   font-family: Arial, sans-serif;
   flex: 1;
   padding: 0.25em;
-  font-size: 1em;
+  font-size: 1.05em;
   border-radius: 3px;
   border: 2px solid var(--pairedgreen2); /* #D9D9D9 */
   background: var(--pairedgreen1);
