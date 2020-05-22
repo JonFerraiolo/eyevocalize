@@ -1,20 +1,12 @@
 
 
-multiple tabs same browser
+global BFV, builtin favorites version
+set in main with current version
+pass with current version
 
-scenario 1: one tab makes a change
+when initializing or importing builtin favorites, set bi to true for each item and category
 
+save bfv to BIV on Favorites
 
-scenario 2: change by a different browser
-
-server
-
-server keeps track of all open sockets for given clientId, and whether visible
-ServerInitiatedSync to all visible immediately,
-nothing to hidden sockets
-
-client
-
-first thing with sync is refreshing from localStorage
-new messages, ClientVisible, ClientHidden
-when client becomes visible, sync
+if bfv < BFV, then remove all items with bi===true,
+after delete any empty categories with bi===true

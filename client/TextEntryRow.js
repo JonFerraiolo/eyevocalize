@@ -23,7 +23,7 @@ let css = `
   text-align: center;
   display: inline-block;
   padding:  0 0.5em 0 0;
-  color: #0d0887;
+  color: #220055;
 }
 .TextEntryRow .TextEntryLabel em {
   font-size: 90%;

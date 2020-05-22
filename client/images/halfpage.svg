@@ -6,11 +6,11 @@
   <style type="text/css">
     .thin { stroke-width:2; stroke-dasharray:8 4; }
     .thick { stroke-width:4; }
-    .fillstrokedark { fill:#555; stroke:#555; }
-    .filldark { fill:#555; stroke:none; }
+    .fillstrokedark { fill:#058; stroke:#058; }
+    .filldark { fill:#058; stroke:none; }
     .filllight { fill:#fff; stroke:none; }
-    .strokedark { fill:none; stroke:#333; }
-    .strokehalfdark { fill:none; stroke:#777; }
+    .strokedark { fill:none; stroke:#058; }
+    .strokehalfdark { fill:none; stroke:#39c; }
   </style>
 </defs>
 

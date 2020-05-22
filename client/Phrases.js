@@ -104,6 +104,18 @@ let css = `
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  border-radius: 3px;
+  padding: 0.15em 0.25em;
+  color: black;
+  margin: 1px 0;
+}
+.HistoryContent button {
+  background: #fffdfa;
+  border: 1px solid #660;
+}
+.NotesContent button {
+  background: #fffdff;
+  border: 1px solid #630;
 }
 .rightsideicons {
   float: right;
