@@ -5,6 +5,7 @@ const http = require('http');
 const https = require('https');
 const compression = require('compression');
 const bodyParser = require('body-parser');
+const findRemoveSync = require('find-remove');
 const path = require('path');
 const fs = require('fs');
 const localizationIndex = require('./localization/index');
@@ -78,6 +79,16 @@ if (typeof logdir === 'string' && logdir.length > 0) {
     ],
     exitOnError: false
   });
+  // delete older log files
+  let oneweekseconds = 60*60*24*7;
+  let onedayms = 1000*60*60*24;
+  let deleteOldLogFiles = () => {
+    let result = findRemoveSync(logdir, {age: {seconds: oneweekseconds}, });
+  };
+  deleteOldLogFiles();
+  setInterval(() => {
+    deleteOldLogFiles();
+  },onedayms);
 } else {
   global.logger = createLogger({
     format: myFormat2,
