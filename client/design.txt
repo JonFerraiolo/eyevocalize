@@ -10,3 +10,13 @@ save bfv to BIV on Favorites
 
 if bfv < BFV, then remove all items with bi===true,
 after delete any empty categories with bi===true
+
+what if user didn't import all items in a collection? how to know which old items to delete?
+each item needs unique id
+
+if editing a builtin, remove builtin flag
+
+=====
+
+remove all default categories
+add new default categories at front

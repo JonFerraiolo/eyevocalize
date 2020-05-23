@@ -199,7 +199,7 @@ function main() {
 		localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
 	}
 
-  let currentVersion = 4;
+  let currentVersion = 6;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
   initializeNotes(initializationProps);
@@ -412,7 +412,7 @@ export function sync() {
 			clientId: window.eyevocalizeClientId,
 			lastSync,
 			thisSyncClientTimestamp: Date.now(),
-			thisSyncServerInstance: window.EvcServerInstance, 
+			thisSyncServerInstance: window.EvcServerInstance,
 			updates: {
 				Notes: NotesGetPending(lastSync),
 				History: HistoryGetPending(lastSync),

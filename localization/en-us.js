@@ -217,7 +217,7 @@ which currently redirects to me (Jon Ferraiolo). Read the [About](/About) page f
       <ul>
         <li><strong>Sign up and log in</strong>. The signup/login hyperlink appears in the top-right corner if you are not currently logged in. </li>
         <li><strong>You should customize your settings</strong> by clicking the <icon1>gear</icon1> gear icon, particularly your voice settings.</li>
-        <li><strong>You should customize your Favorites</strong>. By default, EyeVocalize provides a limited set of Favorites, such as "yes", "no", "hello" and "goodbye". Press the small <icon1>import</icon1> import icon (on the Favorites section header) to review and import the various collections of add-on Favorites. </li>
+        <li><strong>You might want to customize your Favorites</strong>. You can add, change, delete and reorder <topic>Favorites</topic>. </li>
         <li>You might want to skim through the various help screens at some point to get a sense of all of the features.</li>
       </ul>
       <p>You can bring up the Help window at any time by clicking on the <icon1>helpicon</icon1> question mark icon.</p>
@@ -359,6 +359,9 @@ which currently redirects to me (Jon Ferraiolo). Read the [About](/About) page f
       { type: 'text', label: 'no', text: 'no'},
       { type: 'text', label: 'OK', text: 'OK'},
       { type: 'text', label: 'good', text: "good"},
+      { type: 'text', label: 'vgood', text: "very good"},
+      { type: 'text', label: 'perfect', text: "perfect"},
+      { type: 'text', label: 'wonful', text: "wonderful"},
       { type: 'text', label: 'still', text: "still not right"},
       { type: 'text', label: 'gaze trouble', text: "I am having trouble with my eye gaze at the moment, so I may not be able to answer questions. Maybe try asking me questions that have yes and no answers. "},
     ]},
@@ -368,7 +371,9 @@ which currently redirects to me (Jon Ferraiolo). Read the [About](/About) page f
       { type: 'text', label: 'hello', text: 'hello'},
       { type: 'text', label: 'goodbye', text: 'goodbye'},
       { type: 'text', label: 'g-morn', text: 'good morning'},
+      { type: 'text', label: 'g-night', text: 'good night'},
       { type: 'text', label: 'howRU', text: 'how are you'},
+      { type: 'text', label: 'loveU', text: 'I love you'},
     ]},
     { label: 'Opposites', default: true, column: 2, category: 'Opposites', items: [
       { type: 'text', label: 'up', text: 'Please move it up. '},
@@ -397,51 +402,35 @@ which currently redirects to me (Jon Ferraiolo). Read the [About](/About) page f
       { type: 'youtube', label: 'bumpy', videoId: 'yKHUGvde7KU', startAt: 3, endAt: 10 },
       { type: 'youtube', label: 'tara', videoId: 'c_WkyalPOEI', startAt: 32, endAt: 999 },
       { type: 'youtube', label: 'kind', videoId: 'l4V8OHy0su0', startAt: 50, endAt: 60.5 },
-      { type: 'youtube', label: 'stupid', videoId: 'cJe6-afGz0Q', startAt: 4, endAt: 999 },
       { type: 'youtube', label: 'ppgood', videoId: 'ZUOVRJ4wJ7g', startAt: 27.5, endAt: 999 },
     ]},
-    { label: 'Basic additions', column: 3, category: 'Basic', items: [
-      { type: 'text', label: 'vgood', text: "very good"},
-      { type: 'text', label: 'perfect', text: "perfect"},
-      { type: 'text', label: 'wonful', text: "wonderful"},
-      { type: 'text', label: 'lol', text: "L O L"},
-    ]},
-    { label: 'Pleasantries additions', column: 3, category: 'Pleasantries', items: [
-      { type: 'text', label: 'g-aft', text: 'good afternoon'},
-      { type: 'text', label: 'g-eve', text: 'good evening'},
-      { type: 'text', label: 'g-night', text: 'good night'},
-    ]},
-    { label: 'ALS Requests', column: 2, category: 'Care Requests', items: [
+    { label: 'ALS Requests', default: true, column: 2, category: 'Care Requests', items: [
       { type: 'text', label: 'air', text: 'Can I have air?'},
       { type: 'text', label: 'mask', text: 'Can you please fix my breathing mask?'},
       { type: 'text', label: 'nebulizer', text: 'Time for nebulizer and feeding'},
-      { type: 'text', label: 'stretch', text: 'Can I please stretch?'},
       { type: 'text', label: 'toilet', text: 'Take me to the toilet, please'},
       { type: 'text', label: 'urinal', text: 'can I please use the urinal'},
       { type: 'text', label: 'bed', text: 'Can I please go to my bed?'},
       { type: 'text', label: 'cold', text: 'I am a little cold. Could I please have something more over me?'},
       { type: 'text', label: 'warm', text: 'I am a little warm. Could you please take something off of me?'},
-      { type: 'text', label: 'tubing', text: 'Please pull the blue tubing, you know, the tubing that goes from the breathing machine to my face mask, please pull it outside of the bed as much as possible. '},
       { type: 'text', label: 'itch', text: 'Can you please scratch something for me? '},
     ]},
-    { label: 'ALS Adjustments', column: 2, category: 'Care Adjustments', items: [
+    { label: 'ALS Adjustments', default: true, column: 2, category: 'Care Adjustments', items: [
       { type: 'text', label: 'hands', text: 'Please move my hands. They are uncomfortable.'},
       { type: 'text', label: 'laptop', text: 'Can you please adjust the position of the computer?'},
       { type: 'text', label: 'strap', text: 'Can you please adjust the head strap?'},
       { type: 'text', label: 'mask', text: 'Can you please adjust the mask?'},
       { type: 'text', label: 'leak', text: 'my mask is leaking'},
-      { type: 'text', label: 'eyes', text: 'The eye gaze bar cannot see one of my eyes. '},
       { type: 'text', label: 'crooked', text: 'It is crooked. Please straighten.'},
       { type: 'text', label: 'hurts', text: 'It hurts. Please adjust.'},
-      { type: 'text', label: 'body', text: 'Please roll me a little so that my body is flat on the bed and my head is facing straight up. '},
       { type: 'text', label: 'head', text: 'Please straighten my head '},
       { type: 'text', label: 'chair pos', text: 'Can you please fix the position of the wheelchair?'},
       { type: 'text', label: 'tilt fwd', text: 'Can you please tilt the wheelchair forward?'},
       { type: 'text', label: 'tilt back', text: 'Can you please tilt the wheelchair backward?'},
       { type: 'text', label: 'feet up', text: 'Can you please elevate my feet a little?'},
-      { type: 'text', label: 'plug', text: 'Can you please plug in the computer?'},
+      { type: 'text', label: 'plug', text: 'Can you please plug it in?'},
     ]},
-    { label: 'ALS Clips', column: 1, category: 'Clips', items: [
+    { label: 'ALS Clips', default: true, column: 1, category: 'ALS Clips', items: [
       { type: 'youtube', label: 'gehrig1', videoId: 'qswig8dcEAY', startAt: 5, endAt: 16 },
       { type: 'youtube', label: 'gehrig2', videoId: 'OyT4mPBe4YQ', startAt: 150, endAt: 165 },
     ]},
