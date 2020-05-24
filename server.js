@@ -83,7 +83,7 @@ if (typeof logdir === 'string' && logdir.length > 0) {
   let oneweekseconds = 60*60*24*7;
   let onedayms = 1000*60*60*24;
   let deleteOldLogFiles = () => {
-    let result = findRemoveSync(logdir, {age: {seconds: oneweekseconds}, });
+    let result = findRemoveSync(logdir, {age: {seconds: oneweekseconds}, files: "*.*" });
   };
   deleteOldLogFiles();
   setInterval(() => {
