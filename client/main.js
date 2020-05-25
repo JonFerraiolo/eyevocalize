@@ -199,7 +199,7 @@ function main() {
 		localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
 	}
 
-  let currentVersion = 6;
+  let currentVersion = 9;
   let initializationProps = { currentVersion };
   initializeSettings(initializationProps);
   initializeNotes(initializationProps);
