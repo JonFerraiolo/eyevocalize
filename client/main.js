@@ -45,7 +45,7 @@ export function setAppMinOrMax(minOrMax) {
 	updateMain();
 	setTimeout(() => {
 		let event = new CustomEvent("AppLayoutChanged", { detail: null } );
-    window.dispatchEvent(event);
+		window.dispatchEvent(event);
 	}, 0);
 }
 
@@ -59,57 +59,57 @@ export function setAppMinOrMax(minOrMax) {
  * @returns {lit-html html`` return object} renderable object for the title
  */
 export function buildSlideRightTitle(title, returnFunc) {
-  let onClickReturn = e => {
-    e.preventDefault();
-    returnFunc();
-  }
-  return html`<div class=SlideRightTitle>
-    ${returnFunc ? html`<a href="" @click=${onClickReturn} class=SlideRightBackArrow></a>` : '' }
-    <span class=SlideRightTitleText>${title}</span>
-  </div>`;
+	let onClickReturn = e => {
+		e.preventDefault();
+		returnFunc();
+	}
+	return html`<div class=SlideRightTitle>
+		${returnFunc ? html`<a href="" @click=${onClickReturn} class=SlideRightBackArrow></a>` : '' }
+		<span class=SlideRightTitleText>${title}</span>
+	</div>`;
 }
 
 function slideInScreenShow(leftContentDiv, rightContentDiv, rightRenderDiv,  params) {
-  let { renderFunc, renderFuncParams } = params;
-  renderFunc(rightRenderDiv, renderFuncParams);
-  let animParams = {
+	let { renderFunc, renderFuncParams } = params;
+	renderFunc(rightRenderDiv, renderFuncParams);
+	let animParams = {
 		leftContentDiv,
 		rightContentDiv,
-    animClassName: 'slideFromRightAnim',
+		animClassName: 'slideFromRightAnim',
 		endAnimClassName: 'endFromRightAnim',
-  };
-  fromRight(animParams);
+	};
+	fromRight(animParams);
 }
 
 function slideInScreenHide(leftContentDiv, rightContentDiv) {
-  let animParams = {
+	let animParams = {
 		leftContentDiv,
 		rightContentDiv,
-    origAnimClassName: 'endFromRightAnim',
-    undoAnimClassName: 'undoSlideFromRightAnim'
-  };
-  fromLeft(animParams);
+		origAnimClassName: 'endFromRightAnim',
+		undoAnimClassName: 'undoSlideFromRightAnim'
+	};
+	fromLeft(animParams);
 }
 
 export function secondLevelScreenShow(params) {
 	mainShowing = false;
-  slideInScreenShow(document.querySelector('.mainleft'), document.querySelector('.mainright'),
-    document.querySelector('.secondlevelleft'), params);
+	slideInScreenShow(document.querySelector('.mainleft'), document.querySelector('.mainright'),
+		document.querySelector('.secondlevelleft'), params);
 }
 
 export function secondLevelScreenHide() {
-  slideInScreenHide(document.querySelector('.mainleft'), document.querySelector('.mainright'));
+	slideInScreenHide(document.querySelector('.mainleft'), document.querySelector('.mainright'));
 	mainShowing = true;
 	updateMain();
 }
 
 export function thirdLevelScreenShow(params) {
-  slideInScreenShow(document.querySelector('.secondlevelleft'), document.querySelector('.secondlevelright'),
-    document.querySelector('.secondlevelright'), params);
+	slideInScreenShow(document.querySelector('.secondlevelleft'), document.querySelector('.secondlevelright'),
+		document.querySelector('.secondlevelright'), params);
 }
 
 export function thirdLevelScreenHide() {
-  slideInScreenHide(document.querySelector('.secondlevelleft'), document.querySelector('.secondlevelright'));
+	slideInScreenHide(document.querySelector('.secondlevelleft'), document.querySelector('.secondlevelright'));
 }
 
 /**
@@ -141,18 +141,18 @@ export function updateMain(searchString, updateWhat) {
 			${trial}
 			<div class=appmaincontent>
 				<div class=main>
-		      <div class=mainleft>
-		        <div class=mainleftcontent>
-		          <div id=TextEntryRowContainer></div>
-		          <div id=PhrasesContainer></div>
-		        </div>
-		      </div>
-		      <div class=mainright>
-		        <div class=secondlevelleft></div>
-		        <div class=secondlevelright></div>
-		      </div>
+		<div class=mainleft>
+		<div class=mainleftcontent>
+		<div id=TextEntryRowContainer></div>
+		<div id=PhrasesContainer></div>
+		</div>
+		</div>
+		<div class=mainright>
+		<div class=secondlevelleft></div>
+		<div class=secondlevelright></div>
+		</div>
 					<div class=Help style=${styleMap({display: helpShowing() ? 'block' : 'none'})}></div>
-		    </div>
+		</div>
 			</div>
 			<div class=appinitiallyblank>
 			<p>This area is intentionally blank to provide room for an onscreen keyboard.</p>
@@ -173,7 +173,7 @@ export function updateMain(searchString, updateWhat) {
 	if (updateWhat.TextEntryRow) {
 		updateTextEntryRow(document.getElementById('TextEntryRowContainer'), TextEntryRowProps);
 	}
-  updatePhrases(document.getElementById('PhrasesContainer'), PhrasesProps);
+	updatePhrases(document.getElementById('PhrasesContainer'), PhrasesProps);
 	if (mainShowing) TextEntryRowSetFocus();
 	updateMainInProcess = false;
 };
@@ -199,11 +199,11 @@ function main() {
 		localStorage.setItem('lastSync', window.eyevocalizeLastSync.toString());
 	}
 
-  let currentVersion = 9;
-  let initializationProps = { currentVersion };
-  initializeSettings(initializationProps);
-  initializeNotes(initializationProps);
-  initializeHistory(initializationProps);
+	let currentVersion = 9;
+	let initializationProps = { currentVersion };
+	initializeSettings(initializationProps);
+	initializeNotes(initializationProps);
+	initializeHistory(initializationProps);
 	initializeFavorites(initializationProps);
 
 	updateMain();
@@ -325,11 +325,11 @@ function main() {
 			console.error('socket.io initialization failed. ');
 		}
 	}, () => {
-	  console.error('autoLoginPromise reject.');
+		console.error('autoLoginPromise reject.');
 		window.eyevocalizeUserEmail = null;
 		window.eyevocalizeUserChecksum = null;
 	}).catch(e => {
-	  console.error('autoLoginPromise error'+e);
+		console.error('autoLoginPromise error'+e);
 		window.eyevocalizeUserEmail = null;
 		window.eyevocalizeUserChecksum = null;
 	}).finally(() => {
@@ -342,21 +342,21 @@ function main() {
 
 	document.addEventListener('keydown', e => {
 		let shift = e.getModifierState("Shift");
-    let control = e.getModifierState("Control");
-    let meta = e.getModifierState("Meta");
-    if (e.key === 'Enter') {
-      if (shift && !control && !meta) {
-        // just pass through to default processing, which will add a newline
-      } else if (!shift && (control || meta)) {
-        e.preventDefault();
-        AddTextToNotes();
-      } else {
-        e.preventDefault();
-        speak();
-      }
-    } else if (e.key === 's' && !shift && (control || meta)) {
-      e.preventDefault();
-      search();
+		let control = e.getModifierState("Control");
+		let meta = e.getModifierState("Meta");
+		if (e.key === 'Enter') {
+		if (shift && !control && !meta) {
+		// just pass through to default processing, which will add a newline
+		} else if (!shift && (control || meta)) {
+		e.preventDefault();
+		AddTextToNotes();
+		} else {
+		e.preventDefault();
+		speak();
+		}
+		} else if (e.key === 's' && !shift && (control || meta)) {
+		e.preventDefault();
+		search();
 		} else if (e.key === '.' && !shift && (control || meta)) {
 			// Control+period speaks the most recent entry in the History
 			e.preventDefault();
@@ -365,9 +365,9 @@ function main() {
 			// Control+h toggles visibility of the Help popup
 			e.preventDefault();
 			toggleHelp();
-    } else {
-      // just pass through to default processing, which will add the character
-    }
+		} else {
+		// just pass through to default processing, which will add the character
+		}
 	}, false);
 
 	document.addEventListener('focusout', e => {
