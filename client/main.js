@@ -69,7 +69,7 @@ export function buildSlideRightTitle(title, returnFunc) {
 	</div>`;
 }
 
-function slideInScreenShow(leftContentDiv, rightContentDiv, rightRenderDiv,  params) {
+function slideInScreenShow(leftContentDiv, rightContentDiv, rightRenderDiv, params) {
 	let { renderFunc, renderFuncParams } = params;
 	renderFunc(rightRenderDiv, renderFuncParams);
 	let animParams = {
@@ -141,23 +141,23 @@ export function updateMain(searchString, updateWhat) {
 			${trial}
 			<div class=appmaincontent>
 				<div class=main>
-		<div class=mainleft>
-		<div class=mainleftcontent>
-		<div id=TextEntryRowContainer></div>
-		<div id=PhrasesContainer></div>
-		</div>
-		</div>
-		<div class=mainright>
-		<div class=secondlevelleft></div>
-		<div class=secondlevelright></div>
-		</div>
+					<div class=mainleft>
+						<div class=mainleftcontent>
+							<div id=TextEntryRowContainer></div>
+							<div id=PhrasesContainer></div>
+						</div>
+					</div>
+					<div class=mainright>
+						<div class=secondlevelleft></div>
+						<div class=secondlevelright></div>
+					</div>
 					<div class=Help style=${styleMap({display: helpShowing() ? 'block' : 'none'})}></div>
-		</div>
+				</div>
 			</div>
 			<div class=appinitiallyblank>
-			<p>This area is intentionally blank to provide room for an onscreen keyboard.</p>
-			<p>To use this area instead for the application's user interface, press the
-				<span @click=${onMinOrMax} class=icon></span> toggle icon at the top-right of the application.</p>
+				<p>This area is intentionally blank to provide room for an onscreen keyboard.</p>
+				<p>To use this area instead for the application's user interface, press the
+					<span @click=${onMinOrMax} class=icon></span> toggle icon at the top-right of the application.</p>
 			</div>
 			<div class=footer>
 				<a href="/">Home</a>
@@ -345,18 +345,18 @@ function main() {
 		let control = e.getModifierState("Control");
 		let meta = e.getModifierState("Meta");
 		if (e.key === 'Enter') {
-		if (shift && !control && !meta) {
-		// just pass through to default processing, which will add a newline
-		} else if (!shift && (control || meta)) {
-		e.preventDefault();
-		AddTextToNotes();
-		} else {
-		e.preventDefault();
-		speak();
-		}
+			if (shift && !control && !meta) {
+				// just pass through to default processing, which will add a newline
+			} else if (!shift && (control || meta)) {
+				e.preventDefault();
+				AddTextToNotes();
+			} else {
+				e.preventDefault();
+				speak();
+			}
 		} else if (e.key === 's' && !shift && (control || meta)) {
-		e.preventDefault();
-		search();
+			e.preventDefault();
+			search();
 		} else if (e.key === '.' && !shift && (control || meta)) {
 			// Control+period speaks the most recent entry in the History
 			e.preventDefault();
