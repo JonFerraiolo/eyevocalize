@@ -31,7 +31,7 @@ export declare const markerRegex: RegExp;
  */
 export declare const boundAttributeSuffix = "$lit$";
 /**
- * An updateable Template that tracks the location of dynamic parts.
+ * An updatable Template that tracks the location of dynamic parts.
  */
 export declare class Template {
     readonly parts: TemplatePart[];

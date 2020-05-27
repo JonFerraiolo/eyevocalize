@@ -25,7 +25,7 @@ import {TemplateResult} from './template-result.js';
 import {createMarker} from './template.js';
 
 // https://tc39.github.io/ecma262/#sec-typeof-operator
-export type Primitive = null|undefined|boolean|number|string|Symbol|bigint;
+export type Primitive = null|undefined|boolean|number|string|symbol|bigint;
 export const isPrimitive = (value: unknown): value is Primitive => {
   return (
       value === null ||
@@ -33,13 +33,13 @@ export const isPrimitive = (value: unknown): value is Primitive => {
 };
 export const isIterable = (value: unknown): value is Iterable<unknown> => {
   return Array.isArray(value) ||
-      // tslint:disable-next-line:no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       !!(value && (value as any)[Symbol.iterator]);
 };
 
 /**
  * Writes attribute values to the DOM for a group of AttributeParts bound to a
- * single attibute. The value is only set once even if there are multiple parts
+ * single attribute. The value is only set once even if there are multiple parts
  * for an attribute.
  */
 export class AttributeCommitter {
@@ -201,6 +201,9 @@ export class NodePart implements Part {
   }
 
   commit() {
+    if (this.startNode.parentNode === null) {
+      return;
+    }
     while (isDirective(this.__pendingValue)) {
       const directive = this.__pendingValue;
       this.__pendingValue = noChange;
@@ -344,11 +347,11 @@ export class NodePart implements Part {
 export class BooleanAttributePart implements Part {
   readonly element: Element;
   readonly name: string;
-  readonly strings: ReadonlyArray<string>;
+  readonly strings: readonly string[];
   value: unknown = undefined;
   private __pendingValue: unknown = undefined;
 
-  constructor(element: Element, name: string, strings: ReadonlyArray<string>) {
+  constructor(element: Element, name: string, strings: readonly string[]) {
     if (strings.length !== 2 || strings[0] !== '' || strings[1] !== '') {
       throw new Error(
           'Boolean attributes can only contain a single expression');
@@ -416,7 +419,7 @@ export class PropertyCommitter extends AttributeCommitter {
   commit(): void {
     if (this.dirty) {
       this.dirty = false;
-      // tslint:disable-next-line:no-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this.element as any)[this.name] = this._getValue();
     }
   }
@@ -425,25 +428,29 @@ export class PropertyCommitter extends AttributeCommitter {
 export class PropertyPart extends AttributePart {}
 
 // Detect event listener options support. If the `capture` property is read
-// from the options object, then options are supported. If not, then the thrid
+// from the options object, then options are supported. If not, then the third
 // argument to add/removeEventListener is interpreted as the boolean capture
 // value so we should only pass the `capture` property.
 let eventOptionsSupported = false;
 
-try {
-  const options = {
-    get capture() {
-      eventOptionsSupported = true;
-      return false;
-    }
-  };
-  // tslint:disable-next-line:no-any
-  window.addEventListener('test', options as any, options);
-  // tslint:disable-next-line:no-any
-  window.removeEventListener('test', options as any, options);
-} catch (_e) {
-}
-
+// Wrap into an IIFE because MS Edge <= v41 does not support having try/catch
+// blocks right into the body of a module
+(() => {
+  try {
+    const options = {
+      get capture() {
+        eventOptionsSupported = true;
+        return false;
+      }
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    window.addEventListener('test', options as any, options);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    window.removeEventListener('test', options as any, options);
+  } catch (_e) {
+    // event options not supported
+  }
+})();
 
 type EventHandlerWithOptions =
     EventListenerOrEventListenerObject&Partial<AddEventListenerOptions>;

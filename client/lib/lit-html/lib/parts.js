@@ -26,12 +26,12 @@ export const isPrimitive = (value) => {
 };
 export const isIterable = (value) => {
     return Array.isArray(value) ||
-        // tslint:disable-next-line:no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         !!(value && value[Symbol.iterator]);
 };
 /**
  * Writes attribute values to the DOM for a group of AttributeParts bound to a
- * single attibute. The value is only set once even if there are multiple parts
+ * single attribute. The value is only set once even if there are multiple parts
  * for an attribute.
  */
 export class AttributeCommitter {
@@ -168,6 +168,9 @@ export class NodePart {
         this.__pendingValue = value;
     }
     commit() {
+        if (this.startNode.parentNode === null) {
+            return;
+        }
         while (isDirective(this.__pendingValue)) {
             const directive = this.__pendingValue;
             this.__pendingValue = noChange;
@@ -364,7 +367,7 @@ export class PropertyCommitter extends AttributeCommitter {
     commit() {
         if (this.dirty) {
             this.dirty = false;
-            // tslint:disable-next-line:no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             this.element[this.name] = this._getValue();
         }
     }
@@ -372,24 +375,29 @@ export class PropertyCommitter extends AttributeCommitter {
 export class PropertyPart extends AttributePart {
 }
 // Detect event listener options support. If the `capture` property is read
-// from the options object, then options are supported. If not, then the thrid
+// from the options object, then options are supported. If not, then the third
 // argument to add/removeEventListener is interpreted as the boolean capture
 // value so we should only pass the `capture` property.
 let eventOptionsSupported = false;
-try {
-    const options = {
-        get capture() {
-            eventOptionsSupported = true;
-            return false;
-        }
-    };
-    // tslint:disable-next-line:no-any
-    window.addEventListener('test', options, options);
-    // tslint:disable-next-line:no-any
-    window.removeEventListener('test', options, options);
-}
-catch (_e) {
-}
+// Wrap into an IIFE because MS Edge <= v41 does not support having try/catch
+// blocks right into the body of a module
+(() => {
+    try {
+        const options = {
+            get capture() {
+                eventOptionsSupported = true;
+                return false;
+            }
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        window.addEventListener('test', options, options);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        window.removeEventListener('test', options, options);
+    }
+    catch (_e) {
+        // event options not supported
+    }
+})();
 export class EventPart {
     constructor(element, eventName, eventContext) {
         this.value = undefined;

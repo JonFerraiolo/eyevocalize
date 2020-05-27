@@ -1037,16 +1037,16 @@ function editMyPhrases(Section, parentElement, props) {
               title="Delete selected items">Delete</button>
             <button @click=${onClickMoveLeft} ?disabled=${!enableMoveLeft}
               title="Move selected items up one position">
-              <span class=arrowButton>&#x1f851;</span></button>
+              <span class="arrowButton uparrow"></span></button>
             <button @click=${onClickMoveRight} ?disabled=${!enableMoveRight}
               title="Move selected items down one position">
-              <span class=arrowButton>&#x1f853;</span></button>
+              <span class="arrowButton downarrow"></span></button>
             <button @click=${onClickMoveToTop} ?disabled=${!enableMoveLeft}
               title="Move selected items to the start of the list">
-              <span class=arrowButton>&#x2b71;</span></button>
+              <span class="arrowButton uparrowbar"></span></button>
             <button @click=${onClickMoveToBottom} ?disabled=${!enableMoveRight}
               title="Move selected items to the end of the list">
-              <span class=arrowButton>&#x2b73;</span></button>
+              <span class="arrowButton downarrowbar"></span></button>
           </div>
       `;
     }

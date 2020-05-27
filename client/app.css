@@ -225,7 +225,26 @@ button,input,textarea,select {
 }
 .ButtonRow button .arrowButton {
   font-size: 200%;
-  font-weight:bold
+  font-weight: bold;
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-size: 0.65em 0.65em;
+  background-position: 50% 50%;
+}
+.ButtonRow button .arrowButton.uparrow {
+  background-image: url('./images/upwards_sansserif_arrow.svg');
+}
+.ButtonRow button .arrowButton.downarrow {
+  background-image: url('./images/downwards_sansserif_arrow.svg');
+}
+.ButtonRow button .arrowButton.uparrowbar {
+  background-image: url('./images/upwards_triangleheaded_arrow_to_bar.svg');
+}
+.ButtonRow button .arrowButton.downarrowbar {
+  background-image: url('./images/downwards_triangleheaded_arrow_to_bar.svg');
 }
 .PhraseRow button.selected, .MyPhrases .MyPhraseContainer button.selected {
   color: black;

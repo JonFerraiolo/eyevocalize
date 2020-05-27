@@ -217,7 +217,7 @@ which currently redirects to me (Jon Ferraiolo). Read the [About](/About) page f
       <ul>
         <li><strong>Sign up and log in</strong>. The signup/login hyperlink appears in the top-right corner if you are not currently logged in. </li>
         <li><strong>You should customize your settings</strong> by clicking the <icon1>gear</icon1> gear icon, particularly your voice settings.</li>
-        <li><strong>You might want to customize your Favorites</strong>. You can add, change, delete and reorder <topic>Favorites</topic>. </li>
+        <li>You might want to customize your Favorites. You can add, change, delete and reorder <topic>Favorites</topic>. </li>
         <li>You might want to skim through the various help screens at some point to get a sense of all of the features.</li>
       </ul>
       <p>You can bring up the Help window at any time by clicking on the <icon1>helpicon</icon1> question mark icon.</p>
