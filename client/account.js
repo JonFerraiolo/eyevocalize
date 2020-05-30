@@ -59,15 +59,15 @@ export function showAccountMenu(refNode, hideCB) {
 }
 
 const fetchPostOptionsTemplate = {
-  method: 'POST',
-  mode: 'same-origin',
-  headers: { "Content-type": "application/json" },
-  credentials: 'include',
+	method: 'POST',
+	mode: 'same-origin',
+	headers: { "Content-type": "application/json" },
+	credentials: 'include',
 };
 
 let AccountMenu = (parentElement, customControlsData) => {
-  let onClickLogout = e => {
-    e.preventDefault();
+	let onClickLogout = e => {
+		e.preventDefault();
 		e.stopPropagation();
 		hidePopup(showPopupReturnData, customControlsData);
 		let fetchPostOptions = JSON.parse(JSON.stringify(fetchPostOptionsTemplate));
@@ -90,14 +90,14 @@ let AccountMenu = (parentElement, customControlsData) => {
 		}).catch(e => {
 			console.error('logout fetch error e='+e);
 		});
-  };
-  let onClickAccountSettings = e => {
-    e.preventDefault();
+	};
+	let onClickAccountSettings = e => {
+		e.preventDefault();
 		e.stopPropagation();
-    hidePopup(showPopupReturnData, customControlsData);
+		hidePopup(showPopupReturnData, customControlsData);
 		slideInSettingsScreen({ initialSection: 'Account' });
-  };
-  render(html`<div class="AccountMenu popupMenu">
+	};
+	render(html`<div class="AccountMenu popupMenu">
 		<ul class=popupMenuUL>
 			<li><a class=popupMenuItem href="" @click=${onClickLogout}>
 				<span class=popupMenuLabel>Logout</span>
@@ -122,12 +122,12 @@ export function showCloseAccountPopup() {
 }
 
 let CloseAccountDialog = (parentElement, customControlsData) => {
-  let onClickYesIAmSure = e => {
+	let onClickYesIAmSure = e => {
 		let rootElement = document.querySelector('.CloseAccountDialog');
 		if (rootElement) {
 			rootElement.removeEventListener('keydown', onKeyDown, false);
 		}
-    e.preventDefault();
+		e.preventDefault();
 		e.stopPropagation();
 		let fetchPostOptions = JSON.parse(JSON.stringify(fetchPostOptionsTemplate));
 		let payload = {};
@@ -151,16 +151,16 @@ let CloseAccountDialog = (parentElement, customControlsData) => {
 		}).catch(e => {
 			console.error('closeaccount fetch error e='+e);
 		});
-  };
-  let onClickNevermind = e => {
+	};
+	let onClickNevermind = e => {
 		let rootElement = document.querySelector('.CloseAccountDialog');
 		if (rootElement) {
 			rootElement.removeEventListener('keydown', onKeyDown, false);
 		}
-    e.preventDefault();
+		e.preventDefault();
 		e.stopPropagation();
-    hidePopup(showPopupReturnData, customControlsData);
-  };
+		hidePopup(showPopupReturnData, customControlsData);
+	};
 	let onKeyDown = e => {
 		if (e.key === 'Enter') {
 			onClickNevermind(e);

@@ -37,12 +37,12 @@ export function showPopup(params) {
 	clickAwayToClose = typeof params.clickAwayToClose == 'boolean' ? params.clickAwayToClose : true;
 	underlayOpacity = typeof params.underlayOpacity == 'undefined' ? '.6' : params.underlayOpacity;
 	let hideCallback = params.hideCallback;
-  if (!popupStack[popupStackCount]) {
-    popupStack[popupStackCount] = { popupOverlay: null, popupUnderlay: null, popupStackCount };
-  }
-  let showPopupReturnData = popupStack[popupStackCount];
-  showPopupReturnData.hideCallback = hideCallback;
-  let { popupOverlay, popupUnderlay } = showPopupReturnData;
+	if (!popupStack[popupStackCount]) {
+		popupStack[popupStackCount] = { popupOverlay: null, popupUnderlay: null, popupStackCount };
+	}
+	let showPopupReturnData = popupStack[popupStackCount];
+	showPopupReturnData.hideCallback = hideCallback;
+	let { popupOverlay, popupUnderlay } = showPopupReturnData;
 	if (!popupUnderlay) {
 		popupUnderlay = document.createElement('div');
 		popupUnderlay.className = 'popupUnderlay';
@@ -60,7 +60,7 @@ export function showPopup(params) {
 			}
 		}.bind(this), false);
 		document.body.appendChild(popupUnderlay);
-    showPopupReturnData.popupUnderlay = popupUnderlay;
+		showPopupReturnData.popupUnderlay = popupUnderlay;
 	}
 	popupUnderlay.style.opacity = underlayOpacity;
 	if (!popupOverlay) {
@@ -69,7 +69,7 @@ export function showPopup(params) {
 		popupOverlay.style.position = 'absolute';
 		popupOverlay.style.zIndex = (10000000+popupStackCount*2+1).toString();
 		document.body.appendChild(popupOverlay);
-    showPopupReturnData.popupOverlay = popupOverlay;
+		showPopupReturnData.popupOverlay = popupOverlay;
 	}
 	popupUnderlay.style.display = '';
 	popupOverlay.style.display = '';
@@ -114,13 +114,13 @@ export function showPopup(params) {
 		popupOverlay.style.top = y + 'px';
 		popupOverlay.style.opacity = 1;
 	}, 0);
-  popupStackCount++;
+	popupStackCount++;
 	return showPopupReturnData;
 }
 
 export function hidePopup(showPopupReturnData, hideCallbackParams) {
-  let { popupOverlay, popupUnderlay, hideCallback } = showPopupReturnData;
-  popupStackCount--;
+	let { popupOverlay, popupUnderlay, hideCallback } = showPopupReturnData;
+	popupStackCount--;
 	popupUnderlay.style.display = 'none';
 	popupOverlay.style.display = 'none';
 	if (hideCallback) {
@@ -130,5 +130,5 @@ export function hidePopup(showPopupReturnData, hideCallbackParams) {
 }
 
 export function popupShowing() {
-  return popupStackCount > 0;
+	return popupStackCount > 0;
 }

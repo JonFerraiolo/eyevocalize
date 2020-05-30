@@ -1,218 +1,218 @@
 *, *:before, *:after {
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 }
 :root {
-  --popupMenuBackgroundColor: #ccc;
-  --popupMenuBackgroundColorHover: #9ab;
-  --pairedblue1: #a6cee3;
-  --pairedblue12: #1f78b4;
-  --pairedgreen1: #b2df8a;
-  --pairedgreen2: #33a02c;
-  --pairedred0: #fffdfd;
-  --pairedred1: #fb9a99;
-  --pairedred2: #e31a1c;
-  --pairedorange1: #fdbf6f;
-  --pairedorange2: #ff7f00;
-  --pairedpurple1: #cab2d6;
-  --pairedpurple2: #6a3d9a;
-  --pairedbrown1: #ffff99;
-  --pairedbrown2: #b15928;
+	--popupMenuBackgroundColor: #ccc;
+	--popupMenuBackgroundColorHover: #9ab;
+	--pairedblue1: #a6cee3;
+	--pairedblue12: #1f78b4;
+	--pairedgreen1: #b2df8a;
+	--pairedgreen2: #33a02c;
+	--pairedred0: #fffdfd;
+	--pairedred1: #fb9a99;
+	--pairedred2: #e31a1c;
+	--pairedorange1: #fdbf6f;
+	--pairedorange2: #ff7f00;
+	--pairedpurple1: #cab2d6;
+	--pairedpurple2: #6a3d9a;
+	--pairedbrown1: #ffff99;
+	--pairedbrown2: #b15928;
 }
 html, body, .appfullheight {
 	width: 100%;
-  height: 100%;
+	height: 100%;
 	margin: 0;
 	padding: 0;
 }
 html {
-  font-family: Helvetica, Arial, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 }
 button,input,textarea,select {
-  font-size: 85%;
-  font-family: Arial, sans-serif;
+	font-size: 85%;
+	font-family: Arial, sans-serif;
 }
 .appfullheight {
-  display: flex;
-  flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 .TrialVersion {
-  font-size: 75%;
-  color: darkblue;
-  text-align: center;
-  font-variant: all-small-caps;
-  height: 0.8em;
-  line-height: 0.8em;
+	font-size: 75%;
+	color: darkblue;
+	text-align: center;
+	font-variant: all-small-caps;
+	height: 0.8em;
+	line-height: 0.8em;
 }
 .appmaincontent {
-  flex: 1;
-  overflow: hidden;
-  flex-direction: column;
-  display: flex;
+	flex: 1;
+	overflow: hidden;
+	flex-direction: column;
+	display: flex;
 }
 .appinitiallyblank {
-  height: 50%; /* will get overridden by code which will set height on element.style */
+	height: 50%; /* will get overridden by code which will set height on element.style */
 }
 .appinitiallyblank {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  background: #222;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	background: #222;
 }
 .appinitiallyblank .icon {
-  display: inline-block;
-  width: 2.5em;
-  height: 2.5em;
-  background-repeat: no-repeat;
-  background-size: 1.75em 1.75em;
-  background-position: 50% 50%;
-  background-image: url('./images/halfpage.svg');
-  vertical-align: middle;
-  background-color: white;
+	display: inline-block;
+	width: 2.5em;
+	height: 2.5em;
+	background-repeat: no-repeat;
+	background-size: 1.75em 1.75em;
+	background-position: 50% 50%;
+	background-image: url('./images/halfpage.svg');
+	vertical-align: middle;
+	background-color: white;
 }
 
 /* three levels of horizontal slide animations.
-   Two nested levels of slide-right containers:
-   mainleft/mainright within parent main and
-   secondlevelleft/secondlevelright within parent mainright.
-   level 1 content goes into mainleft.
-   level 2 content goes into secondlevelleft.
-   level 3 content goes into secondlevelright. */
+	 Two nested levels of slide-right containers:
+	 mainleft/mainright within parent main and
+	 secondlevelleft/secondlevelright within parent mainright.
+	 level 1 content goes into mainleft.
+	 level 2 content goes into secondlevelleft.
+	 level 3 content goes into secondlevelright. */
 .main {
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100%;
-  flex: 1;
-  margin: 0;
-  padding: 0;
-  background: #FFFFFF;
+	white-space: nowrap;
+	overflow: hidden;
+	width: 100%;
+	flex: 1;
+	margin: 0;
+	padding: 0;
+	background: #FFFFFF;
 }
 .mainleft, .mainright {
-  /* for left/right slide animations. See animSlide.js */
-  overflow: hidden;
-  white-space: nowrap;
+	/* for left/right slide animations. See animSlide.js */
+	overflow: hidden;
+	white-space: nowrap;
 }
 .mainleft, .mainright, .secondlevelleft, .secondlevelright {
-  width: 100%;
-  height: 100%;
+	width: 100%;
+	height: 100%;
 	display: inline-block;
-  vertical-align: top;
+	vertical-align: top;
 }
 .mainleft, .secondlevelleft, .secondlevelright {
-  white-space: normal;
+	white-space: normal;
 }
 .mainleftcontent {
-  width: 100%;
-  height: 100%;
+	width: 100%;
+	height: 100%;
 	display: flex;
 	flex-direction: column;
-  padding: 0 0.6em;
+	padding: 0 0.6em;
 }
 #PhrasesContainer {
-  flex: 1;
-  min-height: 0px;
+	flex: 1;
+	min-height: 0px;
 }
 .slideFromRightAnim {
-  animation-name: slideFromRight; animation-duration: 1s; animation-timing-function: linear; animation-fill-mode: forwards;
+	animation-name: slideFromRight; animation-duration: 1s; animation-timing-function: linear; animation-fill-mode: forwards;
 }
 .endFromRightAnim {
-  margin-left: -100%;
+	margin-left: -100%;
 }
 @keyframes slideFromRight { from { transform: translate(0,0); } to { transform: translate(-100%,0); } }
 .undoSlideFromRightAnim {
-  animation-name: undoSlideFromRight; animation-duration: 1s; animation-timing-function: linear; animation-fill-mode: forwards;
+	animation-name: undoSlideFromRight; animation-duration: 1s; animation-timing-function: linear; animation-fill-mode: forwards;
 }
 @keyframes undoSlideFromRight { from { transform: translate(-100%,0); } to { transform: translate(0,0); } }
 .nospeechsupport {
-  font-size: 2em;
+	font-size: 2em;
 }
 .SlideRightTitle {
-  font-size: 105%;
-  text-align: center;
-  padding: 0.4em 0;
-  line-height: 150%;
+	font-size: 105%;
+	text-align: center;
+	padding: 0.4em 0;
+	line-height: 150%;
 }
 .SlideRightBackArrow {
-  display: inline-block;
-  width: 1.5em;
-  height: 1.5em;
-  background-image: url(images/arrowback.svg);
-  background-size: contain;
-  background-repeat: no-repeat;
-  margin-left: 1em;
-  float: left;
-  vertical-align: middle;
+	display: inline-block;
+	width: 1.5em;
+	height: 1.5em;
+	background-image: url(images/arrowback.svg);
+	background-size: contain;
+	background-repeat: no-repeat;
+	margin-left: 1em;
+	float: left;
+	vertical-align: middle;
 }
 .skinnyScreenParent {
-  background: #666;
-  width: 100%;
-  height: 100%;
+	background: #666;
+	width: 100%;
+	height: 100%;
 }
 .skinnyScreenChild {
-  max-width: 500px;
-  height: 100%;
-  margin: 0 auto;
-  background: white;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+	max-width: 500px;
+	height: 100%;
+	margin: 0 auto;
+	background: white;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 .skinnyScreenChild .ScreenInstructions {
-  padding: 0.4em 1em 0.8em;
-  font-size: 85%;
-  font-style: italic;
+	padding: 0.4em 1em 0.8em;
+	font-size: 85%;
+	font-style: italic;
 }
 .skinnyScreenChild .SelectLinksRow {
-  padding: 0.5em 1.5em 0;
-  display: flex;
-  justify-content: space-around;
-  font-size: 95%;
+	padding: 0.5em 1.5em 0;
+	display: flex;
+	justify-content: space-around;
+	font-size: 95%;
 }
 .SelectLinksRow a, .SelectLinksRow a:link, .SelectLinksRow a:visited {
-  color: 25274d;
-  text-decoration: underline;
-  cursor: pointer;
+	color: 25274d;
+	text-decoration: underline;
+	cursor: pointer;
 }
 .SelectLinksRow a:hover {
-  color: blue;
+	color: blue;
 }
 .skinnyScreenChild .ButtonRow, .EditMyPhrasesChild .ButtonRow {
-  padding: 0.75em 1.5em;
-  display: flex;
-  justify-content: space-around;
+	padding: 0.75em 1.5em;
+	display: flex;
+	justify-content: space-around;
 }
 .skinnyScreenChild .ButtonRow button, .EditMyPhrasesChild .ButtonRow button {
-  display: inline-block;
-  zoom: 1;
-  padding: 0.1em 0.75em;
-  margin: 0;
-  cursor: pointer;
-  border: 1px solid #bbb;
-  overflow: visible;
-  font: bold 0.7em arial, helvetica, sans-serif;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background-color .2s ease-out;
-  background-clip: padding-box; /* Fix bleeding */
-  border-radius: 3px;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 2px 2px -1px rgba(0, 0, 0, .5), 0 1px 0 rgba(255, 255, 255, .3) inset;
-  user-select: none;
-  color: #003;
-  background-image: linear-gradient(top, rgba(255,255,255,.3), rgba(255,255,255,0));
-  background-color: #2e9cca; /*23:https://visme.co/blog/website-color-schemes/,25274d,464866,aaabb8,29648a,*/
-  border-color: #269CE9;
+	display: inline-block;
+	zoom: 1;
+	padding: 0.1em 0.75em;
+	margin: 0;
+	cursor: pointer;
+	border: 1px solid #bbb;
+	overflow: visible;
+	font: bold 0.7em arial, helvetica, sans-serif;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: background-color .2s ease-out;
+	background-clip: padding-box; /* Fix bleeding */
+	border-radius: 3px;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 2px 2px -1px rgba(0, 0, 0, .5), 0 1px 0 rgba(255, 255, 255, .3) inset;
+	user-select: none;
+	color: #003;
+	background-image: linear-gradient(top, rgba(255,255,255,.3), rgba(255,255,255,0));
+	background-color: #2e9cca; /*23:https://visme.co/blog/website-color-schemes/,25274d,464866,aaabb8,29648a,*/
+	border-color: #269CE9;
 }
 .skinnyScreenChild .ButtonRow button:hover, .EditMyPhrasesChild .ButtonRow button:hover {
-  background: #29648a;
+	background: #29648a;
 }
 .skinnyScreenChild .ButtonRow button:active, .EditMyPhrasesChild .ButtonRow button:active{
-  background: #269CE9;
-  position: relative;
-  top: 1px;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, .3) inset;
+	background: #269CE9;
+	position: relative;
+	top: 1px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, .3) inset;
 }
 .skinnyScreenChild .ButtonRow button[disabled],
 .skinnyScreenChild .ButtonRow button[disabled]:hover,
@@ -220,99 +220,99 @@ button,input,textarea,select {
 .EditMyPhrasesChild .ButtonRow button[disabled],
 .EditMyPhrasesChild .ButtonRow button[disabled]:hover,
 .EditMyPhrasesChild .ButtonRow button[disabled]:active {
-  color: #ccc;
-  opacity: 0.4;
+	color: #ccc;
+	opacity: 0.4;
 }
 .ButtonRow button .arrowButton {
-  font-size: 200%;
-  font-weight: bold;
-  width: 1em;
-  height: 1em;
-  display: inline-block;
-  vertical-align: middle;
-  background-repeat: no-repeat;
-  background-size: 0.65em 0.65em;
-  background-position: 50% 50%;
+	font-size: 200%;
+	font-weight: bold;
+	width: 1em;
+	height: 1em;
+	display: inline-block;
+	vertical-align: middle;
+	background-repeat: no-repeat;
+	background-size: 0.65em 0.65em;
+	background-position: 50% 50%;
 }
 .ButtonRow button .arrowButton.uparrow {
-  background-image: url('./images/upwards_sansserif_arrow.svg');
+	background-image: url('./images/upwards_sansserif_arrow.svg');
 }
 .ButtonRow button .arrowButton.downarrow {
-  background-image: url('./images/downwards_sansserif_arrow.svg');
+	background-image: url('./images/downwards_sansserif_arrow.svg');
 }
 .ButtonRow button .arrowButton.uparrowbar {
-  background-image: url('./images/upwards_triangleheaded_arrow_to_bar.svg');
+	background-image: url('./images/upwards_triangleheaded_arrow_to_bar.svg');
 }
 .ButtonRow button .arrowButton.downarrowbar {
-  background-image: url('./images/downwards_triangleheaded_arrow_to_bar.svg');
+	background-image: url('./images/downwards_triangleheaded_arrow_to_bar.svg');
 }
 .PhraseRow button.selected, .MyPhrases .MyPhraseContainer button.selected {
-  color: black;
-  background-color: #ddd;
-  border-color: #29648a;
+	color: black;
+	background-color: #ddd;
+	border-color: #29648a;
 }
 .PhraseRow button.hidden, .MyPhrases .MyPhraseContainer button.hidden {
-  opacity: 0.4;
-  background-color: #999;
-  border-color: #29648a;
+	opacity: 0.4;
+	background-color: #999;
+	border-color: #29648a;
 }
 .PhraseRow button.selected .checkmark {
-  color: #25274d;
+	color: #25274d;
 }
 .TabControlRadioButtons {
-  display: flex;
-  font-size: 90%;
+	display: flex;
+	font-size: 90%;
 }
 .TabControlRadioButton {
-  flex: 1 1 0;
-  background: #f0f0f0;
-  border: 1px solid #888;
-  border-bottom: 2px solid black;
-  font-weight: normal;
-  padding: 0.25em 0.8em 0.45em 0.1em;
-  margin-left: -1px;
-  text-align: center;
-  white-space: nowrap;
+	flex: 1 1 0;
+	background: #f0f0f0;
+	border: 1px solid #888;
+	border-bottom: 2px solid black;
+	font-weight: normal;
+	padding: 0.25em 0.8em 0.45em 0.1em;
+	margin-left: -1px;
+	text-align: center;
+	white-space: nowrap;
 }
 .TabControlRadioButton * {
-  vertical-align: middle;
+	vertical-align: middle;
 }
 .TabControlRadioButtonChecked {
-  background: white;
-  border: 2px solid black;
-  border-bottom: 2px solid white;
-  font-weight: bold;
-  margin-left: 0;
+	background: white;
+	border: 2px solid black;
+	border-bottom: 2px solid white;
+	font-weight: bold;
+	margin-left: 0;
 }
 .TabControlRadioData {
-  border: 2px solid black;
-  border-top: none;
-  padding: 0 1em 0.4em;
-  flex: 1;
-  font-size: 95%;
+	border: 2px solid black;
+	border-top: none;
+	padding: 0 1em 0.4em;
+	flex: 1;
+	font-size: 95%;
 }
 .Vocalize {
-  padding: 1.5em;
-  font-size: 0.9em;
-  background: white;
-  border: 1px solid black;
-  max-width: 400px;
-  min-width: 25em;
-  max-height: 400px;
-  overflow: auto;
-  text-align: left;
+	padding: 1.5em;
+	font-size: 0.9em;
+	background: white;
+	border: 1px solid black;
+	max-width: 400px;
+	min-width: 25em;
+	max-height: 400px;
+	overflow: auto;
+	text-align: left;
 }
 .VocalizeTitle {
-  font-size: 0.95em;
-  font-style: italic;
-  margin-bottom: 0.5em;
+	font-size: 0.95em;
+	font-style: italic;
+	margin-bottom: 0.5em;
 }
 .popupMenu {
 	border: 1px solid black;
 	box-shadow: 1px 1px 1px #888;
 	background: var(--popupMenuBackgroundColor);
 	padding: 1px;
-  font-size: 0.9em;
+	font-size: 0.9em;
 }
 .popupMenu ul {
 	list-style-type: none;
@@ -322,7 +322,7 @@ button,input,textarea,select {
 .popupMenu li {
 	display: block;
 	margin: 1px 0;
-  padding: 0.1em 0.6em;
+	padding: 0.1em 0.6em;
 	white-space: nowrap;
 }
 .popupMenu a {
@@ -355,36 +355,36 @@ button,input,textarea,select {
 	margin: 3px 5px;
 }
 .popupMenuTitle {
-  padding: 0.1em 0.6em;
-  font-weight: bold;
+	padding: 0.1em 0.6em;
+	font-weight: bold;
 }
 .popupMenuSection.popupMenuItem {
-  padding: 0.1em 0.6em;
-  font-style: italic;
+	padding: 0.1em 0.6em;
+	font-style: italic;
 }
 a.popupMenuItemIndented.popupMenuItem {
-  padding-left: 0.75em;
+	padding-left: 0.75em;
 }
 .logo {
-  margin-right: 0.25em;
-  display: inline-block;
-  width: 1em;
-  height:1em;
-  background-repeat: no-repeat;
-  background-size: 1em 1em;
-  background-position: 50% 50%;
-  background-image: url('./images/favicon.svg');
-  vertical-align: middle;
-  background-color: white;
+	margin-right: 0.25em;
+	display: inline-block;
+	width: 1em;
+	height:1em;
+	background-repeat: no-repeat;
+	background-size: 1em 1em;
+	background-position: 50% 50%;
+	background-image: url('./images/favicon.svg');
+	vertical-align: middle;
+	background-color: white;
 }
 .footer {
-  background: #222;
-  display: flex;
-  justify-content: space-around;
-  font-size: 60%;
-  padding: 0.4em 0 1em;
+	background: #222;
+	display: flex;
+	justify-content: space-around;
+	font-size: 60%;
+	padding: 0.4em 0 1em;
 }
 .footer a, .footer a:link, .footer a:visited {
-  color: #888;
-  text-decoration: none;
+	color: #888;
+	text-decoration: none;
 }

@@ -1,38 +1,38 @@
 {
-  "name": "eyevocalize",
-  "version": "0.0.1",
-  "description": "eyevocalize application",
-  "author": "Jon Ferraiolo",
-  "main": "server.js",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/JonFerraiolo/eyevocalize.git"
-  },
-  "scripts": {
-    "clean": "rm -rf node_modules npm-debug.log",
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "@sendgrid/mail": "^6.5.5",
-    "body-parser": "^1.19.0",
-    "bootstrap-icons": "^1.0.0-alpha4",
-    "compression": "^1.7.4",
-    "csurf": "^1.11.0",
-    "debug": "^4.1.1",
-    "express": "^4.17.1",
-    "express-mysql-session": "^2.1.4",
-    "express-session": "^1.17.1",
-    "find-remove": "^2.0.1",
-    "lit-html": "^1.2.1",
-    "marked": "^0.7.0",
-    "morgan": "^1.10.0",
-    "mysql": "^2.18.1",
-    "node-fetch": "^2.6.0",
-    "passport": "^0.4.1",
-    "passport-local": "^1.0.0",
-    "socket.io": "^2.3.0",
-    "winston": "^3.2.1"
-  }
+	"name": "eyevocalize",
+	"version": "0.0.1",
+	"description": "eyevocalize application",
+	"author": "Jon Ferraiolo",
+	"main": "server.js",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/JonFerraiolo/eyevocalize.git"
+	},
+	"scripts": {
+		"clean": "rm -rf node_modules npm-debug.log",
+		"start": "node server.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"dependencies": {
+		"@sendgrid/mail": "^6.5.5",
+		"body-parser": "^1.19.0",
+		"bootstrap-icons": "^1.0.0-alpha4",
+		"compression": "^1.7.4",
+		"csurf": "^1.11.0",
+		"debug": "^4.1.1",
+		"express": "^4.17.1",
+		"express-mysql-session": "^2.1.4",
+		"express-session": "^1.17.1",
+		"find-remove": "^2.0.1",
+		"lit-html": "^1.2.1",
+		"marked": "^0.7.0",
+		"morgan": "^1.10.0",
+		"mysql": "^2.18.1",
+		"node-fetch": "^2.6.0",
+		"passport": "^0.4.1",
+		"passport-local": "^1.0.0",
+		"socket.io": "^2.3.0",
+		"winston": "^3.2.1"
+	}
 }

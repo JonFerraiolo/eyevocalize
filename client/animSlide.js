@@ -39,13 +39,13 @@
  * @param {function} [params.animEndCallback] Called when the animation is finished
  */
 export function fromRight(params) {
-  let { leftContentDiv, rightContentDiv, animClassName, endAnimClassName, animEndCallback } = params;
+	let { leftContentDiv, rightContentDiv, animClassName, endAnimClassName, animEndCallback } = params;
 	let animEndListener = function(e) {
 		leftContentDiv.removeEventListener('webkitAnimationEnd', animEndListener, false);
 		leftContentDiv.removeEventListener('animationend', animEndListener, false);
-    leftContentDiv.classList.add(endAnimClassName);
-    leftContentDiv.classList.remove(animClassName);
-    rightContentDiv.classList.remove(animClassName);
+		leftContentDiv.classList.add(endAnimClassName);
+		leftContentDiv.classList.remove(animClassName);
+		rightContentDiv.classList.remove(animClassName);
 		if (animEndCallback) {
 			animEndCallback();
 		}
@@ -54,8 +54,8 @@ export function fromRight(params) {
 	leftContentDiv.removeEventListener('animationend', animEndListener, false);
 	leftContentDiv.addEventListener('webkitAnimationEnd', animEndListener, false);
 	leftContentDiv.addEventListener('animationend', animEndListener, false);
-  leftContentDiv.classList.add(animClassName);
-  rightContentDiv.classList.add(animClassName);
+	leftContentDiv.classList.add(animClassName);
+	rightContentDiv.classList.add(animClassName);
 };
 
 /**
@@ -85,12 +85,12 @@ export function fromRight(params) {
  * @param {function} [params.animEndCallback] Called when the animation is finished
  */
 export function fromLeft(params) {
-  let { leftContentDiv, rightContentDiv, origAnimClassName, undoAnimClassName, animEndCallback } = params;
+	let { leftContentDiv, rightContentDiv, origAnimClassName, undoAnimClassName, animEndCallback } = params;
 	let animEndListener = function(e) {
 		leftContentDiv.removeEventListener('webkitAnimationEnd', animEndListener, false);
 		leftContentDiv.removeEventListener('animationend', animEndListener, false);
-    leftContentDiv.classList.remove(undoAnimClassName);
-    rightContentDiv.classList.remove(undoAnimClassName);
+		leftContentDiv.classList.remove(undoAnimClassName);
+		rightContentDiv.classList.remove(undoAnimClassName);
 		if (animEndCallback) {
 			animEndCallback();
 		}
@@ -99,7 +99,7 @@ export function fromLeft(params) {
 	leftContentDiv.removeEventListener('animationend', animEndListener, false);
 	leftContentDiv.addEventListener('webkitAnimationEnd', animEndListener, false);
 	leftContentDiv.addEventListener('animationend', animEndListener, false);
-  leftContentDiv.classList.add(undoAnimClassName);
-  leftContentDiv.classList.remove(origAnimClassName);
-  rightContentDiv.classList.add(undoAnimClassName);
+	leftContentDiv.classList.add(undoAnimClassName);
+	leftContentDiv.classList.remove(origAnimClassName);
+	rightContentDiv.classList.add(undoAnimClassName);
 };

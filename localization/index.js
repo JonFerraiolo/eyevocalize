@@ -5,6 +5,6 @@
  * For example, both en-us and en map to folder en-us
  */
 module.exports = [
-  {'en-us': 'en-us'},
-  {'en': 'en-us'},
+	{'en-us': 'en-us'},
+	{'en': 'en-us'},
 ];

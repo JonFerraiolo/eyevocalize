@@ -9,18 +9,18 @@ import { playPhrase } from './Phrases.js';
 
 let css = `
 .ImportFavorites {
-  background: white;
-  border: 2px solid black;
-  padding: 0.25em 0.75em;
-  font-size: 80%;
+	background: white;
+	border: 2px solid black;
+	padding: 0.25em 0.75em;
+	font-size: 80%;
 	display: flex;
 	flex-direction: column;
 }
 .ImportFavoritesTitle {
 	font-size: 1.1em;
-  font-weight: 700;
-  padding: 0.6em 0;
-  text-align: center;
+	font-weight: 700;
+	padding: 0.6em 0;
+	text-align: center;
 }
 .ImportFavoritesTopControlsRow Label {
 	font-size: 90%;
@@ -70,7 +70,7 @@ let css = `
 .ImportFavoritesData > * {
 	display: contents; /* the grid should ignore the DIV surrounding each row */
 	grid-column-start: 1;
-  grid-column-end: 6;
+	grid-column-end: 6;
 }
 .ImportFavoritesCollectionLabel {
 	grid-column-start: 3;
@@ -120,17 +120,17 @@ let css = `
 }
 .ImportFavoritesSelectExpandRow {
 	padding: 1em 0 0.5em;
-  display: flex;
-  justify-content: space-between;
+	display: flex;
+	justify-content: space-between;
 	font-size: 90%;
 }
 .ImportFavoritesSelectExpandRow > * {
 	margin: 0 0.3em;
 }
 .ImportFavoritesButtonRow {
-  padding: 1em 0;
-  display: flex;
-  justify-content: space-around;
+	padding: 1em 0;
+	display: flex;
+	justify-content: space-around;
 }
 `;
 let styleElement = document.createElement('style');
@@ -218,14 +218,14 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 			try {
 				tempData = JSON.parse(text);
 				if (Array.isArray(tempData) && tempData.length > 0 && typeof tempData[0].label === 'string' && Array.isArray(tempData[0].items)) {
-          localData = prepareNewData(tempData);
-          data = localData;
-          localDataError = null;
-          localFileName = ImportFavoritesFile.value;
-          localUpdate();
+					localData = prepareNewData(tempData);
+					data = localData;
+					localDataError = null;
+					localFileName = ImportFavoritesFile.value;
+					localUpdate();
 				} else {
-          localDataError = localization.ImportFavorites['fileFormatErrorNotValidCollectionFile'];
-          localUpdate();
+					localDataError = localization.ImportFavorites['fileFormatErrorNotValidCollectionFile'];
+					localUpdate();
 				}
 			} catch(e) {
 				localDataError = localization.ImportFavorites['fileFormatErrorNotValidJson'];
@@ -347,9 +347,9 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 		});
 		localUpdate();
 	};
-  let onClickDoit = e => {
-    e.preventDefault();
-    hidePopup(showPopupReturnData, customControlsData);
+	let onClickDoit = e => {
+		e.preventDefault();
+		hidePopup(showPopupReturnData, customControlsData);
 		let Favorites = getFavorites();
 		data.forEach(collection => {
 			let columnIndex = collection.column;
@@ -375,13 +375,13 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 		});
 		cleanUpCandidates();
 		customControlsData.doItCallback(Favorites);
-  };
-  let onClickCancel = e => {
-    e.preventDefault();
-    hidePopup(showPopupReturnData, customControlsData);
+	};
+	let onClickCancel = e => {
+		e.preventDefault();
+		hidePopup(showPopupReturnData, customControlsData);
 		cleanUpCandidates();
 		customControlsData.cancelCallback();
-  };
+	};
 	let cleanUpCandidates = () => {
 		//  remove all candidate categories that are empty, delete candidate property
 		let Favorites = getFavorites();
@@ -452,32 +452,32 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 	let url = null;
 	let urlDataError = null;
 	let localData = null;
-  let localFileName = null;
+	let localFileName = null;
 	let localDataError = null;
 	let fromIndex = 0;
 	let fromValue = 'EyeVocalize.com';
 	let builtinsData = prepareNewData(localization.builtinFavoritesCollections);
 	let data = builtinsData;
-  let localUpdate = () => {
+	let localUpdate = () => {
 		let Favorites = getFavorites();
 		let SelectAll = localization.common['Select all'];
 		let DeselectAll = localization.common['Deselect all'];
 		let ExpandAll = localization.common['Expand all'];
 		let CollapseAll = localization.common['Collapse all'];
-    let noneSelected = true;
-    if (Array.isArray(data)) {
-      data.forEach(collection => {
-        if (collection.selected) {
-          noneSelected = false;
-        } else {
-          collection.items.forEach(item => {
-            if (item.selected) {
-              noneSelected =false;
-            }
-          });
-        }
-      });
-    }
+		let noneSelected = true;
+		if (Array.isArray(data)) {
+			data.forEach(collection => {
+				if (collection.selected) {
+					noneSelected = false;
+				} else {
+					collection.items.forEach(item => {
+						if (item.selected) {
+							noneSelected =false;
+						}
+					});
+				}
+			});
+		}
 		let appmaincontent = document.querySelector('.appmaincontent');
 		let r = appmaincontent.getBoundingClientRect();
 		let dialogWidth = Math.max(r.width/4 + 4, 300);
@@ -511,20 +511,20 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 						`;
 					}
 				} else if (fromValue === 'local file') {
-          if (localFileName === null || localDataError) {
-            return html`
-              <div class=ImportFavoritesUrlControls>
-                <input type=file @change=${onChangeLocalFile} id=ImportFavoritesFile></input>
-              </div>
-              ${localDataError ? html`<div class=ImportFavoritesError>${localDataError}</div>` : ''}
-            `;
-          } else {
-            return html`
-              <div class=ImportFavoritesLoadedFrom>
-                ${localization.ImportFavorites['CollectionLoadedFrom']}: ${localFileName}
-              </div>
-            `;
-          }
+					if (localFileName === null || localDataError) {
+						return html`
+							<div class=ImportFavoritesUrlControls>
+								<input type=file @change=${onChangeLocalFile} id=ImportFavoritesFile></input>
+							</div>
+							${localDataError ? html`<div class=ImportFavoritesError>${localDataError}</div>` : ''}
+						`;
+					} else {
+						return html`
+							<div class=ImportFavoritesLoadedFrom>
+								${localization.ImportFavorites['CollectionLoadedFrom']}: ${localFileName}
+							</div>
+						`;
+					}
 				} else {
 					return '';
 				}
@@ -636,19 +636,19 @@ let ImportFavoritesDialog = (parentElement, customControlsData) => {
 };
 
 export function ImportFavoritesPopupShow(hideCallbackParams) {
-  let params = {
-    content: ImportFavoritesDialog,
-    contentFuncParams: hideCallbackParams,
-    refNode: document.querySelector('.appmaincontent'),
+	let params = {
+		content: ImportFavoritesDialog,
+		contentFuncParams: hideCallbackParams,
+		refNode: document.querySelector('.appmaincontent'),
 		refX: 'left',
-    popupX: 'left',
+		popupX: 'left',
 		refY: 'top',
-    popupY: 'top',
-    clickAwayToClose: false,
-    underlayOpacity: 0.6,
-    hideCallback: hideCallbackParams => {
-      render(html``, showPopupReturnData.popupOverlay);
-    },
-  };
-  showPopupReturnData = showPopup(params);
+		popupY: 'top',
+		clickAwayToClose: false,
+		underlayOpacity: 0.6,
+		hideCallback: hideCallbackParams => {
+			render(html``, showPopupReturnData.popupOverlay);
+		},
+	};
+	showPopupReturnData = showPopup(params);
 };

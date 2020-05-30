@@ -15,22 +15,22 @@
  * @params {function} callback  Parameters(err)
  */
 module.exports = function(params, callback) {
-  //FIXME: uncomment when on an airplane
-  /*
-  callback(null);
-  return;
-  */
-  sgMail.setApiKey(global.config.SENDGRID_API_KEY);
-  const msg = {
-    to: params.email,
-    from: 'EyeVocalize@eyevocalize.com',
-    subject: params.subject,
-    text: params.text,
-    html: params.html,
-  };
-  sgMail.send(msg).then(() => {
-    callback(null);
-  }).catch(error => {
-    callback(error);
-  });
+	//FIXME: uncomment when on an airplane
+	/*
+	callback(null);
+	return;
+	*/
+	sgMail.setApiKey(global.config.SENDGRID_API_KEY);
+	const msg = {
+		to: params.email,
+		from: 'EyeVocalize@eyevocalize.com',
+		subject: params.subject,
+		text: params.text,
+		html: params.html,
+	};
+	sgMail.send(msg).then(() => {
+		callback(null);
+	}).catch(error => {
+		callback(error);
+	});
 };
