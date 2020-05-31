@@ -30,7 +30,7 @@ html {
 	background-repeat: no-repeat;
 	background-size: 1.25em 1.25em;
 	background-position: 50% 50%;
-	background-image: url('./images/favicon.svg');
+	background-image: url('./images/logo.svg');
 	vertical-align: middle;
 	background-color: white;
 }
