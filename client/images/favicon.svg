@@ -3,7 +3,7 @@
 	 viewBox="0 0 100 100" xml:space="preserve">
 	<defs>
 		<style type="text/css">
-			.bg { fill:white; }
+			.bg { fill:#cbd5e8; }
 			.stroke { fill:none; stroke:#005; stroke-width:7; }
 			.fill { fill:#005; stroke:none; }
 		</style>
