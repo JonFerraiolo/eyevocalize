@@ -111,11 +111,11 @@ let css = `
 }
 .HistoryContent button {
 	background: #fffdfa;
-	border: 1px solid #660;
+	border: 1px solid #440;
 }
 .NotesContent button {
-	background: #fffdff;
-	border: 1px solid #630;
+	background: #fdfdff;
+	border: 1px solid #004;
 }
 .rightsideicons {
 	float: right;

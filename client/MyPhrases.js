@@ -68,8 +68,8 @@ let css = `
 	margin: 1px 0;
 	align-items: center;
 	border-radius: 3px;
-	border: 1px solid #600;
-	background: #fffafa;
+	border: 1px solid #400;
+	background: #fffdfd;
 	padding: 0.15em 0.25em;
 	color: black;
 	text-align: left;
