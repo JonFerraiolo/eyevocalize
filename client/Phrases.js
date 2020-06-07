@@ -65,13 +65,13 @@ let css = `
 	font-size: 0.9em;
 }
 #NotesContainer .PhrasesSectionLabel {
-	background: var(--pairedorange1);
+	background: var(--notes_bar_background_color);
 }
 #HistoryContainer .PhrasesSectionLabel {
-	background: var(--pairedbrown1);
+	background: var(--history_bar_background_color);
 }
 #FavoritesContainer .PhrasesSectionLabel {
-	background: var(--pairedred1);
+	background: var(--favorites_bar_background_color);
 }
 .PhrasesSectionLabel .collapsearrow, .PhrasesSectionLabel .expandarrow,
 		.MyPhrasesCategoryLabel .collapsearrow, .MyPhrasesCategoryLabel .expandarrow,

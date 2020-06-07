@@ -35,8 +35,8 @@ let css = `
 	padding: 0.25em;
 	font-size: 1.05em;
 	border-radius: 3px;
-	border: 2px solid var(--pairedgreen2); /* #D9D9D9 */
-	background: var(--pairedgreen1);
+	border: 2px solid var(--text_input_border_color); /* #D9D9D9 */
+	background: var(--text_input_background_color);
 	color: #010;
 	overflow: hidden;
 	resize: none;
@@ -83,24 +83,24 @@ let css = `
 	margin-right: 1em;
 }
 .TextEntrySpeak {
-	background-color: var(--pairedgreen1);
+	background-color: var(--text_input_background_color);
 	background-image: url('./images/speak.svg');
 	background-position: 0px 0.2em;
 }
 .TextEntryNotes {
-	background-color: var(--pairedorange1);
+	background-color: var(--notes_bar_background_color);
 	background-image: url('./images/stickynote.svg');
 	background-size: 2.5em 2.5em;
 	background-position: 0.2em 50%;
 }
 .TextEntryAddMyPhrase {
-	background-color: var(--pairedred1);
+	background-color: var(--favorites_bar_background_color);
 	background-image: url('./images/heart.svg');
 	background-size: 1.75em 1.75em;
 	background-position: 50% 55%;
 }
 .TextEntrySearch {
-	background-color: var(--pairedbrown1);
+	background-color: var(--history_bar_background_color);
 	background-image: url('./images/search.svg');
 	background-size: 2.5em 2.5em;
 	background-position: 0.2em 0.5em;
