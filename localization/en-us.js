@@ -39,6 +39,8 @@ which allows you to quickly switch between speech synthesis (using EyeVocalize),
 other browser tabs (eg, web mail, search, calendar, chat, document authoring)
 and other desktop applications (which for me is mostly programming tools).
 
+<p class="HomepageVideoThumb"><a title="video" href="https://www.youtube.com/watch?v=gE-aPQpqizI" target="_blank">[ short introductory video ]</a></p>
+
 EyeVocalize features:
 * **Text-to-speech**: You can type text, then press Return (or click the speak icon) to cause the words to be spoken
 using voice synthesis

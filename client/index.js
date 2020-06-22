@@ -85,6 +85,9 @@ button {
 	font-size: 80%;
 	padding: 1em 0 0.5em;
 }
+p.HomepageVideoThumb {
+	text-align: center;
+}
 `;
 let styleElement = document.createElement('style');
 styleElement.appendChild(document.createTextNode(css));

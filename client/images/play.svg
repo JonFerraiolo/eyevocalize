@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.0"
+	 xmlns="http://www.w3.org/2000/svg"
+	 viewBox="0 0 1.414 1.414">
+  <path
+     style="fill:#004;fill-opacity:1;stroke:none"
+     d="M0 0 V1.414 L1 0.707 z"/>
+</svg>
