@@ -527,7 +527,9 @@ export function editSettings(parentElement, params) {
 }
 
 export function getVoice() {
-	voice = voice || voices[0];
+	voiceIndex = voices.findIndex(v => v.name === voiceName );
+	if (voiceIndex === -1) voiceIndex = 0;
+	voice = voices[voiceIndex];
 	return voice;
 }
 
