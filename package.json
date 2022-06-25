@@ -29,7 +29,7 @@
 		"marked": "^0.7.0",
 		"morgan": "^1.10.0",
 		"mysql": "^2.18.1",
-		"node-fetch": "^2.6.0",
+		"node-fetch": "^2.6.7",
 		"passport": "^0.4.1",
 		"passport-local": "^1.0.0",
 		"socket.io": "^2.3.0",
